@@ -63,7 +63,10 @@ class BottomNav extends StatelessWidget {
             assetPath,
             width: iconSize,
             height: iconSize,
-            color: Colors.white,
+            colorFilter: const
+            ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn)
           ),
         ),
       ),

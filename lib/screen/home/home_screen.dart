@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
+import 'package:mylm/screen/main/main_profile_screen.dart';
 import 'package:mylm/screen/message/message_screen.dart';
-import 'package:mylm/screen/user_profil/profil_screen.dart';// ⬅️ tambahin import ini
+import 'package:mylm/screen/user_profil/profile_screen.dart';//
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -37,11 +39,10 @@ class HomeScreen extends StatelessWidget {
                         // Profil
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ProfileScreen(),
-                              ),
+                                builder: (context) => const MainProfileScreen())
                             );
                           },
                           child: Row(
@@ -206,12 +207,18 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           _buildFeature(context, "assets/svgs/icons_cart.svg",
                               "Tambah Layanan", onTap: () {
-                                // navigasi ke page tambah layanan disini
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) => const TambahLayananScreen()),
+                            );
                               }),
                           _buildFeature(context, "assets/svgs/icons_repost.svg",
-                              "Ubah Layanan", onTap: () {}),
+                              "Ubah Layanan", onTap: () {
+
+                              }),
                           _buildFeature(context, "assets/svgs/icons_invoice.svg",
-                              "Bayar Tagihan", onTap: () {}),
+                              "Bayar Tagihan", onTap: () {
+
+                              }),
                         ],
                       ),
                     ),

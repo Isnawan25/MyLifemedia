@@ -7,15 +7,15 @@ import 'package:mylm/screen/riwayat_tagihan/billinghistory_screen.dart';
 import 'package:mylm/screen/user_profil/profile_screen.dart';
 
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MainProfileScreen extends StatefulWidget {
+  const MainProfileScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainProfileScreen> createState() => _MainProfileScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // default ke Home
+class _MainProfileScreenState extends State<MainProfileScreen> {
+  int _currentIndex = 0; // default ke Home
 
   final List<Widget> _screens = const [
 
