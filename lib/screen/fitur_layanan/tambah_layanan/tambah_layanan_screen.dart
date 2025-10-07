@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan2_screen.dart';
-import 'package:mylm/screen/main/main_screen.dart';
 
 class TambahLayananScreen extends StatefulWidget {
   const TambahLayananScreen({super.key});
@@ -31,10 +30,7 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
             ),
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen()),
-            );
+            Navigator.pop(context);
           },
         ),
         title: Text(

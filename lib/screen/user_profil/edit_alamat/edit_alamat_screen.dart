@@ -204,14 +204,13 @@ class _EditAlamatScreenState extends State<EditAlamatScreen> {
         ),
       ),
 
-      // Tombol Pilih Alamat melayang
       bottomNavigationBar: SafeArea(
         minimum: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, // biar tombol di tengah
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 250.w, // ubah sesuai kebutuhan
+              width: 250.w,
               height: 48.h,
               child: ElevatedButton(
                 onPressed: () {
