@@ -7,7 +7,6 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
 class VerifyScreen extends StatefulWidget {
-  const VerifyScreen({super.key});
 
   @override
   State<VerifyScreen> createState() => _VerifyScreenState();

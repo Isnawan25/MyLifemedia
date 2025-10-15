@@ -37,7 +37,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
           },
         ),
         title: Text(
-          "Perubahan Layanan",
+          "Riwayat Tagihan",
           style: GoogleFonts.inter(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,

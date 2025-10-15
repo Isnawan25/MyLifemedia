@@ -35,6 +35,8 @@ dependencies:
   cupertino_icons: ^1.0.8                 # icon ios
   google_fonts: ^6.3.1                    # google fonts
   flutter_svg: ^2.2.1                     # import svg
+  http: ^1.5.0                            # request api
+  shimmer: ^3.0.0                         # animasi loading shimmer
 
 
 dev_dependencies:

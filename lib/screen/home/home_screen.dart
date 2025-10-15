@@ -3,10 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_empty_screen.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart';
 import 'package:mylm/screen/main/main_profile_screen.dart';
-import 'package:mylm/screen/message/message_screen.dart';
+import 'package:mylm/screen/message/pesan_screen.dart';
+import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/models/promotion_response.dart';
+import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -22,7 +27,7 @@ class HomeScreen extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Background Gradient + Profil + Tagihan
+                  // Background Gradient
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(24, 40, 24, 66),
@@ -91,11 +96,11 @@ class HomeScreen extends StatelessWidget {
                               const Spacer(),
                               IconButton(
                                 onPressed: () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                      const MessageScreen(),
+                                      const PesanScreen(),
                                     ),
                                   );
                                 },
@@ -219,7 +224,9 @@ class HomeScreen extends StatelessWidget {
                               }),
                           _buildFeature(context, "assets/svgs/icons_invoice.svg",
                               "Bayar Tagihan", onTap: () {
-
+                            Navigator.push(context,
+                                MaterialPageRoute(builder:
+                                    (context) => const BayarTagihanEmptyScreen()));
                               }),
                         ],
                       ),
@@ -247,27 +254,65 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // Banner Penawaran (dummy)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    "assets/images/banner_1.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    "assets/images/banner_2.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              FutureBuilder<List<Promotion>>(
+                future: ApiService().getPromotions(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // ✅ tampilkan skeleton shimmer
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: SkeletonLoading(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text("Gagal memuat promosi: ${snapshot.error}"),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text("Belum ada penawaran."),
+                    );
+                  } else {
+                    final promotions = snapshot.data!;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: promotions.map((promo) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                promo.photo,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, progress) {
+                                  if (progress == null) return child;
+                                  // tambahkan shimmer di dalam image loading juga
+                                  return Shimmer.fromColors(
+                                    baseColor: Colors.grey.shade300,
+                                    highlightColor: Colors.grey.shade100,
+                                    child: Container(
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(height: 150,
+                                        color: Colors.grey.shade300,
+                                        child: const Icon(Icons.broken_image)),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 20),
             ],

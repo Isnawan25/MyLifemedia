@@ -3,7 +3,7 @@ import 'package:mylm/base/widgets/bottom_nav.dart';
 import 'package:mylm/screen/faq/faq_screen.dart';
 import 'package:mylm/screen/helpdesk/helpdesk_screen.dart';
 import 'package:mylm/screen/home/home_screen.dart';
-import 'package:mylm/screen/riwayat_tagihan/billinghistory_screen.dart';
+import 'package:mylm/screen/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/user_profil/profile_screen.dart';
 
 
@@ -15,12 +15,12 @@ class MainProfileScreen extends StatefulWidget {
 }
 
 class _MainProfileScreenState extends State<MainProfileScreen> {
-  int _currentIndex = 0; // default ke Home
+  int _currentIndex = 0; // default ke Profil
 
   final List<Widget> _screens = const [
 
     ProfileScreen(),
-    BillingsScreen(),
+    RiwayatTagihanScreen(),
     HomeScreen(),
     FaqScreen(),
     HelpdeskScreen(),

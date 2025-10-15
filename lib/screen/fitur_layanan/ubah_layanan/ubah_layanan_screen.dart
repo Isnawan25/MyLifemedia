@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan2_screen.dart';
-import 'package:mylm/screen/main/main_screen.dart';
 
 class UbahLayananScreen extends StatefulWidget {
   const UbahLayananScreen({super.key});
@@ -30,10 +29,7 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
             ),
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen()),
-            );
+            Navigator.pop(context);
           },
         ),
         title: Text(
