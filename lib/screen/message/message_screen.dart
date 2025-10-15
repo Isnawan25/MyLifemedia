@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/screen/main/main_screen.dart';
+import 'package:mylm/screen/message/notif_perubahan.dart';
+
 
 class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key});
@@ -98,11 +100,21 @@ class _MessageScreenState extends State<MessageScreen> {
           return InkWell(
             onTap: () {
               setState(() {
-                isRead[index] = true; // ubah jadi sudah dibaca
+                isRead[index] = true;
               });
-
-              // bisa diarahkan ke halaman detail pesan nanti
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotifPerubahanPage(
+                    judulBantuan: messages[index]['title']!,
+                    deskripsi: messages[index]['subtitle']!,
+                    waktu: messages[index]['time']!,
+                  ),
+                ),
+              );
             },
+
+
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.h),
               child: Row(
