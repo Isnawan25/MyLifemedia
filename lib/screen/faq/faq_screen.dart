@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mylm/screen/faq/detail_faq1_screen.dart';
+import 'package:mylm/screen/faq/detail_faq2_screen.dart';
+import 'package:mylm/screen/faq/detail_faq3_screen.dart';
+import 'package:mylm/screen/faq/detail_faq4_screen.dart';
+import 'package:mylm/screen/faq/detail_faq5_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
 class FaqScreen extends StatelessWidget {
@@ -48,12 +53,11 @@ class FaqScreen extends StatelessWidget {
         centerTitle: true,
       ),
 
-      // ✅ Tampilan utama
       body: Padding(
         padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
-            // 🔍 Kolom pencarian
+            // 🔍 Pencarian
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey[100],
@@ -77,11 +81,13 @@ class FaqScreen extends StatelessWidget {
 
             SizedBox(height: 16.h),
 
-            // 📋 Daftar bantuan
+            // 📋 Daftar FAQ
             Expanded(
               child: ListView.builder(
                 itemCount: daftarBantuan.length,
                 itemBuilder: (context, index) {
+                  final judul = daftarBantuan[index];
+
                   return Column(
                     children: [
                       Container(
@@ -90,9 +96,8 @@ class FaqScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 8,
-                              spreadRadius: 1,
+                              color: Colors.grey.withOpacity(0.3),
+                              blurRadius: 6,
                               offset: const Offset(0, 3),
                             ),
                           ],
@@ -103,7 +108,7 @@ class FaqScreen extends StatelessWidget {
                             vertical: 8.h,
                           ),
                           title: Text(
-                            daftarBantuan[index],
+                            judul,
                             style: GoogleFonts.inter(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -116,7 +121,35 @@ class FaqScreen extends StatelessWidget {
                             color: Colors.black54,
                           ),
                           onTap: () {
-                            // TODO: Navigasi ke detail bantuan (belum dibuat)
+                            // 🔹 Arahkan ke halaman berbeda tergantung index
+                            Widget halamanTujuan;
+
+                            switch (index) {
+                              case 0:
+                                halamanTujuan = DetailFaq1Screen(judulBantuan: judul);
+                                break;
+                              case 1:
+                                halamanTujuan = DetailFaq2Screen(judulBantuan: judul);
+                                break;
+                              case 2 :
+                                halamanTujuan = DetailFaq3Screen(judulBantuan: judul);
+                                break ;
+                              case 3 :
+                                halamanTujuan = DetailFaq4Screen(judulBantuan: judul);
+                                break;
+                              case 4 :
+                                halamanTujuan = DetailFaq5Screen(judulBantuan: judul);
+                                break;
+                                default:
+                              halamanTujuan = DetailFaq1Screen(judulBantuan: judul);
+                            }
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => halamanTujuan,
+                              ),
+                            );
                           },
                         ),
                       ),
