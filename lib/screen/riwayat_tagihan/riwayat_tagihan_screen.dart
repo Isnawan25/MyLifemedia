@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/screen/riwayat_tagihan/detail_tagihan_screen.dart';
 
 class RiwayatTagihanScreen extends StatelessWidget {
   const RiwayatTagihanScreen({super.key});
@@ -71,6 +72,16 @@ class RiwayatTagihanScreen extends StatelessWidget {
             return InkWell(
               borderRadius: BorderRadius.circular(16.r),
               onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailTagihanScreen(
+                      idTagihan: tagihan["id"]!,
+                      harga: tagihan["harga"]!,
+                      status: tagihan["status"]!,
+                    ),
+                  ),
+                );
                 debugPrint("Klik: ${tagihan["id"]}");
               },
               splashColor: Colors.orange.withValues(alpha: 0.15),

@@ -7,11 +7,11 @@ import 'package:mylm/data/models/verify_otp_response.dart';
 import 'package:mylm/data/models/promotion_response.dart';
 
 class ApiService {
-  static const String baseApp = "http://202.169.231.66:83/api-mylm-nestjs/apps";
+  static const String baseUrl = "http://202.169.231.66:83/api-mylm-nestjs/apps/api/v1/apps";
 
   /// LOGIN
   Future<LoginResponse?> login(String custNumber) async {
-    final url = Uri.parse("$baseApp/api/v1/apps/login");
+    final url = Uri.parse("$baseUrl/login");
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -30,7 +30,7 @@ class ApiService {
 
   /// REQUEST OTP
   Future<OtpRequestResponse?> requestOtp(String custNumber, String accessToken) async {
-    final url = Uri.parse("$baseApp/api/v1/apps/request-otp");
+    final url = Uri.parse("$baseUrl/request-otp");
 
     print("Sending OTP Request to $url with cust_number=$custNumber");
     print("Authorization: Bearer $accessToken");
@@ -60,7 +60,7 @@ class ApiService {
 
   /// VERIFY OTP
   Future<VerifyOtpResponse?> verifyOtp(String custNumber, String otpCode) async {
-    final url = Uri.parse("$baseApp/api/v1/apps/verify-otp");
+    final url = Uri.parse("$baseUrl/verify-otp");
 
     print("Verifying OTP at $url with cust_number=$custNumber and otp_code=$otpCode");
 
@@ -84,38 +84,40 @@ class ApiService {
   }
 
   // DETAIL RPOFILE
-
-  Future<DetailProfileResponse?> getProfile(String custNumber, String token) async {
+  Future<DetailProfileResponse?> getDetailProfile(
+      String custNumber,
+      String accessToken,
+      ) async {
     final url = Uri.parse(
-        "$baseApp/api/v1/apps/detailprofile?cust_number=$custNumber");
+        "$baseUrl/detailprofile?cust_number=$custNumber");
 
     try {
       final response = await http.get(
         url,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
+          "Authorization": "Bearer $accessToken", // penting!
         },
       );
 
-      print("🔹 Get Profile Response: ${response.statusCode} - ${response.body}");
+      print("🔹 GET DetailProfile Response: ${response.statusCode} - ${response.body}");
 
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        return DetailProfileResponse.fromJson(json);
+        return DetailProfileResponse.fromJson(jsonDecode(response.body));
       } else {
-        print(" Get profile failed: ${response.body}");
+        print(" Gagal GET DetailProfile: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print("Error during getProfile: $e");
+      print(" Error saat GET DetailProfile: $e");
       return null;
     }
   }
 
+
   // PROMOTION
   Future<List<Promotion>> getPromotions() async {
-    final response = await http.get(Uri.parse('$baseApp/api/v1/apps/promotions'));
+    final response = await http.get(Uri.parse('$baseUrl/promotions'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

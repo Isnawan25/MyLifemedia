@@ -12,9 +12,11 @@ import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:mylm/data/models/login_response.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final CustomerData? customerData;
+  const HomeScreen({super.key, this.customerData});
 
   @override
   Widget build(BuildContext context) {

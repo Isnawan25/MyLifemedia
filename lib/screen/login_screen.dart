@@ -5,11 +5,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
-
-
+import 'package:mylm/data/models/login_response.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final CustomerData? customerData;
+  const LoginScreen({super.key, this.customerData});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -122,22 +122,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 final api = ApiService();
                 final custNumber = _idController.text.trim();
 
-                // Kirim login
                 final result = await api.login(custNumber);
 
                 if (result != null && result.success) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VerifyScreen(
+                  final customerData = result.data;
+
+                    // 3) NAVIGATE ke VerifyScreen (jangan langsung ke MainScreen)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VerifyScreen(),
                       ),
-                    ),
-                  );
-
-
+                    );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Login gagal: ${result?.message ?? 'Server error'}")),
+                    SnackBar(
+                      content:
+                      Text("Login gagal: ${result?.message ?? 'Server error'}"),
+                    ),
                   );
                 }
               }

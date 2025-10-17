@@ -5,8 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
+import 'package:mylm/data/models/login_response.dart';
 
 class VerifyScreen extends StatefulWidget {
+
+  const VerifyScreen({super.key});
+
 
   @override
   State<VerifyScreen> createState() => _VerifyScreenState();
@@ -66,8 +70,14 @@ class _VerifyScreenState extends State<VerifyScreen> {
   void _verifyOtp() {
     String otp = _controllers.map((c) => c.text).join();
     debugPrint("OTP Entered: $otp");
-  //integrasi API disini
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()),
+
+    // Karena OTP masih statis → langsung masuk dashboard
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MainScreen(
+        ),
+      ),
     );
   }
 

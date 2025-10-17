@@ -5,10 +5,15 @@ import 'package:mylm/screen/helpdesk/helpdesk_screen.dart';
 import 'package:mylm/screen/home/home_screen.dart';
 import 'package:mylm/screen/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/user_profil/profile_screen.dart';
-
+import 'package:mylm/data/models/login_response.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final CustomerData? customerData;
+
+  const MainScreen({
+    super.key,
+    this.customerData,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -16,15 +21,19 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2; // default ke home
+  late List<Widget> _screens;
 
-  final List<Widget> _screens = const [
-
-    ProfileScreen(),
-    RiwayatTagihanScreen(),
-    HomeScreen(),
-    FaqScreen(),
-    HelpdeskScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const ProfileScreen(),
+      const RiwayatTagihanScreen(),
+      HomeScreen(customerData: widget.customerData), // ✅ sekarang boleh
+      const FaqScreen(),
+      const HelpdeskScreen(),
+    ];
+  }
 
   void _onTap(int index) {
     setState(() {
@@ -43,3 +52,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
+
