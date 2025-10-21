@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/user_profil/edit_alamat/edit_alamat_screen.dart';
+import 'package:mylm/screen/user_profil/edit_email_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nama_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nomor_screen.dart';
 
@@ -67,6 +68,17 @@ class ProfileScreen extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
 
+            _buildInfoField(
+              label: "Alamat",
+              value: "Jl. Ini Tidak Mudah No. 22",
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const EditAlamatScreen()));
+              },
+            ),
+
+            SizedBox(height: 12.h),
+
             // No. Handphone
             _buildInfoField(
               label: "No. Handphone",
@@ -76,15 +88,16 @@ class ProfileScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const EditNomorScreen()));
               },
             ),
+
             SizedBox(height: 12.h),
 
-            // Alamat
+            // Email
             _buildInfoField(
-              label: "Alamat",
-              value: "Jl. Ini Tidak Mudah No. 22",
+              label: "Email",
+              value: "Fauzanthoriq@gmail.com",
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EditAlamatScreen()));
+                    MaterialPageRoute(builder: (context) => const EditEmailScreen()));
               },
             ),
 

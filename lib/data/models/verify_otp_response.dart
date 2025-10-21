@@ -1,15 +1,36 @@
 class VerifyOtpResponse {
-  final String? status;
-  final String? message;
-  final String? token; // jika nanti backend kasih token login
+  final String message;
+  final int success;
+  final VerifyOtpData? data;
 
-  VerifyOtpResponse({this.status, this.message, this.token});
+  VerifyOtpResponse({
+    required this.message,
+    required this.success,
+    this.data,
+  });
 
   factory VerifyOtpResponse.fromJson(Map<String, dynamic> json) {
     return VerifyOtpResponse(
-      status: json['status'],
-      message: json['message'],
-      token: json['token'],
+      message: json['message'] ?? '',
+      success: json['success'] ?? 0,
+      data: json['data'] != null ? VerifyOtpData.fromJson(json['data']) : null,
+    );
+  }
+}
+
+class VerifyOtpData {
+  final String message;
+  final String statusOTP;
+
+  VerifyOtpData({
+    required this.message,
+    required this.statusOTP,
+  });
+
+  factory VerifyOtpData.fromJson(Map<String, dynamic> json) {
+    return VerifyOtpData(
+      message: json['message'] ?? '',
+      statusOTP: json['statusOTP'] ?? '',
     );
   }
 }

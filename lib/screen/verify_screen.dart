@@ -5,11 +5,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:mylm/data/models/login_response.dart';
+import 'package:mylm/data/network/api_service.dart';
 
 class VerifyScreen extends StatefulWidget {
+  final String custNumber;
+  final String accessToken;
 
-  const VerifyScreen({super.key});
+
+  const VerifyScreen({super.key,
+    required this.custNumber,
+    required this.accessToken});
 
 
   @override
@@ -29,6 +34,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
   void initState() {
     super.initState();
     _startTimer();
+    debugPrint("✅ VerifyScreen opened with:");
+    debugPrint("Customer Number: ${widget.custNumber}");
+    debugPrint("Access Token: ${widget.accessToken}");
   }
 
   String get _formattedTime {
@@ -67,19 +75,34 @@ class _VerifyScreenState extends State<VerifyScreen> {
     }
   }
 
-  void _verifyOtp() {
+  void _verifyOtp() async {
     String otp = _controllers.map((c) => c.text).join();
     debugPrint("OTP Entered: $otp");
 
-    // Karena OTP masih statis → langsung masuk dashboard
+    final api = ApiService();
+    final response = await api.verifyOtp(widget.custNumber, otp, widget.accessToken);
+
+    //Jika response null atau tidak verified
+    if (response == null || response.data?.statusOTP?.toLowerCase() != "verified") {
+      debugPrint("OTP Salah atau tidak ditemukan (tetap di VerifyScreen)");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Kode OTP salah")),
+      );
+      return; // keluar, jangan lanjut
+    }
+
+    // Jika berhasil
+    debugPrint("OTP Verified: ${response.data?.statusOTP}");
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => MainScreen(
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => const MainScreen()),
     );
   }
+
+
+
+
+
 
   bool get isValid => _controllers.every((c) => c.text.isNotEmpty);
 

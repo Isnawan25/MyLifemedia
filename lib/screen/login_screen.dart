@@ -122,23 +122,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 final api = ApiService();
                 final custNumber = _idController.text.trim();
 
+                // Login
                 final result = await api.login(custNumber);
 
                 if (result != null && result.success) {
                   final customerData = result.data;
+                  final accessToken = customerData?.accessToken ?? '';
 
-                    // 3) NAVIGATE ke VerifyScreen (jangan langsung ke MainScreen)
+                  // Request OTP
+                  final otpResponse = await api.requestOtp(custNumber, accessToken);
+
+                  if (otpResponse != null && otpResponse.success) {
+                    print("✅ OTP Berhasil diminta: ${otpResponse.data?.otp}");
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => VerifyScreen(),
+                        builder: (context) => VerifyScreen(
+                          custNumber: custNumber,
+                          accessToken: accessToken,
+                        ),
                       ),
                     );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Gagal mengirim OTP.")),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content:
-                      Text("Login gagal: ${result?.message ?? 'Server error'}"),
+                      content: Text(
+                          "Login gagal: ${result?.message ?? 'Server error'}"),
                     ),
                   );
                 }

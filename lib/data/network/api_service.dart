@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:mylm/data/models/detail_profile_response.dart';
 import 'package:mylm/data/models/login_response.dart';
 import 'package:mylm/data/models/otp_request_response.dart';
@@ -28,60 +29,91 @@ class ApiService {
     }
   }
 
-  /// REQUEST OTP
-  Future<OtpRequestResponse?> requestOtp(String custNumber, String accessToken) async {
+  // REQUEST OTP
+  Future<OtpResponse?> requestOtp(String custNumber, String accessToken) async {
     final url = Uri.parse("$baseUrl/request-otp");
-
-    print("Sending OTP Request to $url with cust_number=$custNumber");
-    print("Authorization: Bearer $accessToken");
-    print("Body: ${jsonEncode({"cust_number": custNumber})}");
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json",
-          "Authorization": "Bearer $accessToken",},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
         body: jsonEncode({"cust_number": custNumber}),
       );
 
-      print(" OTP Request Response: ${response.statusCode} - ${response.body}");
+      print("OTP Response: ${response.statusCode} - ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return OtpRequestResponse.fromJson(jsonDecode(response.body));
+        return OtpResponse.fromJson(jsonDecode(response.body));
       } else {
-        print(" OTP Request failed: ${response.statusCode} - ${response.body}");
+        print("Gagal request OTP: ${response.statusCode} - ${response.body}");
         return null;
       }
     } catch (e) {
-      print(" Error during OTP Request: $e");
+      print("Error saat request OTP: $e");
       return null;
     }
   }
 
-  /// VERIFY OTP
-  Future<VerifyOtpResponse?> verifyOtp(String custNumber, String otpCode) async {
+
+  //VERIFY OTP
+  Future<VerifyOtpResponse?> verifyOtp(
+      String custNumber,
+      String otp,
+      String accessToken,
+      ) async {
     final url = Uri.parse("$baseUrl/verify-otp");
 
-    print("Verifying OTP at $url with cust_number=$custNumber and otp_code=$otpCode");
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+        body: jsonEncode({
+          "cust_number": custNumber,
+          "otp_code": otp,
+        }),
+      );
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "cust_number": custNumber,
-        "otp_code": otpCode,
-      }),
-    );
+      debugPrint("🔹 Verify OTP Response: ${response.statusCode} - ${response.body}");
 
-    print("🔹 VERIFY OTP Response: ${response.statusCode} - ${response.body}");
+      //server balas 404 = OTP salah
+      if (response.statusCode == 404) {
+        debugPrint("OTP Salah, server mengembalikan 404 (Not Found)");
+        return null;
+      }
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return VerifyOtpResponse.fromJson(jsonDecode(response.body));
-    } else {
-      print("Verify OTP failed: ${response.statusCode} - ${response.body}");
+      //Jika bukan 201 (Created) = respon tidak valid
+      if (response.statusCode != 201) {
+        debugPrint("Verify OTP gagal: kode status tidak diharapkan (${response.statusCode})");
+        return null;
+      }
+
+      //Parse JSON
+      final decoded = jsonDecode(response.body);
+
+      //Validasi struktur & status
+      if (decoded["success"] == 1 &&
+          decoded["data"]?["statusOTP"]?.toString().toLowerCase() == "verified") {
+        debugPrint("OTP Verified dari server");
+        return VerifyOtpResponse.fromJson(decoded);
+      }
+
+      debugPrint("Response tidak mengandung status 'verified'.");
+      return null;
+    } catch (e) {
+      debugPrint("Error Verify OTP: $e");
       return null;
     }
   }
+
+
+
+
 
   // DETAIL RPOFILE
   Future<DetailProfileResponse?> getDetailProfile(
