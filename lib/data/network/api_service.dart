@@ -112,42 +112,36 @@ class ApiService {
   }
 
 
-
-
-
-  // DETAIL RPOFILE
-  Future<DetailProfileResponse?> getDetailProfile(
-      String custNumber,
-      String accessToken,
-      ) async {
-    final url = Uri.parse(
-        "$baseUrl/detailprofile?cust_number=$custNumber");
+  // GET PROFILE
+  Future<DetailProfileResponse?> getProfile(String custNumber, String accessToken) async {
+    final url = Uri.parse("$baseUrl/detailprofile?cust_number=$custNumber");
 
     try {
       final response = await http.get(
         url,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $accessToken", // penting!
+          "Authorization": "Bearer $accessToken",
         },
       );
 
-      print("🔹 GET DetailProfile Response: ${response.statusCode} - ${response.body}");
+      print("GET Profile Response: ${response.statusCode} - ${response.body}");
 
       if (response.statusCode == 200) {
         return DetailProfileResponse.fromJson(jsonDecode(response.body));
       } else {
-        print(" Gagal GET DetailProfile: ${response.statusCode}");
+        print("Gagal ambil profil: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print(" Error saat GET DetailProfile: $e");
+      print("Error GET Profile: $e");
       return null;
     }
   }
 
 
-  // PROMOTION
+
+  // GET PROMOTION
   Future<List<Promotion>> getPromotions() async {
     final response = await http.get(Uri.parse('$baseUrl/promotions'));
 

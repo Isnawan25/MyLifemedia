@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mylm/screen/main/main_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mylm/screen/main/main_screen.dart';
 
-void showSuccessDialog(BuildContext context) {
+void showSuccessDialog(
+    BuildContext context, {
+      required String custNumber,
+      required String accessToken,
+    }) {
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -15,8 +19,8 @@ void showSuccessDialog(BuildContext context) {
             Image.asset(
               "assets/images/success.gif",
               height: 120.h,
-              width: 120.w,),
-
+              width: 120.w,
+            ),
             const SizedBox(height: 16),
             const Text(
               "Data kamu sudah terkirim!",
@@ -36,7 +40,15 @@ void showSuccessDialog(BuildContext context) {
             GestureDetector(
               onTap: () {
                 Navigator.pop(context); // Tutup dialog
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainScreen(
+                      custNumber: custNumber,
+                      accessToken: accessToken,
+                    ),
+                  ),
+                );
               },
               child: const Text(
                 "Kembali ke Beranda",

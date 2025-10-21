@@ -5,14 +5,16 @@ import 'package:mylm/screen/helpdesk/helpdesk_screen.dart';
 import 'package:mylm/screen/home/home_screen.dart';
 import 'package:mylm/screen/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/user_profil/profile_screen.dart';
-import 'package:mylm/data/models/login_response.dart';
 
 class MainScreen extends StatefulWidget {
-  final CustomerData? customerData;
+  final String custNumber;
+  final String accessToken;
+
 
   const MainScreen({
     super.key,
-    this.customerData,
+    required this.custNumber,
+    required this.accessToken,
   });
 
   @override
@@ -27,11 +29,24 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _screens = [
-      const ProfileScreen(),
-      const RiwayatTagihanScreen(),
-      HomeScreen(customerData: widget.customerData), // ✅ sekarang boleh
-      const FaqScreen(),
-      const HelpdeskScreen(),
+      ProfileScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      RiwayatTagihanScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      HomeScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      FaqScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,),
+      HelpdeskScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,),
     ];
   }
 

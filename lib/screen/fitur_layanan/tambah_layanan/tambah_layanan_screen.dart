@@ -6,7 +6,12 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan2_screen.dart';
 
 class TambahLayananScreen extends StatefulWidget {
-  const TambahLayananScreen({super.key});
+  final String custNumber;
+  final String accessToken;
+  const TambahLayananScreen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken,});
 
   @override
   State<TambahLayananScreen> createState() => _TambahLayananScreenState();
@@ -108,7 +113,10 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
                     : () {
                   Navigator.push(context,
                       MaterialPageRoute(builder:
-                          (context) => const TambahLayanan2Screen()));
+                          (context) => TambahLayanan2Screen(
+                            custNumber: widget.custNumber,
+                            accessToken: widget.accessToken,
+                          )));
                 },
                 style: ButtonStyle(
                   shape: WidgetStateProperty.all(RoundedRectangleBorder(

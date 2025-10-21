@@ -11,12 +11,48 @@ import 'package:mylm/screen/message/pesan_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/data/models/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:mylm/data/models/login_response.dart';
 
-class HomeScreen extends StatelessWidget {
-  final CustomerData? customerData;
-  const HomeScreen({super.key, this.customerData});
+class HomeScreen extends StatefulWidget {
+  final String custNumber;
+  final String accessToken;
+
+  const HomeScreen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken
+  });
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DetailProfileData? profile;
+  bool isLoadingProfile = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() => isLoadingProfile = true);
+
+    final api = ApiService();
+    final result = await api.getProfile(widget.custNumber, widget.accessToken);
+
+    if (result != null && result.success == 1 && result.data != null) {
+      setState(() {
+        profile = result.data!;
+        isLoadingProfile = false;
+      });
+    } else {
+      setState(() => isLoadingProfile = false);
+      print("Gagal memuat profil");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +85,10 @@ class HomeScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MainProfileScreen())
+                                builder: (context) => MainProfileScreen(
+                                  accessToken: widget.accessToken,
+                                  custNumber: widget.custNumber,
+                                ))
                             );
                           },
                           child: Row(
@@ -65,17 +104,17 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Fauzan Thoriq",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  profile?.custName ?? "Nama Tidak Tersedia",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
                                   ),
+                                ),
                                   const SizedBox(height: 4),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -131,7 +170,8 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "LM0001",
+                                isLoadingProfile ? "..."
+                                    : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -139,7 +179,8 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "Jl. Ini Tidak Pernah Mudah No. 22",
+                                isLoadingProfile ? "..."
+                                    : profile?.custAddress ?? "Alamat Tidak Tersedia",
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontSize: 13.sp,
@@ -215,13 +256,18 @@ class HomeScreen extends StatelessWidget {
                           _buildFeature(context, "assets/svgs/icons_cart.svg",
                               "Tambah Layanan", onTap: () {
                             Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const TambahLayananScreen()),
+                                MaterialPageRoute(builder: (context) => TambahLayananScreen(
+                                    custNumber: widget.custNumber,
+                                    accessToken: widget.accessToken)),
                             );
                               }),
                           _buildFeature(context, "assets/svgs/icons_repost.svg",
                               "Ubah Layanan", onTap: () {
                             Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const UbahLayananScreen()));
+                                MaterialPageRoute(builder: (context) => UbahLayananScreen(
+                                  custNumber: widget.custNumber,
+                                  accessToken: widget.accessToken,
+                                )));
 
                               }),
                           _buildFeature(context, "assets/svgs/icons_invoice.svg",

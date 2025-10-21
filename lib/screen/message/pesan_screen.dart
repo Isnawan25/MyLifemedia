@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/message/status_pesan_screen.dart';
 
 
@@ -60,10 +59,7 @@ class _MessageScreenState extends State<PesanScreen> {
             colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen()),
-            );
+            Navigator.pop(context);
           },
         ),
         title: Text(

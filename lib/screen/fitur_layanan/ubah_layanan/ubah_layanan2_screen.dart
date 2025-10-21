@@ -8,7 +8,13 @@ import 'package:mylm/base/popup/popup.dart';
 
 
 class UbahLayanan2Screen extends StatefulWidget {
-  const UbahLayanan2Screen({super.key});
+  final String custNumber;
+  final String accessToken;
+  const UbahLayanan2Screen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken
+  });
 
   @override
   State<UbahLayanan2Screen> createState() => _UbahLayanan2ScreenState();
@@ -155,7 +161,10 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
 
                   if (confirm == true) {
 
-                    showSuccessDialog(context);
+                    showSuccessDialog(
+                        context,
+                        custNumber: widget.custNumber,
+                        accessToken: widget.accessToken);
                   }
                 }
                     : null,

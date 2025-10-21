@@ -6,9 +6,15 @@ import 'package:mylm/screen/home/home_screen.dart';
 import 'package:mylm/screen/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/user_profil/profile_screen.dart';
 
-
 class MainProfileScreen extends StatefulWidget {
-  const MainProfileScreen({super.key});
+  final String custNumber;
+  final String accessToken;
+
+  const MainProfileScreen({
+    super.key,
+    required this.accessToken,
+    required this.custNumber,
+  });
 
   @override
   State<MainProfileScreen> createState() => _MainProfileScreenState();
@@ -16,15 +22,36 @@ class MainProfileScreen extends StatefulWidget {
 
 class _MainProfileScreenState extends State<MainProfileScreen> {
   int _currentIndex = 0; // default ke Profil
+  late List<Widget> _screens;
 
-  final List<Widget> _screens = const [
+  @override
+  void initState() {
+    super.initState();
 
-    ProfileScreen(),
-    RiwayatTagihanScreen(),
-    HomeScreen(),
-    FaqScreen(),
-    HelpdeskScreen(),
-  ];
+    // ⚙️ Inisialisasi di sini agar bisa akses widget.custNumber & widget.accessToken
+    _screens = [
+      ProfileScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      RiwayatTagihanScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      HomeScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      FaqScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+      HelpdeskScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,
+      ),
+    ];
+  }
 
   void _onTap(int index) {
     setState(() {

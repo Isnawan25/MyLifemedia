@@ -10,7 +10,14 @@ import 'package:mylm/screen/faq/detail_faq5_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
 class FaqScreen extends StatelessWidget {
-  const FaqScreen({super.key});
+  final String custNumber;
+  final String accessToken;
+
+  const FaqScreen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +43,11 @@ class FaqScreen extends StatelessWidget {
             ),
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen()),
-            );
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MainScreen(
+                  custNumber: custNumber,
+                  accessToken: accessToken,
+                )));
           },
         ),
         title: Text(

@@ -5,8 +5,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
+
 class TambahLayanan2Screen extends StatefulWidget {
-  const TambahLayanan2Screen({super.key});
+  final String custNumber;
+  final String accessToken;
+  const TambahLayanan2Screen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken,
+  });
 
   @override
   State<TambahLayanan2Screen> createState() => _TambahLayanan2ScreenState();
@@ -368,7 +375,10 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context); // Tutup dialog
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainScreen()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(
+                    custNumber: widget.custNumber,
+                    accessToken: widget.accessToken,
+                  )));
                 },
                 child: const Text(
                   "Kembali ke Beranda",

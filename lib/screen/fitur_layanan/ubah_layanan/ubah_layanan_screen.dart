@@ -6,7 +6,12 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan2_screen.dart';
 
 class UbahLayananScreen extends StatefulWidget {
-  const UbahLayananScreen({super.key});
+  final String custNumber;
+  final String accessToken;
+  const UbahLayananScreen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken});
 
   @override
   State<UbahLayananScreen> createState() => _UbahLayananScreenState();
@@ -112,7 +117,10 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
       borderRadius: BorderRadius.circular(12),
       onTap: () {
 Navigator.push(context,
-    MaterialPageRoute(builder: (context) => const UbahLayanan2Screen()));
+    MaterialPageRoute(builder: (context) => UbahLayanan2Screen(
+      custNumber: widget.custNumber,
+      accessToken: widget.accessToken,
+    )));
       },
       child: Container(
         padding: const EdgeInsets.all(12),

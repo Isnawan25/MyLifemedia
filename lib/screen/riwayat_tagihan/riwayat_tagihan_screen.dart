@@ -3,10 +3,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/riwayat_tagihan/detail_tagihan_screen.dart';
 
 class RiwayatTagihanScreen extends StatelessWidget {
-  const RiwayatTagihanScreen({super.key});
+  final String custNumber;
+  final String accessToken;
+  const RiwayatTagihanScreen({
+    super.key,
+    required this.accessToken,
+    required this.custNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +55,11 @@ class RiwayatTagihanScreen extends StatelessWidget {
             "assets/svgs/arrow_back.svg",
             colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => MainScreen(
+                custNumber: custNumber,
+                accessToken: accessToken,
+              )))
         ),
         title: Text(
           "Riwayat Tagihan",

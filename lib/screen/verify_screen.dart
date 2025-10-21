@@ -95,7 +95,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
     debugPrint("OTP Verified: ${response.data?.statusOTP}");
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const MainScreen()),
+      MaterialPageRoute(builder: (context) => MainScreen(
+        custNumber: widget.custNumber,
+        accessToken: widget.accessToken,)),
     );
   }
 

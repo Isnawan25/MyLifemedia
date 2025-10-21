@@ -8,10 +8,48 @@ import 'package:mylm/screen/user_profil/edit_alamat/edit_alamat_screen.dart';
 import 'package:mylm/screen/user_profil/edit_email_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nama_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nomor_screen.dart';
+import 'package:mylm/data/models/detail_profile_response.dart';
+import 'package:mylm/data/network/api_service.dart';
 
+class ProfileScreen extends StatefulWidget {
+  final String custNumber;
+  final String accessToken;
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken
+  });
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  DetailProfileData? profile;
+  bool isLoadingProfile = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() => isLoadingProfile = true);
+
+    final api = ApiService();
+    final result = await api.getProfile(widget.custNumber, widget.accessToken);
+
+    if (result != null && result.success == 1 && result.data != null) {
+      setState(() {
+        profile = result.data!;
+        isLoadingProfile = false;
+      });
+    } else {
+      setState(() => isLoadingProfile = false);
+      print("Gagal memuat profil");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +64,11 @@ class ProfileScreen extends StatelessWidget {
             colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen()),
-            );
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MainScreen(
+                  custNumber: widget.custNumber,
+                  accessToken: widget.accessToken,
+                )));
           },
         ),
         centerTitle: true,
@@ -52,7 +91,8 @@ class ProfileScreen extends StatelessWidget {
             // ID Pelanggan
             _buildInfoField(
               label: "ID Pelanggan",
-              value: "LM0001",
+              value: isLoadingProfile ? "..."
+                  : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
               showEditButton: false,
             ),
             SizedBox(height: 12.h),
@@ -60,7 +100,7 @@ class ProfileScreen extends StatelessWidget {
             // Nama Lengkap
             _buildInfoField(
               label: "Nama Lengkap",
-              value: "Fauzan Thoriq Perdana Kusuma",
+              value: profile?.custName ?? "Nama Tidak Tersedia",
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditNamaScreen()));
@@ -70,7 +110,8 @@ class ProfileScreen extends StatelessWidget {
 
             _buildInfoField(
               label: "Alamat",
-              value: "Jl. Ini Tidak Mudah No. 22",
+              value: isLoadingProfile ? "..."
+                  : profile?.custAddress ?? "Alamat Tidak Tersedia",
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditAlamatScreen()));
@@ -82,7 +123,7 @@ class ProfileScreen extends StatelessWidget {
             // No. Handphone
             _buildInfoField(
               label: "No. Handphone",
-              value: "085123456789",
+              value: profile?.custPhone ?? "No. Handphone Tidak Tersedia",
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditNomorScreen()));
@@ -94,7 +135,7 @@ class ProfileScreen extends StatelessWidget {
             // Email
             _buildInfoField(
               label: "Email",
-              value: "Fauzanthoriq@gmail.com",
+              value: profile?.custEmail ?? "Email Tidak Tersedia",
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditEmailScreen()));
