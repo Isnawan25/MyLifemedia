@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mylm/base/widgets/text_utils.dart';
 import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_empty_screen.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart';
@@ -13,6 +14,7 @@ import 'package:mylm/data/models/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:mylm/data/models/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:mylm/base/widgets/icons_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   final String custNumber;
@@ -108,12 +110,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  profile?.custName ?? "Nama Tidak Tersedia",
+                                  shortText(profile?.custName ?? "....", limit: 25),
                                   style: GoogleFonts.inter(
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                   const SizedBox(height: 4),
                                   Container(
@@ -179,13 +183,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isLoadingProfile ? "..."
-                                    : profile?.custAddress ?? "Alamat Tidak Tersedia",
+                                isLoadingProfile
+                                    ? "..." : shortText(profile?.custAddress, limit: 36),
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontSize: 13.sp,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis, // aman ganda
                               ),
+
                               const Divider(color: Colors.white54, height: 20),
                               Row(
                                 mainAxisAlignment:
@@ -253,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildFeature(context, "assets/svgs/icons_cart.svg",
+                          buildFeature(context, "assets/svgs/icons_cart.svg",
                               "Tambah Layanan", onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) => TambahLayananScreen(
@@ -261,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     accessToken: widget.accessToken)),
                             );
                               }),
-                          _buildFeature(context, "assets/svgs/icons_repost.svg",
+                          buildFeature(context, "assets/svgs/icons_repost.svg",
                               "Ubah Layanan", onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) => UbahLayananScreen(
@@ -270,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )));
 
                               }),
-                          _buildFeature(context, "assets/svgs/icons_invoice.svg",
+                          buildFeature(context, "assets/svgs/icons_invoice.svg",
                               "Bayar Tagihan", onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder:
@@ -306,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: ApiService().getPromotions(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    // ✅ tampilkan skeleton shimmer
+
                     return const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: SkeletonLoading(),
@@ -336,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fit: BoxFit.cover,
                                 loadingBuilder: (context, child, progress) {
                                   if (progress == null) return child;
-                                  // tambahkan shimmer di dalam image loading juga
+                                  // shimmer loading
                                   return Shimmer.fromColors(
                                     baseColor: Colors.grey.shade300,
                                     highlightColor: Colors.grey.shade100,
@@ -366,40 +373,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildFeature(BuildContext context, String svgPath, String title,
-      {VoidCallback? onTap}) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Column(
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [darkorange, orange],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds),
-            child: SvgPicture.asset(
-              svgPath,
-              width: 45.w,
-              height: 45.h,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

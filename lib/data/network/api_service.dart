@@ -6,6 +6,7 @@ import 'package:mylm/data/models/login_response.dart';
 import 'package:mylm/data/models/otp_request_response.dart';
 import 'package:mylm/data/models/verify_otp_response.dart';
 import 'package:mylm/data/models/promotion_response.dart';
+import 'package:mylm/data/models/packages_response.dart';
 
 class ApiService {
   static const String baseUrl = "http://202.169.231.66:83/api-mylm-nestjs/apps/api/v1/apps";
@@ -153,6 +154,35 @@ class ApiService {
       throw Exception("Gagal memuat data promosi");
     }
   }
+
+  // GET PACKAGES
+  Future<GetPackagesResponse?> getPackages() async {
+    final url = Uri.parse("$baseUrl/packages");
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+
+      print("GET Packages Response: ${response.statusCode} - ${response.body}");
+
+      if (response.statusCode == 200) {
+        return GetPackagesResponse.fromJson(
+          jsonDecode(response.body),
+        );
+      } else {
+        print("Gagal ambil packages: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Error GET Packages: $e");
+      return null;
+    }
+  }
+
 
 }
 

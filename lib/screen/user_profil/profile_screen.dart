@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/base/widgets/text_utils.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/user_profil/edit_alamat/edit_alamat_screen.dart';
 import 'package:mylm/screen/user_profil/edit_email_screen.dart';
@@ -100,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Nama Lengkap
             _buildInfoField(
               label: "Nama Lengkap",
-              value: profile?.custName ?? "Nama Tidak Tersedia",
+              value: shortText(profile?.custName ?? "...", limit: 30),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditNamaScreen()));
@@ -110,8 +111,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             _buildInfoField(
               label: "Alamat",
-              value: isLoadingProfile ? "..."
-                  : profile?.custAddress ?? "Alamat Tidak Tersedia",
+              value: isLoadingProfile
+                  ? "..." : shortText(profile?.custAddress, limit: 36),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditAlamatScreen()));
@@ -194,6 +195,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String value,
     VoidCallback? onPressed,
     bool showEditButton = true,
+    int maxLines = 1,
+    TextOverflow overflow = TextOverflow.ellipsis
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +226,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: maxLines,
+                  overflow: overflow,
                 ),
               ),
               if (showEditButton)

@@ -2,23 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan2_screen.dart';
+import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/models/packages_response.dart';
+import 'package:mylm/base/widgets/skeleton_loading.dart';
 
 class TambahLayananScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+
   const TambahLayananScreen({
     super.key,
     required this.custNumber,
-    required this.accessToken,});
+    required this.accessToken,
+  });
 
   @override
   State<TambahLayananScreen> createState() => _TambahLayananScreenState();
 }
 
 class _TambahLayananScreenState extends State<TambahLayananScreen> {
-  String? _selectedPaket; // simpan pilihan pelanggan
+  String? _selectedPaket;
+  bool isLoading = true;
+  List<PackageData> packages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPackages();
+  }
+
+  Future<void> _fetchPackages() async {
+    final api = ApiService();
+    final response = await api.getPackages();
+
+    if (response != null && response.success == 1) {
+      setState(() {
+        packages = response.data;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      print("Gagal memuat data packages");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +82,14 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        child: Column(
+        child: isLoading
+            ? const SkeletonLoading(
+          itemCount: 4, // 4 paket layanan
+          itemHeight: 90, // tinggi kartu
+          isCard: true, // tampil bentuk kartu layanan
+        )
+
+            : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -64,98 +102,82 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Paket 1
-            _buildPaketItem(
-              title: "izzi life 30",
-              subtitle: "Kecepatan Internet s/d 30 Mbps",
-              harga: "Rp 150.000/bulan",
-              value: "paket30",
+            Expanded(
+              child: ListView.separated(
+                itemCount: packages.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final pkg = packages[index];
+                  return _buildPaketItem(
+                    title: pkg.spName,
+                    subtitle: "Kecepatan Internet s/d ${pkg.spName.replaceAll(RegExp(r'[^0-9]'), '')} Mbps",
+                    harga: "${formatRupiah(pkg.spPrice)}/bulan",
+                    value: pkg.spCodeId,
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 12),
-
-            // Paket 2
-            _buildPaketItem(
-              title: "izzi life 50",
-              subtitle: "Kecepatan Internet s/d 50 Mbps",
-              harga: "Rp 250.000/bulan",
-              value: "paket50",
-            ),
-            const SizedBox(height: 12),
-
-            // Paket 3
-            _buildPaketItem(
-              title: "izzi life 100",
-              subtitle: "Kecepatan Internet s/d 100 Mbps",
-              harga: "Rp 350.000/bulan",
-              value: "paket100",
-            ),
-            const SizedBox(height: 12),
-
-            // Paket 4
-            _buildPaketItem(
-              title: "izzi life 200",
-              subtitle: "Kecepatan Internet s/d 200 Mbps",
-              harga: "Rp 600.000/bulan",
-              value: "paket200",
-            ),
-
-            const Spacer(),
 
             // Tombol Selanjutnya
             Align(
               alignment: Alignment.center,
               child: SizedBox(
-              width: 300.w,
-              height: 48.h,
-              child: ElevatedButton(
-                onPressed: _selectedPaket == null
-                    ? null
-                    : () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder:
-                          (context) => TambahLayanan2Screen(
-                            custNumber: widget.custNumber,
-                            accessToken: widget.accessToken,
-                          )));
-                },
-                style: ButtonStyle(
-                  shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  )),
-                  backgroundColor: _selectedPaket == null
-                      ? WidgetStateProperty.all(Colors.grey.shade300)
-                      : null,
-
-                  //Gradient Button
-                  padding: WidgetStateProperty.all(EdgeInsets.zero),
-                  elevation: WidgetStateProperty.all(0),
-                ),
-                child: Ink(
-                  decoration: _selectedPaket == null
+                width: 300.w,
+                height: 48.h,
+                child: ElevatedButton(
+                  onPressed: _selectedPaket == null
                       ? null
-                      : BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [(darkorange), (orange)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            TambahLayanan2Screen(
+                              custNumber: widget.custNumber,
+                              accessToken: widget.accessToken,
+                            ),
+                      ),
+                    );
+                  },
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(30),
+                    backgroundColor: _selectedPaket == null
+                        ? WidgetStateProperty.all(Colors.grey.shade300)
+                        : null,
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    elevation: WidgetStateProperty.all(0),
                   ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Selanjutnya",
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color:
-                        _selectedPaket == null ? Colors.black45 : Colors.white,
+                  child: Ink(
+                    decoration: _selectedPaket == null
+                        ? null
+                        : BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [darkorange, orange],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Selanjutnya",
+                        style: GoogleFonts.inter(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: _selectedPaket == null
+                              ? Colors.black45
+                              : Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
             ),
             const SizedBox(height: 20),
           ],
@@ -170,7 +192,6 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
     required String harga,
     required String value,
   }) {
-
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () {
@@ -193,7 +214,6 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
         ),
         child: Row(
           children: [
-            // Kotak icons wifi
             Container(
               width: 48,
               height: 48,
@@ -209,7 +229,7 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
             ),
             const SizedBox(width: 12),
 
-            // Teks info paket
+            // Info paket
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +263,7 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
               ),
             ),
 
-            // Radio button
+            // Radio
             Radio<String>(
               value: value,
               groupValue: _selectedPaket,
@@ -260,4 +280,5 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
     );
   }
 }
+
 

@@ -4,20 +4,50 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan2_screen.dart';
+import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/models/packages_response.dart';
+import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/currency_formatter.dart';
 
 class UbahLayananScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+
   const UbahLayananScreen({
     super.key,
     required this.custNumber,
-    required this.accessToken});
+    required this.accessToken,
+  });
 
   @override
   State<UbahLayananScreen> createState() => _UbahLayananScreenState();
 }
 
 class _UbahLayananScreenState extends State<UbahLayananScreen> {
+  bool isLoading = true;
+  List<PackageData> packages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPackages();
+  }
+
+  Future<void> _fetchPackages() async {
+    final api = ApiService();
+    final result = await api.getPackages();
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (mounted) {
+      setState(() {
+        if (result != null && result.success == 1) {
+          packages = result.data;
+        }
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +58,7 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             "assets/svgs/arrow_back.svg",
-            colorFilter: const ColorFilter.mode(
-              Colors.black,
-              BlendMode.srcIn,
-            ),
+            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -50,7 +77,13 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        child: Column(
+        child: isLoading
+            ? const SkeletonLoading(
+          itemCount: 4,
+          itemHeight: 90,
+          isCard: true,
+        )
+            : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -63,43 +96,29 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Paket 1
-            _buildPaketItem(
-              title: "izzi life 30",
-              subtitle: "Kecepatan Internet s/d 30 Mbps",
-              harga: "Rp 150.000/bulan",
-              value: "paket30",
-            ),
-            const SizedBox(height: 12),
 
-            // Paket 2
-            _buildPaketItem(
-              title: "izzi life 50",
-              subtitle: "Kecepatan Internet s/d 50 Mbps",
-              harga: "Rp 250.000/bulan",
-              value: "paket50",
-            ),
-            const SizedBox(height: 12),
-
-            // Paket 3
-            _buildPaketItem(
-              title: "izzi life 100",
-              subtitle: "Kecepatan Internet s/d 100 Mbps",
-              harga: "Rp 350.000/bulan",
-              value: "paket100",
-            ),
-            const SizedBox(height: 12),
-
-            // Paket 4
-            _buildPaketItem(
-              title: "izzi life 200",
-              subtitle: "Kecepatan Internet s/d 200 Mbps",
-              harga: "Rp 600.000/bulan",
-              value: "paket200",
-            ),
-
+            ...packages.map((pkg) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildPaketItem(
+                title: pkg.spName,
+                subtitle:
+                "Kecepatan Internet s/d ${pkg.spCode.replaceAll(RegExp(r'[^0-9]'), '')} Mbps",
+                harga:
+                "${formatRupiah(pkg.spPrice)}/bulan",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UbahLayanan2Screen(
+                        custNumber: widget.custNumber,
+                        accessToken: widget.accessToken,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )),
             const Spacer(),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -111,17 +130,11 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
     required String title,
     required String subtitle,
     required String harga,
-    required String value,
+    required VoidCallback onTap,
   }) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () {
-Navigator.push(context,
-    MaterialPageRoute(builder: (context) => UbahLayanan2Screen(
-      custNumber: widget.custNumber,
-      accessToken: widget.accessToken,
-    )));
-      },
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -137,7 +150,6 @@ Navigator.push(context,
         ),
         child: Row(
           children: [
-            // Kotak ikon wifi
             Container(
               width: 48,
               height: 48,
@@ -153,7 +165,6 @@ Navigator.push(context,
             ),
             const SizedBox(width: 12),
 
-            // Teks info paket
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,6 +214,5 @@ Navigator.push(context,
       ),
     );
   }
-
 }
 
