@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
+import 'package:mylm/screen/login_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/user_profil/edit_alamat/edit_alamat_screen.dart';
 import 'package:mylm/screen/user_profil/edit_email_screen.dart';
@@ -11,6 +12,8 @@ import 'package:mylm/screen/user_profil/edit_nama_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nomor_screen.dart';
 import 'package:mylm/data/models/detail_profile_response.dart';
 import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/preferences/user_preferences.dart';
+import 'package:mylm/data/preferences/secure_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String custNumber;
@@ -148,8 +151,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Tombol Keluar
             Center(
               child: GestureDetector(
-                onTap: () {
-                  // Aksi keluar bisa ditambahkan nanti
+                onTap: () async {
+                  // 🔹 Tampilkan dialog konfirmasi logout
+                  final confirmLogout = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      title: Text(
+                        "Keluar Aplikasi",
+                        style: GoogleFonts.inter(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                      content: Text(
+                        "Apakah Anda yakin ingin keluar dari akun ini?",
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      actionsAlignment: MainAxisAlignment.end,
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: Text(
+                            "Batal",
+                            style: GoogleFonts.inter(
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [(darkorange), (orange)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              "Keluar",
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+
+                      ],
+                    ),
+                  );
+
+                  // 🔹 Jika user memilih "Keluar"
+                  if (confirmLogout == true) {
+                    try {
+                      // Hapus semua data user yang tersimpan
+                      await SecureStorage.clear(); // token, session, dsb.
+                      await UserPreferences.clear(); // data prefs seperti nama, email, dsb.
+
+                      // 🔹 Arahkan ke LoginScreen dan hapus semua route sebelumnya
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                            (route) => false,
+                      );
+                    } catch (e) {
+                      debugPrint("Logout error: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Gagal logout, coba lagi.")),
+                      );
+                    }
+                  }
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -182,6 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+
             SizedBox(height: 20.h),
           ],
         ),

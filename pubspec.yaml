@@ -37,7 +37,9 @@ dependencies:
   flutter_svg: ^2.2.1                     # import svg
   http: ^1.5.0                            # request api
   shimmer: ^3.0.0                         # animasi loading shimmer
-  intl: ^0.20.2                           # format local
+  intl: ^0.20.2                           # format local money
+  flutter_secure_storage: ^9.2.4          # Menyimpan data
+  shared_preferences: ^2.5.3              # Menyimpan data secara lokal
 
 
 dev_dependencies:

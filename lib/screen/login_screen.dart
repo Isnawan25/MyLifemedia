@@ -6,6 +6,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/login_response.dart';
+import 'package:mylm/screen/welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final CustomerData? customerData;
@@ -58,7 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder:
+                  (context) => WelcomeScreen()))
         ),
         title: Text(
           "Masuk",
@@ -135,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (otpResponse != null && otpResponse.success) {
                     print("✅ OTP Berhasil diminta: ${otpResponse.data?.otp}");
 
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => VerifyScreen(

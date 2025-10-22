@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/preferences/secure_storage.dart';
 
 class VerifyScreen extends StatefulWidget {
   final String custNumber;
@@ -90,6 +91,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
       );
       return; // keluar, jangan lanjut
     }
+    await SecureStorage.saveAccessToken(widget.accessToken);
+    await SecureStorage.saveCustNumber(widget.custNumber);
 
     // Jika berhasil
     debugPrint("OTP Verified: ${response.data?.statusOTP}");

@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mylm/data/preferences/secure_storage.dart';
+import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/welcome_screen.dart';
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,13 +16,35 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
+  }
 
-    Timer(const Duration(seconds: 3), () {
+  Future<void> _checkLoginStatus() async {
+    await Future.delayed(const Duration(seconds: 3)); // delay 3 detik splash
+    final token = await SecureStorage.getAccessToken();
+    final custNumber = await SecureStorage.getCustNumber();
+    print("Token tersimpan: $token");// ambil token
+
+    if (!mounted) return;
+
+    if (token != null && token.isNotEmpty && custNumber != null && custNumber.isNotEmpty) {
+      // Kalau token ada → langsung ke MainScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        MaterialPageRoute(
+          builder: (_) => MainScreen(
+            accessToken: token,
+            custNumber: custNumber,
+          ),
+        ),
       );
-    });
+    } else {
+      // Kalau token tidak ada → ke WelcomeScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+      );
+    }
   }
 
   @override
