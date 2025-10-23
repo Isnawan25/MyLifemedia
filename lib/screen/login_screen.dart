@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
-import 'package:mylm/data/models/login_response.dart';
+import 'package:mylm/data/models/auth_&_otp/login_response.dart';
 import 'package:mylm/screen/welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {

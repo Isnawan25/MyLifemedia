@@ -3,16 +3,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
-import 'package:mylm/screen/main/main_screen.dart';
+import 'package:mylm/base/popup/popup.dart';
+import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/screen/fitur_layanan/tambah_layanan/location_maps_screen.dart';
+import 'package:mylm/data/models/register_customer_request.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 
 
 class TambahLayanan2Screen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String packageId;
+
   const TambahLayanan2Screen({
     super.key,
     required this.custNumber,
     required this.accessToken,
+    required this.packageId,
   });
 
   @override
@@ -27,10 +34,14 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
   final _hpController = TextEditingController();
   final _emailController = TextEditingController();
   final _alamatController = TextEditingController();
+  final _kodeposController = TextEditingController();
   final _kelurahanController = TextEditingController();
   final _kecamatanController = TextEditingController();
   final _kotaController = TextEditingController();
   final _provinsiController = TextEditingController();
+  final _latController = TextEditingController();
+  final _longController = TextEditingController();
+
 
   bool _isFilled = false;
 
@@ -40,6 +51,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
     _namaController.addListener(_checkFormFilled);
     _hpController.addListener(_checkFormFilled);
     _emailController.addListener(_checkFormFilled);
+    _kodeposController.addListener(_checkFormFilled);
     _alamatController.addListener(_checkFormFilled);
     _kelurahanController.addListener(_checkFormFilled);
     _kecamatanController.addListener(_checkFormFilled);
@@ -52,6 +64,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
       _isFilled = _namaController.text.isNotEmpty &&
           _hpController.text.isNotEmpty &&
           _emailController.text.isNotEmpty &&
+          _kodeposController.text.isNotEmpty &&
           _alamatController.text.isNotEmpty &&
           _kelurahanController.text.isNotEmpty &&
           _kecamatanController.text.isNotEmpty &&
@@ -65,11 +78,15 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
     _namaController.dispose();
     _hpController.dispose();
     _emailController.dispose();
+    _kodeposController.dispose();
     _alamatController.dispose();
     _kelurahanController.dispose();
     _kecamatanController.dispose();
     _kotaController.dispose();
     _provinsiController.dispose();
+    _latController.dispose();
+    _longController.dispose();
+
     super.dispose();
   }
 
@@ -141,7 +158,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                   ),
                 ),
                 child: const Center(
-                  child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                  child: Icon(Icons.location_pin, color: darkorange, size: 40),
                 ),
               ),
 
@@ -154,17 +171,34 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                   width: 160.w,
                   height: 42.h,
                   child: ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Mendeteksi lokasi Anda..."),
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LocationMapsScreen(),
                         ),
-                      );
+                      ).then((value) {
+                        if (value != null && value is GeoPoint) {
+                          setState(() {
+                            _latController.text = value.latitude.toString();
+                            _longController.text = value.longitude.toString();
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Lokasi dipilih: ${value.latitude}, ${value.longitude}",
+                              ),
+                            ),
+                          );
+                        }
+                      });
                     },
+
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
                     child: Ink(
@@ -174,7 +208,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       child: Center(
                         child: Text(
@@ -190,6 +224,17 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                   ),
                 ),
               ),
+              Visibility(
+                visible: false, // Invisible UI
+                child: Column(
+                  children: [
+                    _buildLabeledTextField("Latitude", _latController),
+                    _buildLabeledTextField("Longitude", _longController),
+                  ],
+                ),
+              ),
+
+
 
               SizedBox(height: 24.h),
 
@@ -197,6 +242,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
               _buildLabeledTextField("Nama Lengkap", _namaController),
               _buildLabeledTextField("No. Handphone", _hpController),
               _buildLabeledTextField("Email", _emailController),
+              _buildLabeledTextField("Kode Pos", _kodeposController),
               _buildLabeledTextField("Alamat", _alamatController),
               _buildLabeledTextField("Kelurahan", _kelurahanController),
               _buildLabeledTextField("Kecamatan", _kecamatanController),
@@ -214,19 +260,60 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                   child: ElevatedButton(
                     onPressed: _isFilled
                         ? () async {
-                      bool? confirm = await _showConfirmationDialog(context);
+                      bool? confirm = await showConfirmationDialog(context);
 
                       if (confirm == true) {
-                        // Tampilkan popup sukses jika user klik YA
-                        _showSuccessDialog(context);
+                        try {
+                          final request = RegisterCustomerRequest(
+                            custName: _namaController.text,
+                            custPhone: _hpController.text,
+                            custEmail: _emailController.text,
+                            custPostalCode: int.parse(_kodeposController.text),
+                            custProvince: _provinsiController.text,
+                            custDistrict: _kotaController.text,
+                            custSubDistrict: _kecamatanController.text,
+                            custVillage: _kelurahanController.text,
+                            custAddress: _alamatController.text,
+                            custLat: double.parse(_latController.text.isEmpty ? '0' : _latController.text),
+                            custLong: double.parse(_longController.text.isEmpty ? '0' : _longController.text),
+                            packageId: widget.packageId,
+                          );
+
+                          // Log isi data yang akan dikirim
+                          print("Kirim Data:");
+                          print(request.toJson());
+
+                          print("Mengirim Req ke server...");
+                          final response = await ApiService().registerCustomer(request);
+
+                          print("Response diterima dari server:");
+                          print("Status: ${response.success}");
+                          print("Pesan: ${response.message}");
+
+                          if (response.success == 1) {
+                            print("Data berhasil dikirim dan diterima server!");
+                            showSuccessDialog(context,
+                              custNumber: widget.custNumber, // di sini boleh pakai widget.
+                              accessToken: widget.accessToken,);
+                          } else {
+                            print("Server menolak data: ${response.message}");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Gagal: ${response.message}")),
+                            );
+                          }
+                        } catch (e) {
+                          print("Terjadi error saat mengirim data: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Error: $e")),
+                          );
+                        }
                       }
                     }
                         : null,
-
                     style: ButtonStyle(
                       shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                       backgroundColor: _isFilled
@@ -270,6 +357,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
   }
 
   Widget _buildLabeledTextField(String label, TextEditingController controller) {
+    final bool isEmailOrPhone = label.toLowerCase().contains('email') || label.toLowerCase().contains('handphone');
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: Column(
@@ -286,6 +374,11 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
           SizedBox(height: 6.h),
           TextFormField(
             controller: controller,
+            textCapitalization:
+            isEmailOrPhone ? TextCapitalization.none : TextCapitalization.words,
+            keyboardType: isEmailOrPhone && label.toLowerCase().contains('email')
+                ? TextInputType.emailAddress
+                : TextInputType.text,
             decoration: InputDecoration(
               hintText: "Masukkan $label",
               hintStyle: GoogleFonts.inter(
@@ -306,94 +399,6 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
       ),
     );
   }
-  //Pop-up Konfirmasi
-  Future<bool?> _showConfirmationDialog(BuildContext context) {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text(
-            "Apakah kamu yakin data yang dimasukkan sudah benar?",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text(
-                "TIDAK",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                "YA",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-//Pop-up Sukses
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-                Image.asset(
-                    "assets/images/success.gif",
-                  height: 120.h,
-                  width: 120.w,),
-
-              const SizedBox(height: 16),
-              const Text(
-                "Data kamu sudah terkirim!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Tim kami akan segera menghubungi kamu,\nuntuk proses lebih lanjut.",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54, fontSize: 12),
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context); // Tutup dialog
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(
-                    custNumber: widget.custNumber,
-                    accessToken: widget.accessToken,
-                  )));
-                },
-                child: const Text(
-                  "Kembali ke Beranda",
-                  style: TextStyle(
-                    color: Colors.pink,
-                    decoration: TextDecoration.underline,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
 }

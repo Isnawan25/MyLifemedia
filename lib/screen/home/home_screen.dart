@@ -10,9 +10,9 @@ import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart'
 import 'package:mylm/screen/main/main_profile_screen.dart';
 import 'package:mylm/screen/message/pesan_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
-import 'package:mylm/data/models/promotion_response.dart';
+import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
-import 'package:mylm/data/models/detail_profile_response.dart';
+import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mylm/base/widgets/icons_colors.dart';
 
@@ -153,7 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   "assets/svgs/icons_notification.svg",
                                   width: 28.w,
                                   height: 28.h,
-                                  color: Colors.white,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
                             ],
@@ -167,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(

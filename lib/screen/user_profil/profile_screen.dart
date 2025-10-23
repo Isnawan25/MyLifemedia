@@ -10,7 +10,7 @@ import 'package:mylm/screen/user_profil/edit_alamat/edit_alamat_screen.dart';
 import 'package:mylm/screen/user_profil/edit_email_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nama_screen.dart';
 import 'package:mylm/screen/user_profil/edit_nomor_screen.dart';
-import 'package:mylm/data/models/detail_profile_response.dart';
+import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/user_preferences.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';

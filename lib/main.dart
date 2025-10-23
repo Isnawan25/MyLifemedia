@@ -18,6 +18,14 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
+          theme: ThemeData(
+            primarySwatch: Colors.orange,
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor: Colors.grey,
+              selectionColor: Colors.grey.withValues(alpha: 0.4),
+              selectionHandleColor: Colors.grey,
+            ),
+          ),
           debugShowCheckedModeBanner: false,
           home: const SplashScreen(),
         );

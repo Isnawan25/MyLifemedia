@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan2_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
-import 'package:mylm/data/models/packages_response.dart';
+import 'package:mylm/data/models/product/packages_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:mylm/base/currency_formatter.dart';
 

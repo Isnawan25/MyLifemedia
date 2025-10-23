@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import 'package:mylm/data/models/detail_profile_response.dart';
-import 'package:mylm/data/models/login_response.dart';
-import 'package:mylm/data/models/otp_request_response.dart';
-import 'package:mylm/data/models/verify_otp_response.dart';
-import 'package:mylm/data/models/promotion_response.dart';
-import 'package:mylm/data/models/packages_response.dart';
+import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
+import 'package:mylm/data/models/auth_&_otp/login_response.dart';
+import 'package:mylm/data/models/auth_&_otp/otp_request_response.dart';
+import 'package:mylm/data/models/auth_&_otp/verify_otp_response.dart';
+import 'package:mylm/data/models/product/promotion_response.dart';
+import 'package:mylm/data/models/product/packages_response.dart';
+import 'package:mylm/data/models/register_customer_request.dart';
+import 'package:mylm/data/models/register_customer_response.dart';
 
 class ApiService {
   static const String baseUrl = "http://202.169.231.66:83/api-mylm-nestjs/apps/api/v1/apps";
@@ -183,6 +185,27 @@ class ApiService {
     }
   }
 
+  // REGISTER CUSTOMERS
+  Future<RegisterCustomerResponse> registerCustomer(RegisterCustomerRequest request) async {
+    final url = Uri.parse('$baseUrl/register');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(request.toJson()),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse["success"] == 1) {
+        return RegisterCustomerResponse.fromJson(jsonResponse);
+      } else {
+        throw Exception("Failed to register customer: ${jsonResponse["message"]}");
+      }
+    } else {
+      throw Exception("HTTP Error ${response.statusCode}: ${response.body}");
+    }
+  }
 
 }
 

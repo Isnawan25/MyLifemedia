@@ -1,0 +1,174 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class LocationMapsScreen extends StatefulWidget {
+  const LocationMapsScreen({super.key});
+
+  @override
+  State<LocationMapsScreen> createState() => _LocationMapsScreenState();
+}
+
+class _LocationMapsScreenState extends State<LocationMapsScreen> {
+  late final MapController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = MapController.withUserPosition(); // versi terbaru pakai ini
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pilihLokasi() async {
+    // Mengambil posisi tengah peta
+    final GeoPoint point = await controller.centerMap;
+    if (!mounted) return;
+    Navigator.pop(context, point);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            "assets/svgs/arrow_back.svg",
+            colorFilter: const ColorFilter.mode(
+              Colors.black,
+              BlendMode.srcIn,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "Pilih Lokasi Anda",
+          style: GoogleFonts.inter(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          OSMFlutter(
+            controller: controller,
+            mapIsLoading: const Center(child: CircularProgressIndicator()),
+            osmOption: OSMOption(
+              enableRotationByGesture: false,
+              zoomOption: const ZoomOption(
+                initZoom: 16,
+                minZoomLevel: 3,
+                maxZoomLevel: 19,
+                stepZoom: 1.0,
+              ),
+              userLocationMarker: UserLocationMaker(
+                personMarker: const MarkerIcon(
+                  icon: Icon(Icons.location_on, color: Colors.red, size: 56),
+                ),
+                directionArrowMarker: const MarkerIcon(
+                  icon: Icon(Icons.navigation, color: darkorange, size: 48),
+                ),
+              ),
+              roadConfiguration: const RoadOption(
+                roadColor: darkorange,
+              ),
+            ),
+          ),
+
+          // icons crosshair
+          Center(
+            child: Icon(
+              Icons.location_on,
+              color: darkorange.withValues(alpha: 0.9),
+              size: 48,
+            ),
+          ),
+
+      // Tombol Pilih Lokasi
+      Positioned(
+        bottom: 28,
+        left: 24,
+        right: 24,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [(darkorange), (orange)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.check, color: Colors.white),
+            label: Text(
+              "Pilih Lokasi Ini",
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            onPressed: _pilihLokasi,
+          ),
+        ),
+      ),
+        ],
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 90, right: 8), // naik di atas tombol
+        child: Container(
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [darkorange, orange],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: const Icon(Icons.my_location, color: Colors.white),
+            onPressed: () async {
+              await controller.currentLocation();
+            },
+          ),
+        ),
+      ),
+
+    );
+  }
+}

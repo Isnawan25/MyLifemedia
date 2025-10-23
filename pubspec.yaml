@@ -40,6 +40,7 @@ dependencies:
   intl: ^0.20.2                           # format local money
   flutter_secure_storage: ^9.2.4          # Menyimpan data
   shared_preferences: ^2.5.3              # Menyimpan data secara lokal
+  flutter_osm_plugin: ^1.4.3              # auto fill lokasi
 
 
 dev_dependencies:

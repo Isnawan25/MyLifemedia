@@ -12,7 +12,10 @@ void showSuccessDialog(
     barrierDismissible: false,
     builder: (context) {
       return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -61,6 +64,41 @@ void showSuccessDialog(
             ),
           ],
         ),
+      );
+    },
+  );
+}
+
+//Pop-up Konfirmasi
+Future<bool?> showConfirmationDialog(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          "Apakah kamu yakin data yang dimasukkan sudah benar?",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16),
+        ),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text(
+              "TIDAK",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              "YA",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
       );
     },
   );
