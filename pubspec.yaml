@@ -41,6 +41,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4          # Menyimpan data
   shared_preferences: ^2.5.3              # Menyimpan data secara lokal
   flutter_osm_plugin: ^1.4.3              # auto fill lokasi
+  screenshot: ^3.0.0                      # ambil gambar maps
 
 
 dev_dependencies:

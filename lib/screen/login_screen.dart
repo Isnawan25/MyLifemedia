@@ -136,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   final otpResponse = await api.requestOtp(custNumber, accessToken);
 
                   if (otpResponse != null && otpResponse.success) {
-                    print("✅ OTP Berhasil diminta: ${otpResponse.data?.otp}");
+                    print("OTP Berhasil diminta: ${otpResponse.data?.otp}");
 
                     Navigator.pushReplacement(
                       context,

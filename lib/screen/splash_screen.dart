@@ -20,10 +20,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 3)); // delay 3 detik splash
+    await Future.delayed(const Duration(seconds: 3));
     final token = await SecureStorage.getAccessToken();
     final custNumber = await SecureStorage.getCustNumber();
-    print("Token tersimpan: $token");// ambil token
+    print("Token tersimpan: $token");
 
     if (!mounted) return;
 
