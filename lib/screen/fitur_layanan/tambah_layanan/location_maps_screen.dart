@@ -83,11 +83,48 @@ class _LocationMapsScreenState extends State<LocationMapsScreen> {
                   stepZoom: 1.0,
                 ),
                 userLocationMarker: UserLocationMaker(
-                  personMarker: const MarkerIcon(
-                    icon: Icon(Icons.location_on, color: Colors.red, size: 56),
+                  personMarker: MarkerIcon(
+                    iconWidget: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+
+                        color: Colors.transparent,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: darkorange.withOpacity(0.25),
+                            ),
+                          ),
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: darkorange,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   directionArrowMarker: const MarkerIcon(
-                    icon: Icon(Icons.navigation, color: darkorange, size: 48),
+                    icon: Icon(
+                      Icons.navigation,
+                      color: darkorange,
+                      size: 48,
+                    ),
                   ),
                 ),
                 roadConfiguration: const RoadOption(
