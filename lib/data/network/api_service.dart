@@ -9,6 +9,9 @@ import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
 import 'package:mylm/data/models/register_customer_request.dart';
 import 'package:mylm/data/models/register_customer_response.dart';
+import 'package:mylm/data/models/support/term_conditions_response.dart';
+import 'package:dio/dio.dart';
+
 
 class ApiService {
   static const String baseUrl = "http://202.169.231.66:83/api-mylm-nestjs/apps/api/v1/apps";
@@ -206,6 +209,24 @@ class ApiService {
       throw Exception("HTTP Error ${response.statusCode}: ${response.body}");
     }
   }
+
+  Future<TermConditionsResponse?> getTermConditions() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get("$baseUrl/term-conditions");
+
+      if (response.statusCode == 200) {
+        return TermConditionsResponse.fromJson(response.data);
+      } else {
+        debugPrint("Gagal memuat term conditions: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("Error saat mengambil term conditions: $e");
+      return null;
+    }
+  }
+
 
 }
 

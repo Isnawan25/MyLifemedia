@@ -112,6 +112,7 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
                       builder: (context) => UbahLayanan2Screen(
                         custNumber: widget.custNumber,
                         accessToken: widget.accessToken,
+                        packagePrice: pkg.spPrice,
                       ),
                     ),
                   );

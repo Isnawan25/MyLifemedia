@@ -152,13 +152,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Center(
               child: GestureDetector(
                 onTap: () async {
-                  // 🔹 Tampilkan dialog konfirmasi logout
+                  //dialog konfirmasi logout
                   final confirmLogout = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       title: Text(
                         "Keluar Aplikasi",
@@ -194,14 +194,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                             ),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(30),
                           ),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(30),
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             ),
@@ -220,14 +220,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   );
 
-                  // 🔹 Jika user memilih "Keluar"
                   if (confirmLogout == true) {
                     try {
                       // Hapus semua data user yang tersimpan
-                      await SecureStorage.clear(); // token, session, dsb.
-                      await UserPreferences.clear(); // data prefs seperti nama, email, dsb.
+                      await SecureStorage.clear();
+                      await UserPreferences.clear();
 
-                      // 🔹 Arahkan ke LoginScreen dan hapus semua route sebelumnya
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => const LoginScreen()),

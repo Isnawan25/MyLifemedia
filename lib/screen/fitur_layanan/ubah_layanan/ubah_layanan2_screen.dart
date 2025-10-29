@@ -3,17 +3,24 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
-import 'package:mylm/base/lifemedia_text.dart';
 import 'package:mylm/base/popup/popup.dart';
-
+import 'package:flutter_html/flutter_html.dart';
+import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/models/support/term_conditions_response.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mylm/base/currency_formatter.dart';
 
 class UbahLayanan2Screen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final int packagePrice;
+
   const UbahLayanan2Screen({
     super.key,
     required this.custNumber,
-    required this.accessToken
+    required this.accessToken,
+    required this.packagePrice,
   });
 
   @override
@@ -22,6 +29,26 @@ class UbahLayanan2Screen extends StatefulWidget {
 
 class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   bool isChecked = false;
+  TermConditionsData? termData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTerms();
+  }
+
+  Future<void> _loadTerms() async {
+    final apiService = ApiService();
+    final result = await apiService.getTermConditions();
+    if (mounted) {
+      setState(() {
+        termData = result?.data;
+        isLoading = false;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +70,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
           },
         ),
         title: Text(
-          "Riwayat Tagihan",
+          "Perubahan Layanan",
           style: GoogleFonts.inter(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
@@ -84,11 +111,11 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
               ),
               child: Column(
                 children: [
-                  _buildPriceRow("Tagihan Internet", "Rp 250.000"),
+                  _buildPriceRow("Tagihan Internet", "${formatRupiah(widget.packagePrice)}",),
                   const SizedBox(height: 8),
-                  _buildPriceRow("PPN 11%", "Rp 27.500"),
+                  _buildPriceRow("PPN 11%",""),
                   const Divider(thickness: 1, height: 20),
-                  _buildPriceRow("Total", "Rp 277.500", isBold: true),
+                  _buildPriceRow("Total", "${formatRupiah(widget.packagePrice)}", isBold: true),
                 ],
               ),
             ),
@@ -105,17 +132,65 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
             const SizedBox(height: 8),
 
             Expanded(
-              child: SingleChildScrollView(
-                child: Text(
-                  termsAndConditionsText,
-                  style: GoogleFonts.inter(
-                    fontSize: 13.sp,
-                    color: Colors.black87,
-                    height: 1.4,
-                  ),
-                ),
+              child: isLoading
+                  ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SkeletonLoading(),
+              )
+                  : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: termData == null
+                    ? Text(
+                  "Gagal memuat Syarat & Ketentuan.",
+                  style: GoogleFonts.inter(fontSize: 13.sp),
+                )
+                : Html(
+                  data: termData!.termconditions,
+                  style: {
+                    "body": Style(
+                      margin: Margins.zero,
+                      padding: HtmlPaddings.zero,
+                      fontSize: FontSize(13.sp),
+                      color: Colors.black87,
+                      fontFamily: GoogleFonts.inter().fontFamily,
+                      lineHeight: LineHeight.number(1.5),
+                      textAlign: TextAlign.justify,
+                    ),
+                    "ul": Style(
+                      margin: Margins.zero,
+                      padding: HtmlPaddings.only(left: 0),
+                    ),
+                    "li": Style(
+                      margin: Margins.only(bottom: 6),
+                      padding: HtmlPaddings.only(left: 10),
+                      lineHeight: LineHeight.number(1.5),
+                    ),
+                    "a": Style(
+                      color: darkorange,
+                      textDecoration: TextDecoration.underline,
+                    ),
+                  },
+                  onLinkTap: (url, attributes, element) async {
+                    if (url == null) return;
+                    final Uri uri = Uri.parse(url);
+                    if (!await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    )) {
+                      // fallback ke browser default
+                      if (!await launchUrl(
+                        uri,
+                        mode: LaunchMode.platformDefault,
+                      )) {
+                        debugPrint("Tidak dapat membuka URL: $url");
+                      }
+                    }
+                  },
+                )
               ),
             ),
+
+
 
             const SizedBox(height: 12),
 
