@@ -6,6 +6,7 @@ void showSuccessDialog(
     BuildContext context, {
       required String custNumber,
       required String accessToken,
+      required String custGroupId,
     }) {
   showDialog(
     context: context,
@@ -49,6 +50,7 @@ void showSuccessDialog(
                     builder: (context) => MainScreen(
                       custNumber: custNumber,
                       accessToken: accessToken,
+                      custGroupId: custGroupId,
                     ),
                   ),
                 );

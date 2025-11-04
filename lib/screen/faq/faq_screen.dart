@@ -12,11 +12,14 @@ import 'package:mylm/screen/main/main_screen.dart';
 class FaqScreen extends StatelessWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
   const FaqScreen({
     super.key,
     required this.custNumber,
-    required this.accessToken
+    required this.accessToken,
+    required this.custGroupId,
   });
 
   @override
@@ -47,6 +50,7 @@ class FaqScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => MainScreen(
                   custNumber: custNumber,
                   accessToken: accessToken,
+                  custGroupId: custGroupId,
                 )));
           },
         ),

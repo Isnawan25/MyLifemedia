@@ -25,6 +25,7 @@ class CustomerData {
   final String custAddress;
   final String custPhone;
   final String custEmail;
+  final String custGroupId;
   final String? custProvince;
   final String? custDistrict;
   final String? custSubDistrict;
@@ -37,6 +38,7 @@ class CustomerData {
     required this.custAddress,
     required this.custPhone,
     required this.custEmail,
+    required this.custGroupId,
     this.custProvince,
     this.custDistrict,
     this.custSubDistrict,
@@ -51,6 +53,7 @@ class CustomerData {
       custAddress: json['custAddress'] ?? '',
       custPhone: json['custPhone'] ?? '',
       custEmail: json['custEmail'] ?? '',
+      custGroupId: json['custGroupId'] ?? '',
       custProvince: json['custProvince'],
       custDistrict: json['custDistrict'],
       custSubDistrict: json['custSubDistrict'],

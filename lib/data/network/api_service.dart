@@ -11,6 +11,8 @@ import 'package:mylm/data/models/register_customer_request.dart';
 import 'package:mylm/data/models/register_customer_response.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
 import 'package:dio/dio.dart';
+import 'package:mylm/data/models/bill/bill_list_response.dart';
+
 
 
 class ApiService {
@@ -93,16 +95,13 @@ class ApiService {
         return null;
       }
 
-      //Jika bukan 201 (Created) = respon tidak valid
       if (response.statusCode != 201) {
         debugPrint("Verify OTP gagal: kode status tidak diharapkan (${response.statusCode})");
         return null;
       }
 
-      //Parse JSON
       final decoded = jsonDecode(response.body);
 
-      //Validasi struktur & status
       if (decoded["success"] == 1 &&
           decoded["data"]?["statusOTP"]?.toString().toLowerCase() == "verified") {
         debugPrint("OTP Verified dari server");
@@ -227,6 +226,28 @@ class ApiService {
     }
   }
 
+  Future<BillListResponse> getBillList({
+    required String custNumber,
+    required String custGroupId,
+    required String accessToken,
+  })
+  async {
+    final url = Uri.parse('$baseUrl/bill-list?cust_number=$custNumber&group_id=$custGroupId');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return BillListResponse.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load bill list: ${response.body}');
+    }
+  }
 
 }
 

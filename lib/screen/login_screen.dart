@@ -131,6 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (result != null && result.success) {
                   final customerData = result.data;
                   final accessToken = customerData?.accessToken ?? '';
+                  final custGroupId = customerData?.custGroupId ?? '';
 
                   // Request OTP
                   final otpResponse = await api.requestOtp(custNumber, accessToken);
@@ -144,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         builder: (context) => VerifyScreen(
                           custNumber: custNumber,
                           accessToken: accessToken,
+                          custGroupId: custGroupId,
                         ),
                       ),
                     );

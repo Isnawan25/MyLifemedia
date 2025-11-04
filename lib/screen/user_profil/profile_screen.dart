@@ -18,11 +18,14 @@ import 'package:mylm/data/preferences/secure_storage.dart';
 class ProfileScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
   const ProfileScreen({
     super.key,
     required this.custNumber,
-    required this.accessToken
+    required this.accessToken,
+    required this.custGroupId,
   });
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -72,6 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 MaterialPageRoute(builder: (context) => MainScreen(
                   custNumber: widget.custNumber,
                   accessToken: widget.accessToken,
+                  custGroupId: widget.custGroupId,
                 )));
           },
         ),

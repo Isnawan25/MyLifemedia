@@ -21,13 +21,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkLoginStatus() async {
     await Future.delayed(const Duration(seconds: 3));
-    final token = await SecureStorage.getAccessToken();
+    final token = await SecureStorage.getAccessToken(); print("Token tersimpan: $token");
     final custNumber = await SecureStorage.getCustNumber();
-    print("Token tersimpan: $token");
+    final custGroupId = await SecureStorage.getCustGroupId();
+
 
     if (!mounted) return;
 
-    if (token != null && token.isNotEmpty && custNumber != null && custNumber.isNotEmpty) {
+    if (token != null
+        && token.isNotEmpty
+        && custNumber != null
+        && custNumber.isNotEmpty
+        && custGroupId != null
+        && custGroupId.isNotEmpty) {
       // Kalau token ada → langsung ke MainScreen
       Navigator.pushReplacement(
         context,
@@ -35,6 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
           builder: (_) => MainScreen(
             accessToken: token,
             custNumber: custNumber,
+            custGroupId: custGroupId,
           ),
         ),
       );

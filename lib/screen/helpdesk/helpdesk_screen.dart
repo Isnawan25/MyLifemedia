@@ -8,11 +8,13 @@ import 'package:mylm/screen/main/main_screen.dart';
 class HelpdeskScreen extends StatelessWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
 
   const HelpdeskScreen({
     super.key,
     required this.custNumber,
-    required this.accessToken
+    required this.accessToken,
+    required this.custGroupId,
   });
 
   @override
@@ -35,7 +37,10 @@ class HelpdeskScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => MainScreen(
                   custNumber: custNumber,
                   accessToken: accessToken,
-                )));
+                  custGroupId: custGroupId,
+                )
+                )
+            );
           },
         ),
         title: Text(

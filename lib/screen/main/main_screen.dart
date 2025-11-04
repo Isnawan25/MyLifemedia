@@ -9,12 +9,15 @@ import 'package:mylm/screen/user_profil/profile_screen.dart';
 class MainScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
 
   const MainScreen({
     super.key,
     required this.custNumber,
     required this.accessToken,
+    required this.custGroupId,
   });
 
   @override
@@ -32,21 +35,26 @@ class _MainScreenState extends State<MainScreen> {
       ProfileScreen(
         custNumber: widget.custNumber,
         accessToken: widget.accessToken,
+        custGroupId: widget.custGroupId,
       ),
       RiwayatTagihanScreen(
         custNumber: widget.custNumber,
         accessToken: widget.accessToken,
+        custGroupId: widget.custGroupId,
       ),
       HomeScreen(
         custNumber: widget.custNumber,
         accessToken: widget.accessToken,
+        custGroupId: widget.custGroupId,
       ),
       FaqScreen(
         custNumber: widget.custNumber,
-        accessToken: widget.accessToken,),
+        accessToken: widget.accessToken,
+        custGroupId: widget.custGroupId,),
       HelpdeskScreen(
         custNumber: widget.custNumber,
-        accessToken: widget.accessToken,),
+        accessToken: widget.accessToken,
+        custGroupId: widget.custGroupId,),
     ];
   }
 

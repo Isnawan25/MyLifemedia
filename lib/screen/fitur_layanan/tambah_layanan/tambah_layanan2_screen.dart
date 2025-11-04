@@ -16,12 +16,14 @@ class TambahLayanan2Screen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final String packageId;
+  final String custGroupId;
 
   const TambahLayanan2Screen({
     super.key,
     required this.custNumber,
     required this.accessToken,
     required this.packageId,
+    required this.custGroupId,
   });
 
   @override
@@ -346,7 +348,8 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                             print("Data berhasil dikirim dan diterima server!");
                             showSuccessDialog(context,
                               custNumber: widget.custNumber, // di sini boleh pakai widget.
-                              accessToken: widget.accessToken,);
+                              accessToken: widget.accessToken,
+                                custGroupId: widget.custGroupId);
                           } else {
                             print("Server menolak data: ${response.message}");
                             ScaffoldMessenger.of(context).showSnackBar(

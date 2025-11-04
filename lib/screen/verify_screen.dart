@@ -11,11 +11,14 @@ import 'package:mylm/data/preferences/secure_storage.dart';
 class VerifyScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
 
   const VerifyScreen({super.key,
     required this.custNumber,
-    required this.accessToken});
+    required this.accessToken,
+    required this.custGroupId,});
 
 
   @override
@@ -100,7 +103,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
       context,
       MaterialPageRoute(builder: (context) => MainScreen(
         custNumber: widget.custNumber,
-        accessToken: widget.accessToken,)),
+        accessToken: widget.accessToken,
+        custGroupId: widget.custGroupId,)),
     );
   }
 

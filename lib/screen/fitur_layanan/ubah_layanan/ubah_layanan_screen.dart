@@ -12,11 +12,14 @@ import 'package:mylm/base/currency_formatter.dart';
 class UbahLayananScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
   const UbahLayananScreen({
     super.key,
     required this.custNumber,
     required this.accessToken,
+    required this.custGroupId,
   });
 
   @override
@@ -113,6 +116,7 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
                         custNumber: widget.custNumber,
                         accessToken: widget.accessToken,
                         packagePrice: pkg.spPrice,
+                        custGroupId: widget.custGroupId,
                       ),
                     ),
                   );

@@ -19,11 +19,14 @@ import 'package:mylm/base/widgets/icons_colors.dart';
 class HomeScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
   const HomeScreen({
     super.key,
     required this.custNumber,
-    required this.accessToken
+    required this.accessToken,
+    required this.custGroupId,
   });
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -90,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 builder: (context) => MainProfileScreen(
                                   accessToken: widget.accessToken,
                                   custNumber: widget.custNumber,
+                                  custGroupId: widget.custGroupId,
                                 ))
                             );
                           },
@@ -268,7 +272,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) => TambahLayananScreen(
                                     custNumber: widget.custNumber,
-                                    accessToken: widget.accessToken)),
+                                    accessToken: widget.accessToken,
+                                    custGroupId: widget.custGroupId
+
+                                )
+                                ),
                             );
                               }),
                           buildFeature(context, "assets/svgs/icons_repost.svg",
@@ -277,6 +285,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 MaterialPageRoute(builder: (context) => UbahLayananScreen(
                                   custNumber: widget.custNumber,
                                   accessToken: widget.accessToken,
+                                  custGroupId: widget.custGroupId,
+
                                 )));
 
                               }),

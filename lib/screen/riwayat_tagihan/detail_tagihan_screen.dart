@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mylm/base/date_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 
 class DetailTagihanScreen extends StatelessWidget {
+  final String paketInternet;
+  final String Periode;
+  final String Pembayaran;
   final String idTagihan;
   final String harga;
-  final String status; // Menunggu Pembayaran / Sudah Dibayar
+  final String status;
+  final String tanggalPembayaran;
 
   const DetailTagihanScreen({
     super.key,
+    required this.paketInternet,
+    required this.Periode,
+    required this.Pembayaran,
     required this.idTagihan,
     required this.harga,
     required this.status,
+    required this.tanggalPembayaran,
   });
 
   bool get isMenunggu => status.contains("Menunggu");
@@ -42,12 +51,11 @@ class DetailTagihanScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // === ICON STATUS ===
             Container(
               width: 80.w,
               height: 80.w,
@@ -65,14 +73,14 @@ class DetailTagihanScreen extends StatelessWidget {
                   isMenunggu
                       ? "assets/svgs/icons_three_dots.svg"
                       : "assets/svgs/icons_invoice2.svg",
-                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter:
+                  const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
             ),
 
             SizedBox(height: 16.h),
 
-            // === STATUS TEXT ===
             Text(
               isMenunggu ? "Menunggu Pembayaran" : "Sudah Dibayar",
               style: GoogleFonts.inter(
@@ -84,7 +92,6 @@ class DetailTagihanScreen extends StatelessWidget {
 
             SizedBox(height: 8.h),
 
-            // === ID TAGIHAN ===
             Text(
               "ID Tagihan: $idTagihan",
               style: GoogleFonts.inter(
@@ -95,7 +102,6 @@ class DetailTagihanScreen extends StatelessWidget {
 
             SizedBox(height: 4.h),
 
-            // === NOMINAL ===
             Text(
               harga,
               style: GoogleFonts.inter(
@@ -107,7 +113,6 @@ class DetailTagihanScreen extends StatelessWidget {
 
             SizedBox(height: 32.h),
 
-            // === CARD DETAIL ===
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(16.w),
@@ -134,10 +139,13 @@ class DetailTagihanScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12.h),
-                  _detailItem("Paket Internet", "Unlimited 30 Mbps"),
-                  _detailItem("Periode", "1 Oktober 2025 - 31 Oktober 2025"),
+                  _detailItem("Paket Internet", paketInternet),
+                  _detailItem("Periode", Periode),
+                  _detailItem("Pembayaran", Pembayaran),
                   _detailItem("Harga", harga),
                   _detailItem("Status", status),
+                  _detailItem("Tanggal Pembayaran", formatTanggalWaktu(tanggalPembayaran)),
+
                 ],
               ),
             ),
@@ -151,21 +159,29 @@ class DetailTagihanScreen extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 14.sp,
-              color: Colors.grey[700],
+          SizedBox(
+            width: 120.w,
+            child: Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                color: Colors.grey[700],
+              ),
             ),
           ),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              softWrap: true,
+              overflow: TextOverflow.visible,
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
           ),
         ],

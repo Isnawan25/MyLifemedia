@@ -15,12 +15,15 @@ class UbahLayanan2Screen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final int packagePrice;
+  final String custGroupId;
+
 
   const UbahLayanan2Screen({
     super.key,
     required this.custNumber,
     required this.accessToken,
     required this.packagePrice,
+    required this.custGroupId,
   });
 
   @override
@@ -109,14 +112,29 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                   ),
                 ],
               ),
-              child: Column(
-                children: [
-                  _buildPriceRow("Tagihan Internet", "${formatRupiah(widget.packagePrice)}",),
-                  const SizedBox(height: 8),
-                  _buildPriceRow("PPN 11%",""),
-                  const Divider(thickness: 1, height: 20),
-                  _buildPriceRow("Total", "${formatRupiah(widget.packagePrice)}", isBold: true),
-                ],
+              child: Builder(
+                builder: (context) {
+                  final total = widget.packagePrice + (widget.packagePrice * 0.11).round();
+                  return Column(
+                    children: [
+                      _buildPriceRow(
+                        "Tagihan Internet",
+                        "${formatRupiah(widget.packagePrice)}",
+                      ),
+                      const SizedBox(height: 8),
+                      _buildPriceRow(
+                        "PPN 11%",
+                        "${formatRupiah((widget.packagePrice * 0.11).round())}",
+                      ),
+                      const Divider(thickness: 1, height: 20),
+                      _buildPriceRow(
+                        "Total",
+                        formatRupiah(total),
+                        isBold: true,
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
 
@@ -239,7 +257,9 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                     showSuccessDialog(
                         context,
                         custNumber: widget.custNumber,
-                        accessToken: widget.accessToken);
+                        accessToken: widget.accessToken,
+                        custGroupId: widget.custGroupId
+                    );
                   }
                 }
                     : null,

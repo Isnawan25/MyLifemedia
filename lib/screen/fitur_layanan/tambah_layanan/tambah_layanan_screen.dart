@@ -12,11 +12,14 @@ import 'package:mylm/base/widgets/skeleton_loading.dart';
 class TambahLayananScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
+  final String custGroupId;
+
 
   const TambahLayananScreen({
     super.key,
     required this.custNumber,
     required this.accessToken,
+    required this.custGroupId,
   });
 
   @override
@@ -83,8 +86,8 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: isLoading
-            ? const SkeletonLoading(
-          itemCount: 4, // 4 paket layanan
+            ? SkeletonLoading(
+          itemCount: packages.isNotEmpty ? packages.length : 4, // 4 paket layanan
           itemHeight: 90, // tinggi kartu
           isCard: true, // tampil bentuk kartu layanan
         )
@@ -136,6 +139,7 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
                               custNumber: widget.custNumber,
                               accessToken: widget.accessToken,
                               packageId: _selectedPaket!,
+                              custGroupId: widget.custGroupId,
                             ),
                       ),
                     );
