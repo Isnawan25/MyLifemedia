@@ -87,10 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Profil
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
+                            Navigator.push(context,
                               MaterialPageRoute(
-                                builder: (context) => MainProfileScreen(
+                                  builder: (context) => MainProfileScreen(
                                   accessToken: widget.accessToken,
                                   custNumber: widget.custNumber,
                                   custGroupId: widget.custGroupId,
@@ -145,8 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const Spacer(),
                               IconButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
+                                  Navigator.push(context,
                                     MaterialPageRoute(
                                       builder: (context) =>
                                       const PesanScreen(),
@@ -307,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Penawaran
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -326,9 +324,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: ApiService().getPromotions(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-
                     return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: 24),
                       child: SkeletonLoading(),
                     );
                   } else if (snapshot.hasError) {
@@ -338,41 +335,55 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: 24),
                       child: Text("Belum ada penawaran."),
                     );
                   } else {
                     final promotions = snapshot.data!;
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         children: promotions.map((promo) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                promo.photo,
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, progress) {
-                                  if (progress == null) return child;
-                                  // shimmer loading
-                                  return Shimmer.fromColors(
-                                    baseColor: Colors.grey.shade300,
-                                    highlightColor: Colors.grey.shade100,
-                                    child: Container(
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade300,
-                                        borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                height: 180,
+                                width: double.infinity,
+                                color: Colors.grey.shade200,
+                                child: Image.network(
+                                  promo.photo,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: 180,
+                                  loadingBuilder: (context, child, progress) {
+                                    if (progress == null) return child;
+                                    // shimmer loading
+                                    return Shimmer.fromColors(
+                                      baseColor: Colors.grey.shade300,
+                                      highlightColor: Colors.grey.shade100,
+                                      child: Container(
+                                        height: 180,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade300,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
                                       ),
+                                    );
+                                  },
+                                  // jika gagal load/404
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    height: 180,
+                                    color: Colors.grey.shade300,
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.broken_image,
+                                      size: 40,
+                                      color: Colors.grey,
                                     ),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(height: 150,
-                                        color: Colors.grey.shade300,
-                                        child: const Icon(Icons.broken_image)),
+                                  ),
+                                ),
                               ),
                             ),
                           );
@@ -382,6 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
               ),
+
               const SizedBox(height: 20),
             ],
           ),

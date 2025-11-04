@@ -88,7 +88,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
     final response = await api.verifyOtp(widget.custNumber, otp, widget.accessToken);
 
     //Jika response null atau tidak verified
-    if (response == null || response.data?.statusOTP?.toLowerCase() != "verified") {
+    if (response == null || response.data?.statusOTP.toLowerCase() != "verified") {
       debugPrint("OTP Salah atau tidak ditemukan (tetap di VerifyScreen)");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Kode OTP salah")),
@@ -107,7 +107,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
       MaterialPageRoute(builder: (context) => MainScreen(
         custNumber: widget.custNumber,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,)),
+        custGroupId: widget.custGroupId,)
+      ),
     );
   }
 
