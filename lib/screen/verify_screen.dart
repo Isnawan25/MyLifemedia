@@ -38,7 +38,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   void initState() {
     super.initState();
     _startTimer();
-    debugPrint("✅ VerifyScreen opened with:");
+    debugPrint("VerifyScreen opened with:");
     debugPrint("Customer Number: ${widget.custNumber}");
     debugPrint("Access Token: ${widget.accessToken}");
   }
@@ -74,10 +74,11 @@ class _VerifyScreenState extends State<VerifyScreen> {
     if (value.isNotEmpty && index < _focusNodes.length - 1) {
       _focusNodes[index + 1].requestFocus();
     }
-    if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
+    if (_controllers.every((c) => c.text.isNotEmpty)) {
+      _verifyOtp();
     }
   }
+
 
   void _verifyOtp() async {
     String otp = _controllers.map((c) => c.text).join();
@@ -92,10 +93,12 @@ class _VerifyScreenState extends State<VerifyScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Kode OTP salah")),
       );
-      return; // keluar, jangan lanjut
+      return;
     }
     await SecureStorage.saveAccessToken(widget.accessToken);
     await SecureStorage.saveCustNumber(widget.custNumber);
+    await SecureStorage.saveCustGroupId(widget.custGroupId);
+
 
     // Jika berhasil
     debugPrint("OTP Verified: ${response.data?.statusOTP}");
@@ -266,11 +269,16 @@ class _VerifyScreenState extends State<VerifyScreen> {
             // Kirim ulang kode OTP (selalu ada)
             GestureDetector(
               onTap: _canResend
-                  ? () {
+                  ? () async {
                 _startTimer();
-                debugPrint("Kirim ulang OTP");
+                final api = ApiService();
+                await api.resendOtp(widget.custNumber, widget.accessToken);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Kode OTP telah dikirim ulang")),
+                );
               }
                   : null,
+
               child: Center(
                 child: Text(
                   "Kirim ulang kode OTP",

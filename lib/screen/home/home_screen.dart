@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => isLoadingProfile = true);
 
     final api = ApiService();
-    final result = await api.getProfile(widget.custNumber, widget.accessToken);
+    final result = await api.getProfile(widget.custNumber, widget.accessToken, context);
 
     if (result != null && result.success == 1 && result.data != null) {
       setState(() {

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/models/auth_&_otp/login_response.dart';
 import 'package:mylm/data/models/auth_&_otp/otp_request_response.dart';
@@ -12,6 +11,10 @@ import 'package:mylm/data/models/register_customer_response.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
 import 'package:dio/dio.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
+import 'package:mylm/screen/login_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 
 
@@ -63,6 +66,12 @@ class ApiService {
       print("Error saat request OTP: $e");
       return null;
     }
+  }
+
+  // RESEND OTP
+  Future<OtpResponse?> resendOtp(String custNumber, String accessToken) async {
+    debugPrint("Mengirim ulang OTP ke nomor: $custNumber");
+    return await requestOtp(custNumber, accessToken);
   }
 
 
@@ -117,8 +126,12 @@ class ApiService {
   }
 
 
-  // GET PROFILE
-  Future<DetailProfileResponse?> getProfile(String custNumber, String accessToken) async {
+// GET PROFILE
+  Future<DetailProfileResponse?> getProfile(
+      String custNumber,
+      String accessToken,
+      BuildContext context,
+      ) async {
     final url = Uri.parse("$baseUrl/detailprofile?cust_number=$custNumber");
 
     try {
@@ -134,16 +147,30 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return DetailProfileResponse.fromJson(jsonDecode(response.body));
+
+      } else if (response.statusCode == 401) {
+        print("Token expired atau tidak valid, menghapus token dan kembali ke login.");
+
+        final storage = const FlutterSecureStorage();
+        await storage.delete(key: 'access_token');
+
+        if (context.mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
+          );
+        }
+        return null;
+
       } else {
         print("Gagal ambil profil: ${response.statusCode}");
-        return null;
-      }
-    } catch (e) {
-      print("Error GET Profile: $e");
-      return null;
+        return null;}
     }
+    catch (e) {
+      print("Error GET Profile: $e");
+      return null;}
   }
-
 
 
   // GET PROMOTION

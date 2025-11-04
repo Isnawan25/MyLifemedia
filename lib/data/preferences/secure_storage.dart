@@ -27,13 +27,16 @@ class SecureStorage {
     return await _storage.read(key: _keyCustNumber);
   }
 
+  static const _keyCustGroupId = 'custGroupId';
+
   static Future<void> saveCustGroupId(String groupId) async {
-    await _storage.write(key: 'custGroupId', value: groupId);
+    await _storage.write(key: _keyCustGroupId, value: groupId);
   }
 
   static Future<String?> getCustGroupId() async {
-    return await _storage.read(key: 'custGroupId');
+    return await _storage.read(key: _keyCustGroupId);
   }
+
 
 
 }

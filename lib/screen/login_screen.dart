@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/auth_&_otp/login_response.dart';
@@ -128,10 +129,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Login
                 final result = await api.login(custNumber);
 
-                if (result != null && result.success) {
-                  final customerData = result.data;
-                  final accessToken = customerData?.accessToken ?? '';
-                  final custGroupId = customerData?.custGroupId ?? '';
+                  if (result != null && result.success) {
+                    final customerData = result.data;
+                    final accessToken = customerData?.accessToken ?? '';
+                    final custGroupId = customerData?.custGroupId ?? '';
+
+                    // ✅ SIMPAN DATA KE SECURE STORAGE
+                    await SecureStorage.saveAccessToken(accessToken);
+                    await SecureStorage.saveCustNumber(custNumber);
+                    await SecureStorage.saveCustGroupId(custGroupId);
 
                   // Request OTP
                   final otpResponse = await api.requestOtp(custNumber, accessToken);
