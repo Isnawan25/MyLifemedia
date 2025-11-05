@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
@@ -15,6 +16,8 @@ import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mylm/base/widgets/icons_colors.dart';
+import 'package:mylm/data/models/product/exists_package_response.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final String custNumber;
@@ -35,18 +38,25 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   DetailProfileData? profile;
   bool isLoadingProfile = true;
+  ExistsPackage? existsPackage;
+  bool isLoadingPackage = true;
+
 
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    _loadExistingPackage();
   }
 
   Future<void> _loadProfile() async {
     setState(() => isLoadingProfile = true);
 
     final api = ApiService();
-    final result = await api.getProfile(widget.custNumber, widget.accessToken, context);
+    final result = await api.getProfile(
+        widget.custNumber,
+        widget.accessToken,
+        context);
 
     if (result != null && result.success == 1 && result.data != null) {
       setState(() {
@@ -58,6 +68,25 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Gagal memuat profil");
     }
   }
+
+  Future<void> _loadExistingPackage() async {
+    setState(() => isLoadingPackage = true);
+
+    final api = ApiService();
+    final result = await api.getExistingPackage(
+      widget.custGroupId,
+      widget.custNumber,
+      widget.accessToken,
+    );
+
+    setState(() {
+      existsPackage = result;
+      isLoadingPackage = false;
+    });
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +241,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: Colors.white70,
                                             fontSize: 12.sp,
                                           )),
-                                      Text("Izzi Life 30",
+                                      Text(
+                                          isLoadingPackage ? "..." : (existsPackage?.spCode ?? "-"),
                                           style: GoogleFonts.inter(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w600,
@@ -227,7 +257,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: Colors.white70,
                                             fontSize: 12.sp,
                                           )),
-                                      Text("Rp 166.500",
+                                      Text(
+                                          isLoadingPackage
+                                              ? "..."
+                                              : formatRupiah(existsPackage?.spReguler ?? 0),
                                           style: GoogleFonts.inter(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w600,
@@ -284,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   custNumber: widget.custNumber,
                                   accessToken: widget.accessToken,
                                   custGroupId: widget.custGroupId,
-
+                                  currentPackage: existsPackage,
                                 )));
 
                               }),

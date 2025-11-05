@@ -14,7 +14,7 @@ import 'package:mylm/data/models/bill/bill_list_response.dart';
 import 'package:mylm/screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:mylm/data/models/product/exists_package_response.dart';
 
 
 
@@ -214,6 +214,46 @@ class ApiService {
     }
   }
 
+  //GET EXISTS PACKAGES
+  Future<ExistsPackage?> getExistingPackage(String groupId, String custNumber, String accessToken)
+  async {
+    final url = Uri.parse("$baseUrl/exists-package""?group_id=$groupId&cust_number=$custNumber",
+    );
+    try {
+      final response = await http.get(
+          url,
+        headers: {
+          "Authorization": "Bearer $accessToken",
+          "Content-Type": "application/json"
+        },
+      );
+      print("RAW JSON EXISTS PACKAGE:");
+      print(response.body);
+
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["success"] == 1 && data["data"] is List && data["data"].isNotEmpty) {
+          // Ambil yang cocok dengan custNumber
+
+          final pkg = (data["data"] as List).firstWhere(
+                  (e) => e["custNumber"] == custNumber,
+              orElse: () => null
+          );
+
+          if (pkg == null) return null;
+          return ExistsPackage.fromJson(pkg);
+        }
+      }
+      return null;
+    } catch (e) {
+      print("Error get Existing Package: $e");
+      return null;
+    }
+
+  }
+
   // REGISTER CUSTOMERS
   Future<RegisterCustomerResponse> registerCustomer(RegisterCustomerRequest request) async {
     final url = Uri.parse('$baseUrl/register');
@@ -236,6 +276,7 @@ class ApiService {
     }
   }
 
+  // TERM CONDITIONS
   Future<TermConditionsResponse?> getTermConditions() async {
     try {
       final dio = Dio();
@@ -253,6 +294,7 @@ class ApiService {
     }
   }
 
+  // BILL LIST
   Future<BillListResponse> getBillList({
     required String custNumber,
     required String custGroupId,

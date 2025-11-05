@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/welcome_screen.dart';
+import 'package:flutter/services.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,7 +18,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ));
+    });
   }
+
 
   Future<void> _checkLoginStatus() async {
     await Future.delayed(const Duration(seconds: 3));

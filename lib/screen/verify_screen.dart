@@ -99,7 +99,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
     await SecureStorage.saveCustNumber(widget.custNumber);
     await SecureStorage.saveCustGroupId(widget.custGroupId);
 
-
     // Jika berhasil
     debugPrint("OTP Verified: ${response.data?.statusOTP}");
     Navigator.pushReplacement(
@@ -112,22 +111,13 @@ class _VerifyScreenState extends State<VerifyScreen> {
     );
   }
 
-
-
-
-
-
   bool get isValid => _controllers.every((c) => c.text.isNotEmpty);
 
   @override
   void dispose() {
     _timer?.cancel();
-    for (var c in _controllers) {
-      c.dispose();
-    }
-    for (var f in _focusNodes) {
-      f.dispose();
-    }
+    for (var c in _controllers) {c.dispose();}
+    for (var f in _focusNodes) {f.dispose();}
     super.dispose();
   }
 

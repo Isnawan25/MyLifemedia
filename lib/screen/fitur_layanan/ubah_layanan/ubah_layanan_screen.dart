@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan2_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
@@ -13,6 +14,7 @@ class UbahLayananScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final String custGroupId;
+  final ExistsPackage? currentPackage;
 
 
   const UbahLayananScreen({
@@ -20,6 +22,7 @@ class UbahLayananScreen extends StatefulWidget {
     required this.custNumber,
     required this.accessToken,
     required this.custGroupId,
+    required this.currentPackage,
   });
 
   @override
