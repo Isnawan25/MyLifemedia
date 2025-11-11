@@ -310,18 +310,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                             );
                               }),
-                          buildFeature(context, "assets/svgs/icons_repost.svg",
-                              "Ubah Layanan", onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => UbahLayananScreen(
-                                  custNumber: widget.custNumber,
-                                  accessToken: widget.accessToken,
-                                  custGroupId: widget.custGroupId,
-                                  currentPackage: existsPackage,
-                                )));
+                        buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan",
+                            onTap: () {if (isLoadingPackage || existsPackage == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Sedang memuat paket aktif...")),
+                            );
+                            return;
+                          }
 
-                              }),
-                          buildFeature(context, "assets/svgs/icons_invoice.svg",
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UbahLayananScreen(
+                                custNumber: widget.custNumber,
+                                accessToken: widget.accessToken,
+                                custGroupId: widget.custGroupId,
+                                currentPackage: existsPackage, // sekarang dijamin tidak null
+                              ),
+                            ),
+                          );
+                        }),
+
+                        buildFeature(context, "assets/svgs/icons_invoice.svg",
                               "Bayar Tagihan", onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder:

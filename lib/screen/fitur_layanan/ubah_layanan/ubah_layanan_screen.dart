@@ -120,6 +120,8 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
                         accessToken: widget.accessToken,
                         packagePrice: pkg.spPrice,
                         custGroupId: widget.custGroupId,
+                        newPackageId: pkg.spCodeId,
+                        currentPackage: widget.currentPackage,
                       ),
                     ),
                   );

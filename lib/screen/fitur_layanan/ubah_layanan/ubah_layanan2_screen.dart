@@ -6,16 +6,21 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/popup.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mylm/base/currency_formatter.dart';
+import 'package:mylm/data/preferences/secure_storage.dart';
+
 
 class UbahLayanan2Screen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final int packagePrice;
   final String custGroupId;
+  final String newPackageId;
+  final ExistsPackage? currentPackage;
 
 
   const UbahLayanan2Screen({
@@ -24,6 +29,8 @@ class UbahLayanan2Screen extends StatefulWidget {
     required this.accessToken,
     required this.packagePrice,
     required this.custGroupId,
+    required this.newPackageId,
+    required this.currentPackage
   });
 
   @override
@@ -35,10 +42,43 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   TermConditionsData? termData;
   bool isLoading = true;
 
+  // DATA PROFIL (diambil dari SecureStorage)
+  String? custName;
+  String? custPhone;
+  String? custEmail;
+  String? custProvince;
+  String? custDistrict;
+  String? custSubDistrict;
+  String? custVillage;
+  String? custAddress;
+
   @override
   void initState() {
     super.initState();
     _loadTerms();
+    _loadCustomerData();
+  }
+
+  Future<void> _loadCustomerData() async {
+    custName = await SecureStorage.getCustName();
+    custPhone = await SecureStorage.getCustPhone();
+    custEmail = await SecureStorage.getCustEmail();
+    custProvince = await SecureStorage.getCustProvince();
+    custDistrict = await SecureStorage.getCustDistrict();
+    custSubDistrict = await SecureStorage.getCustSubDistrict();
+    custVillage = await SecureStorage.getCustVillage();
+    custAddress = await SecureStorage.getCustAddress();
+
+    print("=== CUSTOMER PROFILE LOADED FROM STORAGE ===");
+    print("custNumber: ${widget.custNumber}");
+    print("custName: $custName");
+    print("custPhone: $custPhone");
+    print("custEmail: $custEmail");
+    print("custProvince: $custProvince");
+    print("custDistrict: $custDistrict");
+    print("custSubDistrict: $custSubDistrict");
+    print("custVillage: $custVillage");
+    print("custAddress: $custAddress");
   }
 
   Future<void> _loadTerms() async {
@@ -51,6 +91,10 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
       });
     }
   }
+
+
+
+
 
 
   @override
@@ -248,22 +292,43 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
               width: 300.w,
               height: 48.h,
               child: ElevatedButton(
-                onPressed: isChecked
-                    ? () async {
-                  bool? confirm = await _showConfirmationDialog(context);
+                  onPressed: isChecked
+                      ? () async {
+                    bool? confirm = await _showConfirmationDialog(context);
 
-                  if (confirm == true) {
+                    if (confirm == true) {
+                      final api = ApiService();
 
-                    showSuccessDialog(
-                        context,
-                        custNumber: widget.custNumber,
+                      final result = await api.upgradePackage(
                         accessToken: widget.accessToken,
-                        custGroupId: widget.custGroupId
-                    );
+                        custNumber: widget.custNumber,
+                        custName: custName ?? "",
+                        custPhone: custPhone ?? "",
+                        custEmail: custEmail ?? "",
+                        custProvince: custProvince ?? "",
+                        custDistrict: custDistrict ?? "",
+                        custSubDistrict: custSubDistrict ?? "",
+                        custVillage: custVillage ?? "",
+                        custAddress: custAddress ?? "",
+                        custSpCodeIdExists: widget.currentPackage?.spCodeId ?? "",
+                        custSpCodeIdNew: widget.newPackageId,
+                      );
+
+                      print("=== RESPONSE RESULT ===");
+                      print(result.toJson());
+
+                      if (result.success == 1) {
+                        showSuccessDialog(
+                          context,
+                          custNumber: widget.custNumber,
+                          accessToken: widget.accessToken,
+                          custGroupId: widget.custGroupId,
+                        );
+                      }
+                    }
                   }
-                }
-                    : null,
-                style: ButtonStyle(
+                      : null,
+                  style: ButtonStyle(
                   padding: WidgetStateProperty.all(EdgeInsets.zero),
                   backgroundColor: WidgetStateProperty.resolveWith<Color>(
                         (states) {

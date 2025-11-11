@@ -6,8 +6,8 @@ import 'package:mylm/data/models/auth_&_otp/otp_request_response.dart';
 import 'package:mylm/data/models/auth_&_otp/verify_otp_response.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
-import 'package:mylm/data/models/register_customer_request.dart';
-import 'package:mylm/data/models/register_customer_response.dart';
+import 'package:mylm/data/models/product/register%20cust/register_customer_request.dart';
+import 'package:mylm/data/models/product/register%20cust/register_customer_response.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
 import 'package:dio/dio.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
@@ -15,6 +15,7 @@ import 'package:mylm/screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
+import 'package:mylm/data/models/product/upgrade_package_response.dart';
 
 
 
@@ -253,6 +254,63 @@ class ApiService {
     }
 
   }
+
+  // UPGRADE PACKAGES
+  Future<UpgradePackageResponse> upgradePackage({
+    required String accessToken,
+    required String custNumber,
+    required String custName,
+    required String custPhone,
+    required String custEmail,
+    required String custProvince,
+    required String custDistrict,
+    required String custSubDistrict,
+    required String custVillage,
+    required String custAddress,
+    required String custSpCodeIdExists,
+    required String custSpCodeIdNew,
+  }) async {
+    final url = Uri.parse("$baseUrl/upgrade-package");
+
+    print("=== START UPGRADE PACKAGE REQUEST ===");
+    print("custNumber: $custNumber");
+    print("custSpCodeIdExists: $custSpCodeIdExists");
+    print("custSpCodeIdNew: $custSpCodeIdNew");
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json"
+      },
+      body: jsonEncode({
+        "custNumber": custNumber,
+        "custName": custName,
+        "custPhone": custPhone,
+        "custEmail": custEmail,
+        "custProvince": custProvince,
+        "custDistrict": custDistrict,
+        "custSubDistrict": custSubDistrict,
+        "custVillage": custVillage,
+        "custAddress": custAddress,
+        "custSpCodeIdExists": custSpCodeIdExists,
+        "custSpCodeIdNew": custSpCodeIdNew,
+      }),
+    );
+
+    print("=== UPGRADE PACKAGE RESPONSE ===");
+    print(response.body);
+
+    final decoded = jsonDecode(response.body);
+
+    // Jika bukan 200, maka lempar error
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(decoded['message'] ?? "Upgrade package failed");
+    }
+
+    return UpgradePackageResponse.fromJson(decoded);
+  }
+
 
   // REGISTER CUSTOMERS
   Future<RegisterCustomerResponse> registerCustomer(RegisterCustomerRequest request) async {

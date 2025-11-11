@@ -134,10 +134,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     final accessToken = customerData?.accessToken ?? '';
                     final custGroupId = customerData?.custGroupId ?? '';
 
-                    // ✅ SIMPAN DATA KE SECURE STORAGE
+                    //  SIMPAN DATA KE SECURE STORAGE
                     await SecureStorage.saveAccessToken(accessToken);
                     await SecureStorage.saveCustNumber(custNumber);
                     await SecureStorage.saveCustGroupId(custGroupId);
+
+                    // Kirim data dari auth
+                    await SecureStorage.saveCustName(customerData?.custName ?? '');
+                    await SecureStorage.saveCustPhone(customerData?.custPhone ?? '');
+                    await SecureStorage.saveCustEmail(customerData?.custEmail ?? '');
+                    await SecureStorage.saveCustAddress(customerData?.custAddress ?? '');
+                    await SecureStorage.saveCustProvince(customerData?.custProvince ?? '');
+                    await SecureStorage.saveCustDistrict(customerData?.custDistrict ?? '');
+                    await SecureStorage.saveCustSubDistrict(customerData?.custSubDistrict ?? '');
+                    await SecureStorage.saveCustVillage(customerData?.custVillage ?? '');
+
 
                   // Request OTP
                   final otpResponse = await api.requestOtp(custNumber, accessToken);
