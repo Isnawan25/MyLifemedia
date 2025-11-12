@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/models/product/upgrade_package_response.dart';
+import 'package:mylm/data/network/check_server_status.dart';
 
 
 
@@ -133,6 +134,10 @@ class ApiService {
       String accessToken,
       BuildContext context,
       ) async {
+    // 🔍 Cek dulu apakah server hidup
+    if (!await checkServerStatus(context)) {
+      return null; // stop jika server mati
+    }
     final url = Uri.parse("$baseUrl/detailprofile?cust_number=$custNumber");
 
     try {

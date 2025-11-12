@@ -3,12 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 
-class StatusPesanScreen extends StatelessWidget {
+class MessageStatusScreen extends StatelessWidget {
   final String judulBantuan;
   final String deskripsi;
   final String waktu;
 
-  const StatusPesanScreen({
+  const MessageStatusScreen({
     super.key,
     required this.judulBantuan,
     required this.deskripsi,
@@ -91,7 +91,7 @@ class StatusPesanScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 10,
                   spreadRadius: 2,
                   offset: const Offset(0, 4),

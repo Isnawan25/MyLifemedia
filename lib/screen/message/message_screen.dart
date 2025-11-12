@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylm/screen/message/status_pesan_screen.dart';
+import 'package:mylm/screen/message/message_status_screen.dart';
 
 
-class PesanScreen extends StatefulWidget {
-  const PesanScreen({super.key});
+class MessageScreen extends StatefulWidget {
+  const MessageScreen({super.key});
 
   @override
-  State<PesanScreen> createState() => _MessageScreenState();
+  State<MessageScreen> createState() => _MessageScreenState();
 }
 
-class _MessageScreenState extends State<PesanScreen> {
+class _MessageScreenState extends State<MessageScreen> {
   //dummy pesan
   final List<Map<String, String>> messages = [
     {
@@ -100,7 +100,7 @@ class _MessageScreenState extends State<PesanScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => StatusPesanScreen(
+                  builder: (context) => MessageStatusScreen(
                     judulBantuan: messages[index]['title']!,
                     deskripsi: messages[index]['subtitle']!,
                     waktu: messages[index]['time']!,

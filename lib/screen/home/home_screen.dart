@@ -5,11 +5,12 @@ import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
+import 'package:mylm/screen/add_new_idcust/add_custlist_screen.dart';
 import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_empty_screen.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart';
 import 'package:mylm/screen/main/main_profile_screen.dart';
-import 'package:mylm/screen/message/pesan_screen.dart';
+import 'package:mylm/screen/message/message_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
@@ -142,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  shortText(profile?.custName ?? "....", limit: 25),
+                                  shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 25),
                                   style: GoogleFonts.inter(
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.w600,
@@ -151,7 +152,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+
                                   const SizedBox(height: 4),
+
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 12, vertical: 4),
@@ -160,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      "Aktif",
+                                      (widget.accessToken.isNotEmpty) ? "Aktif" : "Nonaktif",
                                       style: GoogleFonts.inter(
                                         color: Colors.white,
                                         fontSize: 12.sp,
@@ -172,11 +175,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const Spacer(),
                               IconButton(
-                                onPressed: () {
-                                  Navigator.push(context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                      const PesanScreen(),
+                                onPressed: () {Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) =>
+                                  const MessageScreen(),
                                     ),
                                   );
                                 },
@@ -193,8 +194,50 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
+                        const SizedBox(height: 12),
 
-                        const SizedBox(height: 24),
+                        // Tambah ID Pelanggan
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AddCustlistScreen()));
+                            },
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Tambah ID Pelanggan',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Transform.flip(
+                                    flipX: true,
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/arrow_back.svg',
+                                      width: 14,
+                                      height: 14,
+                                      colorFilter: const ColorFilter.mode(
+                                        Colors.white,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
 
                         // Info Tagihan Card
                         Container(
@@ -224,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontSize: 13.sp,
                                 ),
                                 maxLines: 1,
-                                overflow: TextOverflow.ellipsis, // aman ganda
+                                overflow: TextOverflow.ellipsis,
                               ),
 
                               const Divider(color: Colors.white54, height: 20),
@@ -310,28 +353,40 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                             );
                               }),
-                        buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan",
+                          buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan",
                             onTap: () {if (isLoadingPackage || existsPackage == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Sedang memuat paket aktif...")),
-                            );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                    "Sedang memuat paket aktif...",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  behavior: SnackBarBehavior.floating,
+                                  margin: const EdgeInsets.only(
+                                    bottom: 20,
+                                    left: 16,
+                                    right: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  backgroundColor: Colors.black,
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
                             return;
                           }
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => UbahLayananScreen(
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) => UbahLayananScreen(
                                 custNumber: widget.custNumber,
                                 accessToken: widget.accessToken,
                                 custGroupId: widget.custGroupId,
-                                currentPackage: existsPackage, // sekarang dijamin tidak null
+                                currentPackage: existsPackage,
                               ),
                             ),
                           );
                         }),
-
-                        buildFeature(context, "assets/svgs/icons_invoice.svg",
+                          buildFeature(context, "assets/svgs/icons_invoice.svg",
                               "Bayar Tagihan", onTap: () {
                             Navigator.push(context,
                                 MaterialPageRoute(builder:
@@ -345,7 +400,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 70),
-
               // Penawaran
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),

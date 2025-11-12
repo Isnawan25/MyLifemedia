@@ -6,10 +6,10 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
 import 'package:mylm/screen/login_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:mylm/screen/user_profil/edit_alamat/edit_alamat_screen.dart';
-import 'package:mylm/screen/user_profil/edit_email_screen.dart';
-import 'package:mylm/screen/user_profil/edit_nama_screen.dart';
-import 'package:mylm/screen/user_profil/edit_nomor_screen.dart';
+import 'package:mylm/screen/user_profile/edit_alamat/edit_alamat_screen.dart';
+import 'package:mylm/screen/user_profile/edit_email_screen.dart';
+import 'package:mylm/screen/user_profile/edit_nama_screen.dart';
+import 'package:mylm/screen/user_profile/edit_nomor_screen.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/user_preferences.dart';
@@ -108,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Nama Lengkap
             _buildInfoField(
               label: "Nama Lengkap",
-              value: shortText(profile?.custName ?? "...", limit: 30),
+              value: shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 30),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const EditNamaScreen()));

@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
-import 'package:mylm/screen/user_profil/edit_alamat/tambah_alamat_screen.dart';
-import 'package:mylm/screen/user_profil/edit_alamat/ubah_alamat_screen.dart';
+import 'package:mylm/screen/user_profile/edit_alamat/tambah_alamat_screen.dart';
+import 'package:mylm/screen/user_profile/edit_alamat/ubah_alamat_screen.dart';
 
 class EditAlamatScreen extends StatefulWidget {
   const EditAlamatScreen({super.key});
@@ -109,12 +109,12 @@ class _EditAlamatScreenState extends State<EditAlamatScreen> {
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.orange.withOpacity(0.15)
+                            ? Colors.orange.withValues(alpha: 0.15)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(
                           color: isSelected
-                              ? Colors.orange.withOpacity(0.3)
+                              ? Colors.orange.withValues(alpha: 0.3)
                               : Colors.grey.shade300,
                         ),
                       ),
