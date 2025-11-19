@@ -17,13 +17,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/models/product/upgrade_package_response.dart';
 import 'package:mylm/data/network/check_server_status.dart';
+import 'package:mylm/data/models/support/faq_response.dart';
 
 
 
 class ApiService {
-  static const String baseUrl = "http://202.169.231.66:83/api-mylm-nestjs/apps/api/v1/apps";
+  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
 
-  /// LOGIN
+  // LOGIN
   Future<LoginResponse?> login(String custNumber) async {
     final url = Uri.parse("$baseUrl/login");
     final response = await http.post(
@@ -128,16 +129,17 @@ class ApiService {
   }
 
 
-// GET PROFILE
+//PROFILE
   Future<DetailProfileResponse?> getProfile(
       String custNumber,
       String accessToken,
       BuildContext context,
       ) async {
-    // 🔍 Cek dulu apakah server hidup
+
     if (!await checkServerStatus(context)) {
-      return null; // stop jika server mati
+      return null;
     }
+
     final url = Uri.parse("$baseUrl/detailprofile?cust_number=$custNumber");
 
     try {
@@ -153,7 +155,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         return DetailProfileResponse.fromJson(jsonDecode(response.body));
-
       } else if (response.statusCode == 401) {
         print("Token expired atau tidak valid, menghapus token dan kembali ke login.");
 
@@ -179,7 +180,7 @@ class ApiService {
   }
 
 
-  // GET PROMOTION
+  //PROMOTION
   Future<List<Promotion>> getPromotions() async {
     final response = await http.get(Uri.parse('$baseUrl/promotions'));
 
@@ -220,7 +221,7 @@ class ApiService {
     }
   }
 
-  //GET EXISTS PACKAGES
+  //EXISTS PACKAGES
   Future<ExistsPackage?> getExistingPackage(String groupId, String custNumber, String accessToken)
   async {
     final url = Uri.parse("$baseUrl/exists-package""?group_id=$groupId&cust_number=$custNumber",
@@ -338,6 +339,31 @@ class ApiService {
       throw Exception("HTTP Error ${response.statusCode}: ${response.body}");
     }
   }
+
+
+  // FAQS
+  Future<List<Faq>> getFaqs(String accessToken) async {
+    final url = Uri.parse('$baseUrl/faqs');
+
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+
+    print("GET FAQ Response: ${response.statusCode} - ${response.body}");
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      final List<dynamic> faqList = body['data'];
+      return faqList.map((e) => Faq.fromJson(e)).toList();
+    } else {
+      throw Exception("Gagal memuat FAQ (code: ${response.statusCode})");
+    }
+  }
+
 
   // TERM CONDITIONS
   Future<TermConditionsResponse?> getTermConditions() async {
