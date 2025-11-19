@@ -15,7 +15,7 @@ class Promotion {
     return Promotion(
       id: json['id'],
       name: json['name'],
-      photo: json['photo'],
+      photo: (json['photo'] ?? ""),
       isActive: json['isActive'],
     );
   }

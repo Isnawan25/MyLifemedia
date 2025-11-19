@@ -6,10 +6,6 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
 import 'package:mylm/screen/login_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:mylm/screen/user_profile/edit_alamat/edit_alamat_screen.dart';
-import 'package:mylm/screen/user_profile/edit_email_screen.dart';
-import 'package:mylm/screen/user_profile/edit_nama_screen.dart';
-import 'package:mylm/screen/user_profile/edit_nomor_screen.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/user_preferences.dart';
@@ -90,7 +86,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
 
-      // --- BODY
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
         child: Column(
@@ -109,10 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildInfoField(
               label: "Nama Lengkap",
               value: shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 30),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EditNamaScreen()));
-              },
+              showEditButton: false,
             ),
             SizedBox(height: 12.h),
 
@@ -120,10 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               label: "Alamat",
               value: isLoadingProfile
                   ? "..." : shortText(profile?.custAddress, limit: 36),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EditAlamatScreen()));
-              },
+              showEditButton: false,
             ),
 
             SizedBox(height: 12.h),
@@ -132,10 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildInfoField(
               label: "No. Handphone",
               value: profile?.custPhone ?? "No. Handphone Tidak Tersedia",
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EditNomorScreen()));
-              },
+              showEditButton: false,
             ),
 
             SizedBox(height: 12.h),
@@ -144,19 +130,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildInfoField(
               label: "Email",
               value: profile?.custEmail ?? "Email Tidak Tersedia",
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EditEmailScreen()));
-              },
+              showEditButton: false,
             ),
 
             const Spacer(),
 
-            // Tombol Keluar
+            // Exit
             Center(
               child: GestureDetector(
                 onTap: () async {
-                  //dialog konfirmasi logout
                   final confirmLogout = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(

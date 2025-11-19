@@ -25,7 +25,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // default ke home
+  int _currentIndex = 2; // default home
   late List<Widget> _screens;
 
   @override

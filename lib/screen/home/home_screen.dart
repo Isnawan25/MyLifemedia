@@ -423,7 +423,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: SkeletonLoading(),
+                      child: SkeletonLoading(
+                          height: 180
+                      ),
                     );
                   } else if (snapshot.hasError) {
                     return Padding(

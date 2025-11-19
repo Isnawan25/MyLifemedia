@@ -6,12 +6,12 @@ import 'package:mylm/screen/home/home_screen.dart';
 import 'package:mylm/screen/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/user_profile/profile_screen.dart';
 
-class MainProfileScreen extends StatefulWidget {
+class MainHelpdeskScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final String custGroupId;
 
-  const MainProfileScreen({
+  const MainHelpdeskScreen({
     super.key,
     required this.accessToken,
     required this.custNumber,
@@ -19,11 +19,11 @@ class MainProfileScreen extends StatefulWidget {
   });
 
   @override
-  State<MainProfileScreen> createState() => _MainProfileScreenState();
+  State<MainHelpdeskScreen> createState() => _MainHelpdeskScreenState();
 }
 
-class _MainProfileScreenState extends State<MainProfileScreen> {
-  int _currentIndex = 0; // default profile
+class _MainHelpdeskScreenState extends State<MainHelpdeskScreen> {
+  int _currentIndex = 4;
   late List<Widget> _screens;
 
   @override

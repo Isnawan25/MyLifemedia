@@ -41,9 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null
         && token.isNotEmpty
         && custNumber != null
-        && custNumber.isNotEmpty
-        && custGroupId != null
-        && custGroupId.isNotEmpty) {
+        && custNumber.isNotEmpty) {
       // Kalau token ada → langsung ke MainScreen
       Navigator.pushReplacement(
         context,
@@ -51,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
           builder: (_) => MainScreen(
             accessToken: token,
             custNumber: custNumber,
-            custGroupId: custGroupId,
+            custGroupId: custGroupId ?? "",
           ),
         ),
       );

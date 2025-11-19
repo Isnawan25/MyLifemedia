@@ -86,10 +86,19 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: isLoading
-            ? SkeletonLoading(
-          itemCount: packages.isNotEmpty ? packages.length : 4, // 4 paket layanan
-          itemHeight: 90, // tinggi kartu
-          isCard: true, // tampil bentuk kartu layanan
+            ? ListView.separated(
+          itemCount: 3, // jumlah dummy skeleton
+          separatorBuilder: (_, __) => SizedBox(height: 12.h),
+          itemBuilder: (_, __) {
+            return Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SkeletonLoading(width: double.infinity, height: 20.h),
+            );
+          },
         )
 
             : Column(

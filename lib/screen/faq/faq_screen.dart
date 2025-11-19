@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylm/screen/faq/detail_faq1_screen.dart';
-import 'package:mylm/screen/faq/detail_faq2_screen.dart';
-import 'package:mylm/screen/faq/detail_faq3_screen.dart';
-import 'package:mylm/screen/faq/detail_faq4_screen.dart';
-import 'package:mylm/screen/faq/detail_faq5_screen.dart';
+import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/models/support/faq_response.dart';
+import 'package:mylm/screen/faq/detailfaq_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
 class FaqScreen extends StatelessWidget {
   final String custNumber;
   final String accessToken;
   final String custGroupId;
-
 
   const FaqScreen({
     super.key,
@@ -24,14 +22,6 @@ class FaqScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> daftarBantuan = [
-      "Cara pembayaran tagihan Life Media",
-      "Kenapa link tagihan saya tidak bisa dibuka?",
-      "Kenapa saya tidak bisa koneksi internet?",
-      "Kenapa lampu LOS di modem saya menyala merah atau berkedip?",
-      "Kenapa kecepatan internet saya lebih lambat dari yang seharusnya?",
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -45,14 +35,16 @@ class FaqScreen extends StatelessWidget {
               BlendMode.srcIn,
             ),
           ),
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MainScreen(
-                  custNumber: custNumber,
-                  accessToken: accessToken,
-                  custGroupId: custGroupId,
-                )));
-          },
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                custNumber: custNumber,
+                accessToken: accessToken,
+                custGroupId: custGroupId,
+              ),
+            ),
+          ),
         ),
         title: Text(
           "Bantuan",
@@ -84,8 +76,10 @@ class FaqScreen extends StatelessWidget {
                   ),
                   prefixIcon: const Icon(Icons.search),
                   border: InputBorder.none,
-                  contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 14.h,
+                  ),
                 ),
               ),
             ),
@@ -93,20 +87,56 @@ class FaqScreen extends StatelessWidget {
             SizedBox(height: 16.h),
 
             Expanded(
-              child: ListView.builder(
-                itemCount: daftarBantuan.length,
-                itemBuilder: (context, index) {
-                  final judul = daftarBantuan[index];
+              child: FutureBuilder<List<Faq>>(
+                future: ApiService().getFaqs(accessToken),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return ListView.separated(
+                      itemCount: 3, // jumlah dummy skeleton
+                      separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                      itemBuilder: (_, __) {
+                        return Container(
+                          padding: EdgeInsets.all(16.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: SkeletonLoading(width: double.infinity, height: 20.h),
+                        );
+                      },
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        "Gagal memuat FAQ",
+                        style: GoogleFonts.inter(fontSize: 14.sp),
+                      ),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Tidak ada FAQ tersedia",
+                        style: GoogleFonts.inter(fontSize: 14.sp),
+                      ),
+                    );
+                  }
 
-                  return Column(
-                    children: [
-                      Container(
+                  final faqs = snapshot.data!;
+
+                  return ListView.separated(
+                    itemCount: faqs.length,
+                    separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                    itemBuilder: (context, index) {
+                      final item = faqs[index];
+                      return Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Colors.grey.withValues(alpha: 0.2),
                               blurRadius: 6,
                               offset: const Offset(0, 3),
                             ),
@@ -115,10 +145,10 @@ class FaqScreen extends StatelessWidget {
                         child: ListTile(
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16.w,
-                            vertical: 8.h,
+                            vertical: 10.h,
                           ),
                           title: Text(
-                            judul,
+                            item.titleFaq,
                             style: GoogleFonts.inter(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -131,47 +161,27 @@ class FaqScreen extends StatelessWidget {
                             color: Colors.black54,
                           ),
                           onTap: () {
-                            //Arah ke halaman berbeda tergantung index
-                            Widget halamanTujuan;
-
-                            switch (index) {
-                              case 0:
-                                halamanTujuan = DetailFaq1Screen(judulBantuan: judul);
-                                break;
-                              case 1:
-                                halamanTujuan = DetailFaq2Screen(judulBantuan: judul);
-                                break;
-                              case 2 :
-                                halamanTujuan = DetailFaq3Screen(judulBantuan: judul);
-                                break ;
-                              case 3 :
-                                halamanTujuan = DetailFaq4Screen(judulBantuan: judul);
-                                break;
-                              case 4 :
-                                halamanTujuan = DetailFaq5Screen(judulBantuan: judul);
-                                break;
-                              default:
-                                halamanTujuan = DetailFaq1Screen(judulBantuan: judul);
-                            }
-
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => halamanTujuan,
+                                builder: (context) => DetailFaqScreen(faq: item,
+                                  custNumber: custNumber,
+                                  accessToken: accessToken,
+                                  custGroupId: custGroupId,),
                               ),
                             );
                           },
                         ),
-                      ),
-                      SizedBox(height: 12.h),
-                    ],
+                      );
+                    },
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
     );
   }
 }
+

@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/popup.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
@@ -197,7 +196,6 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
               child: isLoading
                   ? Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SkeletonLoading(),
               )
                   : SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),

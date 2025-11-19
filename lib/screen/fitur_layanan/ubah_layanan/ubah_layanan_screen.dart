@@ -84,10 +84,19 @@ class _UbahLayananScreenState extends State<UbahLayananScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: isLoading
-            ? const SkeletonLoading(
-          itemCount: 4,
-          itemHeight: 90,
-          isCard: true,
+            ? ListView.separated(
+          itemCount: 3, // jumlah dummy skeleton
+          separatorBuilder: (_, __) => SizedBox(height: 12.h),
+          itemBuilder: (_, __) {
+            return Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SkeletonLoading(width: double.infinity, height: 20.h),
+            );
+          },
         )
             : Column(
           crossAxisAlignment: CrossAxisAlignment.start,

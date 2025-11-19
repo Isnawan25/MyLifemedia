@@ -76,16 +76,21 @@ class _RiwayatTagihanScreenState extends State<RiwayatTagihanScreen> {
       body: FutureBuilder<BillListResponse>(
         future: _billFuture,
         builder: (context, snapshot) {
-          int estimatedItemCount = snapshot.data?.data.length ?? 6;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-              child: SkeletonLoading(
-                itemCount: estimatedItemCount,
-                itemHeight: 90,
-                isCard: true,
-              ),
+            return ListView.separated(
+              itemCount: 3, // jumlah dummy skeleton
+              separatorBuilder: (_, __) => SizedBox(height: 12.h),
+              itemBuilder: (_, __) {
+                return Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SkeletonLoading(width: double.infinity, height: 20.h),
+                );
+              },
             );
           } else if (snapshot.hasError) {
             return Center(child: Text("Terjadi kesalahan: ${snapshot.error}"));
@@ -129,7 +134,7 @@ class _RiwayatTagihanScreenState extends State<RiwayatTagihanScreen> {
                       ),
                     );
                   },
-                  splashColor: Colors.orange.withOpacity(0.1),
+                  splashColor: Colors.orange.withValues(alpha: 0.1),
                   child: Container(
                     padding: EdgeInsets.all(14.w),
                     decoration: BoxDecoration(
@@ -137,7 +142,7 @@ class _RiwayatTagihanScreenState extends State<RiwayatTagihanScreen> {
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
