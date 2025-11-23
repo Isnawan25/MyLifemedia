@@ -5,7 +5,7 @@ import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
-import 'package:mylm/screen/add_new_idcust/add_custlist_screen.dart';
+import 'package:mylm/screen/add_nopel/add_custlist_screen.dart';
 import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_empty_screen.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart';
@@ -18,6 +18,8 @@ import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mylm/base/widgets/icons_colors.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
+import 'package:mylm/data/preferences/secure_storage.dart';
+
 
 
 class HomeScreen extends StatefulWidget {
@@ -42,22 +44,35 @@ class _HomeScreenState extends State<HomeScreen> {
   ExistsPackage? existsPackage;
   bool isLoadingPackage = true;
 
+  late String currentCustNumber;
+  late String currentCustGroupId;
 
   @override
   void initState() {
     super.initState();
+    _loadCurrentCust();
+  }
+  Future<void> _loadCurrentCust() async {
+    String? savedCustNumber = await SecureStorage.getCustNumber();
+    String? savedCustGroupId = await SecureStorage.getCustGroupId();
+
+    setState(() {
+      currentCustNumber = savedCustNumber ?? widget.custNumber;
+      currentCustGroupId = savedCustGroupId ?? widget.custGroupId;
+    });
+
     _loadProfile();
     _loadExistingPackage();
   }
 
   Future<void> _loadProfile() async {
     setState(() => isLoadingProfile = true);
-
     final api = ApiService();
     final result = await api.getProfile(
-        widget.custNumber,
-        widget.accessToken,
-        context);
+      currentCustNumber,
+      widget.accessToken,
+      context,
+    );
 
     if (result != null && result.success == 1 && result.data != null) {
       setState(() {
@@ -72,11 +87,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadExistingPackage() async {
     setState(() => isLoadingPackage = true);
-
     final api = ApiService();
     final result = await api.getExistingPackage(
-      widget.custGroupId,
-      widget.custNumber,
+      currentCustGroupId,
+      currentCustNumber,
       widget.accessToken,
     );
 
@@ -86,8 +100,38 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _openAddCustList() async {
+    final result = await Navigator.push<Map<String, String>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddCustlistScreen(
+          custNumber: currentCustNumber,
+          accessToken: widget.accessToken,
+          custGroupId: currentCustGroupId,
+        ),
+      ),
+    );
 
+    if (result != null) {
+      final newCustNumber = result['custNumber'];
+      final newCustGroupId = result['custGroupId'];
 
+      if (newCustNumber != null && newCustGroupId != null) {
+        await SecureStorage.saveCustNumber(newCustNumber);
+        await SecureStorage.saveCustGroupId(newCustGroupId);
+
+        setState(() {
+          currentCustNumber = newCustNumber;
+          currentCustGroupId = newCustGroupId;
+          isLoadingProfile = true;
+          isLoadingPackage = true;
+        });
+
+        await _loadProfile();
+        await _loadExistingPackage();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,13 +161,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Profil
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(context,
+                            Navigator.push(
+                              context,
                               MaterialPageRoute(
-                                  builder: (context) => MainProfileScreen(
+                                builder: (context) => MainProfileScreen(
                                   accessToken: widget.accessToken,
-                                  custNumber: widget.custNumber,
-                                  custGroupId: widget.custGroupId,
-                                ))
+                                  custNumber: currentCustNumber,
+                                  custGroupId: currentCustGroupId,
+                                ),
+                              ),
                             );
                           },
                           child: Row(
@@ -139,25 +185,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 25),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 25),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-
                                   const SizedBox(height: 4),
-
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                     decoration: BoxDecoration(
                                       color: darkorange,
                                       borderRadius: BorderRadius.circular(12),
@@ -170,15 +211,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                               const Spacer(),
                               IconButton(
-                                onPressed: () {Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) =>
-                                  const MessageScreen(),
-                                    ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const MessageScreen()),
                                   );
                                 },
                                 icon: SvgPicture.asset(
@@ -200,9 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AddCustlistScreen()));
-                            },
+                            onTap: _openAddCustList,
                             splashColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             hoverColor: Colors.transparent,
@@ -238,7 +277,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
 
-
                         // Info Tagihan Card
                         Container(
                           width: double.infinity,
@@ -251,8 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isLoadingProfile ? "..."
-                                    : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
+                                isLoadingProfile ? "..." : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -260,24 +297,18 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isLoadingProfile
-                                    ? "..." : shortText(profile?.custAddress, limit: 36),
+                                isLoadingProfile ? "..." : shortText(profile?.custAddress, limit: 36),
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontSize: 13.sp,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-
                               const Divider(color: Colors.white54, height: 20),
                               Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text("Layanan Internet",
                                           style: GoogleFonts.inter(
@@ -325,8 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     right: 24.w,
                     bottom: -55.h,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -341,20 +371,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          buildFeature(context, "assets/svgs/icons_cart.svg",
-                              "Tambah Layanan", onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => TambahLayananScreen(
-                                    custNumber: widget.custNumber,
-                                    accessToken: widget.accessToken,
-                                    custGroupId: widget.custGroupId
-
-                                )
-                                ),
+                          buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => TambahLayananScreen(
+                                custNumber: currentCustNumber,
+                                accessToken: widget.accessToken,
+                                custGroupId: currentCustGroupId,
+                              )),
                             );
-                              }),
-                          buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan",
-                            onTap: () {if (isLoadingPackage || existsPackage == null) {
+                          }),
+                          buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
+                            if (isLoadingPackage || existsPackage == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: const Text(
@@ -362,11 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(fontSize: 14),
                                   ),
                                   behavior: SnackBarBehavior.floating,
-                                  margin: const EdgeInsets.only(
-                                    bottom: 20,
-                                    left: 16,
-                                    right: 16,
-                                  ),
+                                  margin: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -374,32 +398,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                   duration: const Duration(seconds: 3),
                                 ),
                               );
-                            return;
-                          }
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => UbahLayananScreen(
-                                custNumber: widget.custNumber,
+                              return;
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => UbahLayananScreen(
+                                custNumber: currentCustNumber,
                                 accessToken: widget.accessToken,
-                                custGroupId: widget.custGroupId,
+                                custGroupId: currentCustGroupId,
                                 currentPackage: existsPackage,
-                              ),
-                            ),
-                          );
-                        }),
-                          buildFeature(context, "assets/svgs/icons_invoice.svg",
-                              "Bayar Tagihan", onTap: () {
+                              )),
+                            );
+                          }),
+                          buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan", onTap: () {
                             Navigator.push(context,
-                                MaterialPageRoute(builder:
-                                    (context) => const BayarTagihanEmptyScreen()));
-                              }),
+                                MaterialPageRoute(builder: (context) => const BayarTagihanEmptyScreen()));
+                          }),
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
 
               const SizedBox(height: 70),
+
               // Penawaran
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -423,9 +446,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: SkeletonLoading(
-                          height: 180
-                      ),
+                      child: SkeletonLoading(height: 180),
                     );
                   } else if (snapshot.hasError) {
                     return Padding(
@@ -458,7 +479,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: 180,
                                   loadingBuilder: (context, child, progress) {
                                     if (progress == null) return child;
-                                    // shimmer loading
                                     return Shimmer.fromColors(
                                       baseColor: Colors.grey.shade300,
                                       highlightColor: Colors.grey.shade100,
@@ -471,7 +491,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     );
                                   },
-                                  // jika gagal load/404
                                   errorBuilder: (context, error, stackTrace) => Container(
                                     height: 180,
                                     color: Colors.grey.shade300,
@@ -492,7 +511,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
               ),
-
               const SizedBox(height: 20),
             ],
           ),

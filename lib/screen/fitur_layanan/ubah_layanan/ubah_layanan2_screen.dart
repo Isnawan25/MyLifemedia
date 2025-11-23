@@ -68,7 +68,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
     custVillage = await SecureStorage.getCustVillage();
     custAddress = await SecureStorage.getCustAddress();
 
-    print("=== CUSTOMER PROFILE LOADED FROM STORAGE ===");
+    print("CUSTOMER PROFILE LOADED FROM STORAGE");
     print("custNumber: ${widget.custNumber}");
     print("custName: $custName");
     print("custPhone: $custPhone");
@@ -90,10 +90,6 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
       });
     }
   }
-
-
-
-
 
 
   @override
@@ -249,8 +245,6 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                 )
               ),
             ),
-
-
 
             const SizedBox(height: 12),
 

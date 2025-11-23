@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
-import 'package:mylm/screen/verify_screen.dart';
+import 'package:mylm/screen/auth_otp/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/auth_&_otp/login_response.dart';
 import 'package:mylm/screen/welcome_screen.dart';
@@ -151,7 +151,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
                   // Request OTP
-                  final otpResponse = await api.requestOtp(custNumber, accessToken);
+                  final otpResponse = await api.requestOtp(
+                      custNumber: custNumber, accessToken: accessToken, mode: OtpMode.login);
 
                   if (otpResponse != null && otpResponse.success) {
                     print("OTP Berhasil diminta: ${otpResponse.data?.otp}");
@@ -163,6 +164,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           custNumber: custNumber,
                           accessToken: accessToken,
                           custGroupId: custGroupId,
+                          mainCustNumber: "",
+                          newCustNumber: "",
+                          mode: OtpMode.login,
                         ),
                       ),
                     );

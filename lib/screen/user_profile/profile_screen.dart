@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
-import 'package:mylm/screen/login_screen.dart';
+import 'package:mylm/screen/auth_otp/login_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/network/api_service.dart';

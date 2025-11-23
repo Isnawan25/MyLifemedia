@@ -1,26 +1,30 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mylm/data/models/customer/addnopel_response.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/models/auth_&_otp/login_response.dart';
 import 'package:mylm/data/models/auth_&_otp/otp_request_response.dart';
 import 'package:mylm/data/models/auth_&_otp/verify_otp_response.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
-import 'package:mylm/data/models/product/register%20cust/register_customer_request.dart';
-import 'package:mylm/data/models/product/register%20cust/register_customer_response.dart';
+import 'package:mylm/data/models/customer/register_cust/register_customer_request.dart';
+import 'package:mylm/data/models/customer/register_cust/register_customer_response.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
 import 'package:dio/dio.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
-import 'package:mylm/screen/login_screen.dart';
+import 'package:mylm/screen/auth_otp/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/models/product/upgrade_package_response.dart';
 import 'package:mylm/data/network/check_server_status.dart';
 import 'package:mylm/data/models/support/faq_response.dart';
+import 'package:mylm/data/models/customer/custlist_response.dart';
 
-
-
+enum OtpMode {
+  login,
+  addCustomer,
+}
 class ApiService {
   static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
 
@@ -44,7 +48,11 @@ class ApiService {
   }
 
   // REQUEST OTP
-  Future<OtpResponse?> requestOtp(String custNumber, String accessToken) async {
+  Future<OtpResponse?> requestOtp({
+    required String custNumber,
+    required String accessToken,
+    required OtpMode mode,
+  }) async {
     final url = Uri.parse("$baseUrl/request-otp");
 
     try {
@@ -60,7 +68,9 @@ class ApiService {
       print("OTP Response: ${response.statusCode} - ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return OtpResponse.fromJson(jsonDecode(response.body));
+        return OtpResponse.fromJson(jsonDecode(response.body)..addAll({
+          "otp_mode": mode.name
+        }));
       } else {
         print("Gagal request OTP: ${response.statusCode} - ${response.body}");
         return null;
@@ -71,19 +81,29 @@ class ApiService {
     }
   }
 
+
   // RESEND OTP
-  Future<OtpResponse?> resendOtp(String custNumber, String accessToken) async {
+  Future<OtpResponse?> resendOtp({
+    required String custNumber,
+    required String accessToken,
+    required OtpMode mode,
+  }) async {
     debugPrint("Mengirim ulang OTP ke nomor: $custNumber");
-    return await requestOtp(custNumber, accessToken);
+    return await requestOtp(
+        custNumber: custNumber,
+        accessToken:  accessToken,
+        mode: mode
+    );
   }
 
 
   //VERIFY OTP
-  Future<VerifyOtpResponse?> verifyOtp(
-      String custNumber,
-      String otp,
-      String accessToken,
-      ) async {
+  Future<VerifyOtpResponse?> verifyOtp({
+    required String custNumber,
+    required String otp,
+    required String accessToken,
+    required OtpMode mode,
+  }) async {
     final url = Uri.parse("$baseUrl/verify-otp");
 
     try {
@@ -99,31 +119,16 @@ class ApiService {
         }),
       );
 
-      debugPrint("🔹 Verify OTP Response: ${response.statusCode} - ${response.body}");
+      print("Verify OTP: ${response.statusCode} - ${response.body}");
 
-      //server balas 404 = OTP salah
-      if (response.statusCode == 404) {
-        debugPrint("OTP Salah, server mengembalikan 404 (Not Found)");
-        return null;
-      }
-
-      if (response.statusCode != 201) {
-        debugPrint("Verify OTP gagal: kode status tidak diharapkan (${response.statusCode})");
-        return null;
-      }
+      if (response.statusCode != 201) return null;
 
       final decoded = jsonDecode(response.body);
+      decoded["otp_mode"] = mode.name;
 
-      if (decoded["success"] == 1 &&
-          decoded["data"]?["statusOTP"]?.toString().toLowerCase() == "verified") {
-        debugPrint("OTP Verified dari server");
-        return VerifyOtpResponse.fromJson(decoded);
-      }
-
-      debugPrint("Response tidak mengandung status 'verified'.");
-      return null;
+      return VerifyOtpResponse.fromJson(decoded);
     } catch (e) {
-      debugPrint("Error Verify OTP: $e");
+      print("Error Verify OTP: $e");
       return null;
     }
   }
@@ -406,6 +411,83 @@ class ApiService {
       throw Exception('Failed to load bill list: ${response.body}');
     }
   }
+
+  // ADD NEW ID CUSTOMER
+  Future<AddNopelResponse?> addNopel({
+    required String custNumber,
+    required String custGroupId,
+    required String newCustNumber,
+    required String accessToken,
+  }) async {
+    final url = "$baseUrl/added-nopel";
+
+    try {
+      final body = {
+        "cust_number": custNumber,
+        "group_id": custGroupId.isEmpty ? "" : custGroupId,
+        "cust_number_new": newCustNumber,
+      };
+
+      print("=== SEND ADD NOPEL BODY ===");
+      print(body);
+
+      final res = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Authorization": "Bearer $accessToken",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(body),
+      );
+
+      print("ADD Nopel Response: ${res.statusCode} - ${res.body}");
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return AddNopelResponse.fromJson(jsonDecode(res.body));
+      }
+
+      return null;
+    } catch (e) {
+      print("ADD NOPEL ERROR: $e");
+      return null;
+    }
+  }
+
+  // CUSTOMER LIST
+  Future<GetCustListResponse?> getCustomerList({
+    required String accessToken,
+    required String groupId,
+  }) async {
+    try {
+      final url = Uri.parse(
+        "$baseUrl/cust-list?group_id=$groupId",
+      );
+
+      final response = await http.get(
+        url,
+        headers: {
+          "Authorization": "Bearer $accessToken",
+          "Accept": "application/json",
+        },
+      );
+
+      debugPrint("=== RAW RESPONSE BODY ===");
+      debugPrint(response.body);
+
+      if (response.statusCode == 200) {
+        final jsonBody = jsonDecode(response.body);
+        debugPrint("=== GET CUSTOMER LIST SUCCESS ===");
+        return GetCustListResponse.fromJson(jsonBody);
+      } else {
+        debugPrint("❌ GET CUSTOMER LIST FAILED: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("❌ ERROR Get Customer List: $e");
+      return null;
+    }
+  }
+
 
 }
 

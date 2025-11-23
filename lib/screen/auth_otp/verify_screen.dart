@@ -4,22 +4,28 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/screen/add_nopel/success_bottomsheet.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 
 class VerifyScreen extends StatefulWidget {
+  final String mainCustNumber;
   final String custNumber;
   final String accessToken;
   final String custGroupId;
+  final String newCustNumber;
+  final OtpMode mode;
 
-
-
-  const VerifyScreen({super.key,
-    required this.custNumber,
+  const VerifyScreen({
+    super.key,
+    required this.mainCustNumber,
     required this.accessToken,
-    required this.custGroupId,});
-
+    required this.custNumber,
+    required this.custGroupId,
+    required this.newCustNumber,
+    required this.mode,
+  });
 
   @override
   State<VerifyScreen> createState() => _VerifyScreenState();
@@ -38,9 +44,12 @@ class _VerifyScreenState extends State<VerifyScreen> {
   void initState() {
     super.initState();
     _startTimer();
-    debugPrint("VerifyScreen opened with:");
-    debugPrint("Customer Number: ${widget.custNumber}");
-    debugPrint("Access Token: ${widget.accessToken}");
+
+    debugPrint("VERIFY SCREEN OPENED");
+    debugPrint("Cust Number (OTP target): ${widget.custNumber}");
+    debugPrint("Main Cust Number (Add Nopel): ${widget.mainCustNumber}");
+    debugPrint("Group ID: ${widget.custGroupId}");
+    debugPrint("Mode: ${widget.mode}");
   }
 
   String get _formattedTime {
@@ -58,57 +67,105 @@ class _VerifyScreenState extends State<VerifyScreen> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
-        setState(() {
-          _secondsRemaining--;
-        });
+        setState(() => _secondsRemaining--);
       } else {
-        setState(() {
-          _canResend = true;
-        });
+        setState(() => _canResend = true);
         _timer?.cancel();
       }
     });
   }
 
   void _onOtpChanged(String value, int index) {
-    if (value.isNotEmpty && index < _focusNodes.length - 1) {
+    if (value.isNotEmpty && index < 3) {
       _focusNodes[index + 1].requestFocus();
     }
+
     if (_controllers.every((c) => c.text.isNotEmpty)) {
       _verifyOtp();
     }
   }
 
-
-  void _verifyOtp() async {
+  Future<void> _verifyOtp() async {
     String otp = _controllers.map((c) => c.text).join();
-    debugPrint("OTP Entered: $otp");
+    debugPrint("OTP Input: $otp");
 
     final api = ApiService();
-    final response = await api.verifyOtp(widget.custNumber, otp, widget.accessToken);
+    final response = await api.verifyOtp(
+      custNumber: widget.custNumber,
+      otp: otp,
+      accessToken: widget.accessToken,
+      mode: widget.mode,
+    );
 
-    //Jika response null atau tidak verified
+    // otp gagal
     if (response == null || response.data?.statusOTP.toLowerCase() != "verified") {
-      debugPrint("OTP Salah atau tidak ditemukan (tetap di VerifyScreen)");
+      debugPrint("OTP verification FAILED");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Kode OTP salah")),
       );
       return;
     }
-    await SecureStorage.saveAccessToken(widget.accessToken);
-    await SecureStorage.saveCustNumber(widget.custNumber);
-    await SecureStorage.saveCustGroupId(widget.custGroupId);
 
-    // Jika berhasil
-    debugPrint("OTP Verified: ${response.data?.statusOTP}");
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MainScreen(
-        custNumber: widget.custNumber,
+    debugPrint("=== OTP VERIFIED SUCCESS ===");
+
+    // mode login
+    if (widget.mode == OtpMode.login) {
+      debugPrint("Processing LOGIN MODE...");
+
+      await SecureStorage.saveAccessToken(widget.accessToken);
+      await SecureStorage.saveCustNumber(widget.custNumber);
+      await SecureStorage.saveCustGroupId(widget.custGroupId);
+
+      debugPrint("Token & Customer Data Saved!");
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MainScreen(
+            custNumber: widget.custNumber,
+            accessToken: widget.accessToken,
+            custGroupId: widget.custGroupId,
+          ),
+        ),
+      );
+      return;
+    }
+
+    // mode add customer
+    if (widget.mode == OtpMode.addCustomer) {
+      debugPrint("Processing ADD CUSTOMER MODE...");
+      debugPrint("Calling addNopel API...");
+
+      final addResp = await api.addNopel(
+        custNumber: widget.mainCustNumber,    // ID utama
+        newCustNumber: widget.custNumber,     // ID baru
+        custGroupId: widget.custGroupId,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,)
-      ),
-    );
+      );
+
+      if (addResp == null || addResp.success != 1) {
+        debugPrint("ADD NOPEL FAILED");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal menambahkan ID pelanggan")),
+        );
+        return;
+      }
+
+      debugPrint("ADD NOPEL SUCCESS");
+      debugPrint("Generated Nopel: ${addResp.data?.nopel}");
+      debugPrint("Generated Group ID: ${addResp.data?.groupId}");
+
+      await SecureStorage.saveCustGroupId(addResp.data!.groupId);
+
+      Navigator.pop(context);
+
+      Future.delayed(const Duration(milliseconds: 200), () {
+        showAddCustomerSuccessBottomSheet(
+          context,
+          nopel: addResp.data!.nopel,
+        );
+      });
+    }
   }
 
   bool get isValid => _controllers.every((c) => c.text.isNotEmpty);
@@ -116,8 +173,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    for (var c in _controllers) {c.dispose();}
-    for (var f in _focusNodes) {f.dispose();}
+    for (var c in _controllers) c.dispose();
+    for (var f in _focusNodes) f.dispose();
     super.dispose();
   }
 
@@ -130,10 +187,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             "assets/svgs/arrow_back.svg",
-            colorFilter: const ColorFilter.mode(
-              Colors.black,
-              BlendMode.srcIn,
-            ),
+            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -153,7 +207,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
             Text(
               "Verifikasi Akun",
               style: GoogleFonts.inter(
@@ -167,10 +220,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
               style: GoogleFonts.inter(
                 fontSize: 14.sp,
                 color: Colors.grey[600],
-                height: 1.4.h,
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 30.h),
 
             // OTP Fields
             Row(
@@ -179,7 +231,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 return SizedBox(
                   width: 60.w,
                   child: TextField(
-                    cursorColor: Colors.grey[600],
                     controller: _controllers[index],
                     focusNode: _focusNodes[index],
                     keyboardType: TextInputType.number,
@@ -189,6 +240,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                       fontSize: 20.sp,
                       fontWeight: FontWeight.bold,
                     ),
+                    cursorColor: Colors.grey,
                     decoration: InputDecoration(
                       counterText: "",
                       border: OutlineInputBorder(
@@ -197,34 +249,30 @@ class _VerifyScreenState extends State<VerifyScreen> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
                         borderSide: const BorderSide(
-                          color: Color(0xFFFF6B00), // orange
+                          color: darkorange,
                           width: 2,
                         ),
                       ),
                     ),
-                    onChanged: (value) => _onOtpChanged(value, index),
+                    onChanged: (v) => _onOtpChanged(v, index),
                   ),
                 );
               }),
             ),
 
-            SizedBox(height: 20.h),
+            SizedBox(height: 25.h),
 
-            // Timer text
-            if (!_canResend) ...[
+            if (!_canResend)
               Center(
                 child: Text(
-                  "Masukkan kode Sebelum $_formattedTime ",
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    color: Colors.grey,
-                  ),
+                  "Masukkan kode sebelum $_formattedTime",
+                  style: GoogleFonts.inter(fontSize: 14.sp, color: Colors.grey),
                 ),
               ),
-              SizedBox(height: 20.h),
-            ],
 
-            // Button Verifikasi
+            SizedBox(height: 25.h),
+
+            // Tombol Verifikasi
             GestureDetector(
               onTap: isValid ? _verifyOtp : null,
               child: Center(
@@ -255,21 +303,23 @@ class _VerifyScreenState extends State<VerifyScreen> {
               ),
             ),
 
-            SizedBox(height: 16.h),
+            const SizedBox(height: 16),
 
-            // Kirim ulang kode OTP (selalu ada)
+            // Resend OTP
             GestureDetector(
               onTap: _canResend
                   ? () async {
                 _startTimer();
-                final api = ApiService();
-                await api.resendOtp(widget.custNumber, widget.accessToken);
+                await ApiService().resendOtp(
+                  custNumber: widget.custNumber,
+                  accessToken: widget.accessToken,
+                  mode: widget.mode,
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Kode OTP telah dikirim ulang")),
                 );
               }
                   : null,
-
               child: Center(
                 child: Text(
                   "Kirim ulang kode OTP",

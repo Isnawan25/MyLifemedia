@@ -6,7 +6,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/popup.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/location_maps_screen.dart';
-import 'package:mylm/data/models/product/register%20cust/register_customer_request.dart';
+import 'package:mylm/data/models/customer/register_cust/register_customer_request.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:mylm/data/network/geocoding_service.dart';
 import 'dart:typed_data';
