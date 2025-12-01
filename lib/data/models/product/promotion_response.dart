@@ -11,11 +11,18 @@ class Promotion {
     required this.isActive,
   });
 
+  static const String baseImageUrl =
+      "https://hospitality.lifemedia.id/cms-lifemedia/public/";
+
   factory Promotion.fromJson(Map<String, dynamic> json) {
+    final rawPhoto = json['photo'] ?? "";
+
     return Promotion(
       id: json['id'],
       name: json['name'],
-      photo: (json['photo'] ?? ""),
+      photo: rawPhoto.startsWith("http")
+          ? rawPhoto
+          : "$baseImageUrl$rawPhoto",
       isActive: json['isActive'],
     );
   }

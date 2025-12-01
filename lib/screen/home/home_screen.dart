@@ -446,7 +446,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: SkeletonLoading(height: 180),
+                      child: SkeletonLoading(height: 280),
                     );
                   } else if (snapshot.hasError) {
                     return Padding(
@@ -469,21 +469,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
-                                height: 180,
+                                height: 280.h,
                                 width: double.infinity,
                                 color: Colors.grey.shade200,
                                 child: Image.network(
                                   promo.photo,
                                   fit: BoxFit.cover,
                                   width: double.infinity,
-                                  height: 180,
+                                  height: 280.h,
                                   loadingBuilder: (context, child, progress) {
                                     if (progress == null) return child;
                                     return Shimmer.fromColors(
                                       baseColor: Colors.grey.shade300,
                                       highlightColor: Colors.grey.shade100,
                                       child: Container(
-                                        height: 180,
+                                        height: 280.h,
                                         decoration: BoxDecoration(
                                           color: Colors.grey.shade300,
                                           borderRadius: BorderRadius.circular(12),
@@ -492,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     );
                                   },
                                   errorBuilder: (context, error, stackTrace) => Container(
-                                    height: 180,
+                                    height: 280.h,
                                     color: Colors.grey.shade300,
                                     alignment: Alignment.center,
                                     child: const Icon(
