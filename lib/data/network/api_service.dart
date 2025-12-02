@@ -20,6 +20,7 @@ import 'package:mylm/data/models/product/upgrade_package_response.dart';
 import 'package:mylm/data/network/check_server_status.dart';
 import 'package:mylm/data/models/support/faq_response.dart';
 import 'package:mylm/data/models/customer/custlist_response.dart';
+import 'package:mylm/data/models/notification/notification_response.dart';
 
 enum OtpMode {
   login,
@@ -488,6 +489,56 @@ class ApiService {
     }
   }
 
+
+  // NOTIFICATION
+  Future<List<NotificationItem>> getNotifications({
+    required String accessToken,
+    required String custNumber,
+  }) async {
+    final url = Uri.parse("$baseUrl/notifications?cust_number=$custNumber");
+
+    final response = await http.get(
+      url,
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      final List<dynamic> list = jsonData["data"];
+      return list.map((e) => NotificationItem.fromJson(e)).toList();
+    } else {
+      throw Exception("Failed to fetch notifications: ${response.body}");
+    }
+  }
+
+  // READ NOTIFICATION
+  Future<bool> readNotification({
+    required String accessToken,
+    required int notificationId,
+  }) async {
+    final url = Uri.parse("$baseUrl/read-notification");
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "notification_id": notificationId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true; // sukses
+    } else {
+      return false;
+    }
+  }
 
 }
 

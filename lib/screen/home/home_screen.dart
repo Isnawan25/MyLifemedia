@@ -10,7 +10,7 @@ import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_empty_scre
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart';
 import 'package:mylm/screen/main/main_profile_screen.dart';
-import 'package:mylm/screen/message/message_screen.dart';
+import 'package:mylm/screen/message/notification_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const MessageScreen()),
+                                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
                                   );
                                 },
                                 icon: SvgPicture.asset(
