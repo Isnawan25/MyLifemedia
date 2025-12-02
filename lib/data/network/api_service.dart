@@ -21,6 +21,8 @@ import 'package:mylm/data/network/check_server_status.dart';
 import 'package:mylm/data/models/support/faq_response.dart';
 import 'package:mylm/data/models/customer/custlist_response.dart';
 import 'package:mylm/data/models/notification/notification_response.dart';
+import 'package:mylm/data/models/bill/bill_last_response.dart';
+import 'package:mylm/data/models/bill/url_bill_response.dart';
 
 enum OtpMode {
   login,
@@ -29,7 +31,7 @@ enum OtpMode {
 class ApiService {
   static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
 
-  // LOGIN
+  // AUTH/LOGIN
   Future<LoginResponse?> login(String custNumber) async {
     final url = Uri.parse("$baseUrl/login");
     final response = await http.post(
@@ -472,19 +474,19 @@ class ApiService {
         },
       );
 
-      debugPrint("=== RAW RESPONSE BODY ===");
+      debugPrint("RAW RESPONSE BODY");
       debugPrint(response.body);
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
-        debugPrint("=== GET CUSTOMER LIST SUCCESS ===");
+        debugPrint("GET CUSTOMER LIST SUCCESS");
         return GetCustListResponse.fromJson(jsonBody);
       } else {
-        debugPrint("❌ GET CUSTOMER LIST FAILED: ${response.statusCode}");
+        debugPrint("GET CUSTOMER LIST FAILED: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      debugPrint("❌ ERROR Get Customer List: $e");
+      debugPrint("ERROR Get Customer List: $e");
       return null;
     }
   }
@@ -539,6 +541,58 @@ class ApiService {
       return false;
     }
   }
+
+  // BILL LAST
+  Future<List<BillItem>> getBillLast({
+    required String accessToken,
+    required String custNumber,
+  }) async {
+    final url = Uri.parse(
+      "$baseUrl/bill-last?cust_number=$custNumber",
+    );
+
+    final response = await http.get(
+      url,
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final list = jsonData["data"] as List<dynamic>;
+      return list.map((e) => BillItem.fromJson(e)).toList();
+    } else {
+      throw Exception("Failed to fetch bill last: ${response.body}");
+    }
+  }
+
+  Future<UrlBillResponse> getUrlBill({
+    required String accessToken,
+    required String custNumber,
+  }) async {
+    final url = Uri.parse(
+      "$baseUrl/url-paybill?cust_number=$custNumber",
+    );
+
+    final response = await http.get(
+      url,
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return UrlBillResponse.fromJson(json);   // ← KEMBALIKAN MODEL
+    } else {
+      throw Exception("Failed to fetch url pay bill: ${response.body}");
+    }
+  }
+
+
 
 }
 

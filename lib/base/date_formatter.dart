@@ -38,7 +38,7 @@ String formatNotifikasiShort(String? tanggal) {
     final difference = today.difference(notifDay).inDays;
 
     if (difference == 0) {
-      // Hari ini -> tampilkan jam saja
+      // Hari ini -> tampilkan jam
       return DateFormat("HH.mm").format(date);
     } else if (difference == 1) {
       return "Kemarin";

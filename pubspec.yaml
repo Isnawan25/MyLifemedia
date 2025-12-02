@@ -44,6 +44,7 @@ dependencies:
   screenshot: ^3.0.0                      # ambil gambar maps
   flutter_html: ^3.0.0                    # menampilkan html
   url_launcher: ^6.3.2                    # launcher URL
+  flutter_custom_tabs: ^2.4.1            # custom tabs
 
 
 dev_dependencies:

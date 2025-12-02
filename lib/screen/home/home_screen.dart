@@ -6,7 +6,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
 import 'package:mylm/screen/add_nopel/add_custlist_screen.dart';
-import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_empty_screen.dart';
+import 'package:mylm/screen/fitur_layanan/bayar_tagihan/bayar_tagihan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/fitur_layanan/ubah_layanan/ubah_layanan_screen.dart';
 import 'package:mylm/screen/main/main_profile_screen.dart';
@@ -410,9 +410,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                             );
                           }),
-                          buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan", onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => const BayarTagihanEmptyScreen()));
+                          buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan",
+                              onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => BayarTagihanScreen(
+                                  accessToken: widget.accessToken,
+                                  custNumber: currentCustNumber,)));
                           }),
                         ],
                       ),
