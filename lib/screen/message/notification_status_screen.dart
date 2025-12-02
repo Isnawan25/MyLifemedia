@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/data/models/notification/notification_response.dart';
 import 'package:mylm/base/date_formatter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class NotificationStatusScreen extends StatelessWidget {
   final NotificationItem notification;
@@ -49,7 +50,13 @@ class NotificationStatusScreen extends StatelessWidget {
           },
           child: Padding(
             padding: EdgeInsets.all(12.w),
-            child: const Icon(Icons.close, color: Colors.black87),
+           child: IconButton(
+              icon: SvgPicture.asset(
+                "assets/svgs/arrow_back.svg",
+                colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ),
         title: Text('Pesan', style: GoogleFonts.inter(fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black87)),
