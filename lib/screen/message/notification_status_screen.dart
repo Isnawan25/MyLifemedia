@@ -114,7 +114,7 @@ class NotificationStatusScreen extends StatelessWidget {
                       height: 40.h,
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO -> ke detail tagihan
+                          // untuk ke detail tagihan
                         },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
