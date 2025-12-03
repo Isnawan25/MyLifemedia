@@ -10,6 +10,7 @@ import 'package:mylm/data/models/customer/register_cust/register_customer_reques
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:mylm/data/network/geocoding_service.dart';
 import 'dart:typed_data';
+import 'package:mylm/data/models/support/term_conditions_response.dart';
 
 
 class TambahLayanan2Screen extends StatefulWidget {
@@ -32,6 +33,8 @@ class TambahLayanan2Screen extends StatefulWidget {
 
 class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
   final _formKey = GlobalKey<FormState>();
+  bool isLoading = true;
+  TermConditionsData? termData;
 
   // Controller untuk setiap field
   final _namaController = TextEditingController();
@@ -61,6 +64,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
     _kecamatanController.addListener(_checkFormFilled);
     _kotaController.addListener(_checkFormFilled);
     _provinsiController.addListener(_checkFormFilled);
+    _loadTerms();
   }
 
   void _checkFormFilled() {
@@ -92,6 +96,17 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
     _longController.dispose();
 
     super.dispose();
+  }
+
+  Future<void> _loadTerms() async {
+    final apiService = ApiService();
+    final result = await apiService.getTermConditions();
+    if (mounted) {
+      setState(() {
+        termData = result?.data;
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -138,6 +153,30 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                   color: Colors.black87,
                 ),
               ),
+              SizedBox(height: 8.h),
+
+              isLoading
+                  ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              )
+                  : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: termData == null
+                    ? Text(
+                  "Gagal memuat Syarat & Ketentuan.",
+                  style: GoogleFonts.inter(fontSize: 13.sp),
+                )
+                    : Text(
+                  termData!.termconditions,
+                  textAlign: TextAlign.justify,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.sp,
+                    height: 1.5,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+
               SizedBox(height: 16.h),
 
               Text(
@@ -347,7 +386,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                           if (response.success == 1) {
                             print("Data berhasil dikirim dan diterima server!");
                             showSuccessDialog(context,
-                              custNumber: widget.custNumber, // di sini boleh pakai widget.
+                              custNumber: widget.custNumber,
                               accessToken: widget.accessToken,
                                 custGroupId: widget.custGroupId);
                           } else {

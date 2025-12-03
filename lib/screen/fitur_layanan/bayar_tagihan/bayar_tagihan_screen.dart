@@ -8,7 +8,7 @@ import 'package:mylm/data/network/api_service.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/date_formatter.dart';
-
+import 'package:mylm/screen/fitur_layanan/bayar_tagihan/detail_tagihan_screen.dart';
 
 class BayarTagihanScreen extends StatelessWidget {
   final String custNumber;
@@ -24,6 +24,7 @@ class BayarTagihanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -59,7 +60,7 @@ class BayarTagihanScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text("Gagal memuat data"));
+            return const Center(child: Text("Gagal memuat data"));
           }
 
           final bills = snapshot.data ?? [];
@@ -75,6 +76,7 @@ class BayarTagihanScreen extends StatelessWidget {
     );
   }
 
+  // EMPTY PAGE
   Widget _buildEmpty() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -83,26 +85,25 @@ class BayarTagihanScreen extends StatelessWidget {
           "assets/images/no_empty_logo.png",
           height: 200.h,
         ),
-        Center(
-          child: Text(
-            "Belum ada Tagihan untuk saat ini",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+        Text(
+          "Belum ada Tagihan untuk saat ini",
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-        )
+        ),
       ],
     );
   }
 
+  // CARD
   Widget _buildBillCard(BuildContext context, BillItem bill) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 20.h),
+
         Container(
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
@@ -112,10 +113,11 @@ class BayarTagihanScreen extends StatelessWidget {
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 8,
-                offset: const Offset(0, 3),
+                offset: Offset(0, 3),
               ),
             ],
           ),
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -129,25 +131,22 @@ class BayarTagihanScreen extends StatelessWidget {
                       fontSize: 20.sp,
                     ),
                   ),
-
-                  Spacer(),
-
-                  if (bill.invStatus == 0)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: darkorange,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Text(
-                        "BELUM DIBAYAR",
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: darkorange,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Text(
+                      "BELUM DIBAYAR",
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+                  ),
                 ],
               ),
 
@@ -164,7 +163,6 @@ class BayarTagihanScreen extends StatelessWidget {
 
               SizedBox(height: 6.h),
 
-              // JATUH TEMPO
               Text(
                 "Bayar Sebelum: ${formatTanggal(bill.invDue)}",
                 style: GoogleFonts.inter(
@@ -175,6 +173,7 @@ class BayarTagihanScreen extends StatelessWidget {
 
               SizedBox(height: 16.h),
 
+              // BUTTON BAYAR
               Center(
                 child: Container(
                   width: 300.w,
@@ -209,17 +208,33 @@ class BayarTagihanScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 10),
+              SizedBox(height: 14),
 
               Center(
-              child: Text(
-                "No. Tagihan: ${bill.invNumber}",
-                style: GoogleFonts.inter(
-                  fontSize: 12.sp,
-                  color: Colors.black54,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DetailTagihanScreen(
+                          accessToken: accessToken,
+                          piNumber: bill.invNumber,
+                        ),
+                      ),
+                    );
+                  },
+
+                  child: Text(
+                    "No. Tagihan: ${bill.invNumber}",
+                    style: GoogleFonts.inter(
+                      fontSize: 13.sp,
+                      color: darkorange,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
                 ),
               ),
-              )
             ],
           ),
         ),
@@ -228,41 +243,28 @@ class BayarTagihanScreen extends StatelessWidget {
   }
 
 
+  // PAYMENT URL
   void _getPaymentUrl(BuildContext context) async {
     try {
       final urlResponse = await ApiService()
           .getUrlBill(accessToken: accessToken, custNumber: custNumber);
 
-      final url = urlResponse.url;
-
-      _openCustomTab(url);
-
-    } catch (e) {
+      _openCustomTab(urlResponse.url);
+    } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Gagal mengambil URL pembayaran")),
       );
     }
   }
 
-
   void _openCustomTab(String url) async {
     try {
       await launchUrl(
         Uri.parse(url),
-        customTabsOptions: const CustomTabsOptions(
-          showTitle: true,
-        ),
-        safariVCOptions: const SafariViewControllerOptions(
-          preferredBarTintColor: Colors.white,
-          preferredControlTintColor: Colors.blue,
-        ),
+        customTabsOptions: const CustomTabsOptions(showTitle: true),
       );
     } catch (e) {
       debugPrint("Gagal membuka custom tab: $e");
     }
   }
-
-
-
-
 }

@@ -15,7 +15,7 @@ Future<bool> checkServerStatus(BuildContext context) async {
       Uri.parse(baseUrl),
     ).timeout(const Duration(seconds: 3));
 
-    if (response.statusCode == 200 || response.statusCode == 404) {
+    if (response.statusCode == 404) {
       // Server nyala (walaupun 404 tetap berarti hidup)
       return true;
     } else {

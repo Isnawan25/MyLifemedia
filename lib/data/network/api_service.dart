@@ -10,7 +10,6 @@ import 'package:mylm/data/models/product/packages_response.dart';
 import 'package:mylm/data/models/customer/register_cust/register_customer_request.dart';
 import 'package:mylm/data/models/customer/register_cust/register_customer_response.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
-import 'package:dio/dio.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
 import 'package:mylm/screen/auth_otp/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +22,8 @@ import 'package:mylm/data/models/customer/custlist_response.dart';
 import 'package:mylm/data/models/notification/notification_response.dart';
 import 'package:mylm/data/models/bill/bill_last_response.dart';
 import 'package:mylm/data/models/bill/url_bill_response.dart';
+import 'package:mylm/data/models/bill/detail_bill_response.dart';
+
 
 enum OtpMode {
   login,
@@ -100,7 +101,7 @@ class ApiService {
   }
 
 
-  //VERIFY OTP
+  // VERIFY OTP
   Future<VerifyOtpResponse?> verifyOtp({
     required String custNumber,
     required String otp,
@@ -137,7 +138,7 @@ class ApiService {
   }
 
 
-//PROFILE
+// PROFILE
   Future<DetailProfileResponse?> getProfile(
       String custNumber,
       String accessToken,
@@ -188,7 +189,7 @@ class ApiService {
   }
 
 
-  //PROMOTION
+  // PROMOTION
   Future<List<Promotion>> getPromotions() async {
     final response = await http.get(Uri.parse('$baseUrl/promotions'));
 
@@ -200,6 +201,7 @@ class ApiService {
       throw Exception("Gagal memuat data promosi");
     }
   }
+
 
   // GET PACKAGES
   Future<GetPackagesResponse?> getPackages() async {
@@ -376,20 +378,23 @@ class ApiService {
   // TERM CONDITIONS
   Future<TermConditionsResponse?> getTermConditions() async {
     try {
-      final dio = Dio();
-      final response = await dio.get("$baseUrl/term-conditions");
+      final url = Uri.parse("$baseUrl/term-conditions");
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        return TermConditionsResponse.fromJson(response.data);
+        final jsonBody = jsonDecode(response.body);
+        return TermConditionsResponse.fromJson(jsonBody);
       } else {
         debugPrint("Gagal memuat term conditions: ${response.statusCode}");
         return null;
       }
+
     } catch (e) {
       debugPrint("Error saat mengambil term conditions: $e");
       return null;
     }
   }
+
 
   // BILL LIST
   Future<BillListResponse> getBillList({
@@ -568,6 +573,8 @@ class ApiService {
     }
   }
 
+
+  // URL BILL
   Future<UrlBillResponse> getUrlBill({
     required String accessToken,
     required String custNumber,
@@ -586,13 +593,40 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
-      return UrlBillResponse.fromJson(json);   // ← KEMBALIKAN MODEL
+      return UrlBillResponse.fromJson(json);
     } else {
       throw Exception("Failed to fetch url pay bill: ${response.body}");
     }
   }
 
+  // DETAIL BILL
+  Future<DetailBillResponse> getDetailBill({
+    required String accessToken,
+    required String piNumber,
+  }) async {
 
+    final response = await http.post(
+      Uri.parse("$baseUrl/detail-bill"),
+      headers: {
+        "Authorization": "Bearer $accessToken",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "pi_number": piNumber,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      final json = jsonDecode(response.body);
+      if (json["success"] == 1) {
+        return DetailBillResponse.fromJson(json);
+      } else {
+        throw Exception(json["message"] ?? "Gagal memuat detail bill");
+      }
+    } else {
+      throw Exception("Gagal memuat detail bill");
+    }
+  }
 
 }
 
