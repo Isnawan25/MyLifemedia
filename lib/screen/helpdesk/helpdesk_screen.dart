@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/main/main_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpdeskScreen extends StatelessWidget {
   final String custNumber;
@@ -17,6 +18,17 @@ class HelpdeskScreen extends StatelessWidget {
     required this.custGroupId,
   });
 
+  Future<void> openWhatsApp(String message) async {
+    final String phone = "622746055655"; // nomor lifemedia
+    final String encodedMessage = Uri.encodeComponent(message);
+    final Uri url = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Tidak bisa membuka WhatsApp";
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,8 +93,13 @@ class HelpdeskScreen extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(30.r),
                 onTap: () {
-                print("Go to Whatsapps");
+                  final String text =
+                      "Halo CS Lifemedia,\nSaya ingin bertanya terkait layanan saya.\n\n"
+                      "Nomor Pelanggan: $custNumber";
+
+                  openWhatsApp(text);
                 },
+
                 child: Container(
                   width: 250.w,
                   padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 40.w),
