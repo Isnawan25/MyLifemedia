@@ -1,137 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mylm/base/widgets/text_utils.dart';
-import 'package:mylm/screen/add_nopel/add_custlist_screen.dart';
-import 'package:mylm/screen/main/manage_bills/bayar_tagihan/bayar_tagihan_screen.dart';
-import 'package:mylm/screen/layanan/tambah_layanan/tambah_layanan_screen.dart';
-import 'package:mylm/screen/layanan/ubah_layanan/ubah_layanan_screen.dart';
-import 'package:mylm/screen/main/main_profile_screen.dart';
-import 'package:mylm/screen/notification/notification_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
-import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
+import 'package:mylm/screen/guest/daftar_layanan/daftar_layanan_screen.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:mylm/base/widgets/icons_colors.dart';
-import 'package:mylm/data/models/product/exists_package_response.dart';
-import 'package:mylm/data/preferences/secure_storage.dart';
+import 'package:mylm/screen/guest/welcome_screen.dart';
 
 
 
 class HomePreviewScreen extends StatefulWidget {
-  final String custNumber;
-  final String accessToken;
-  final String custGroupId;
-
 
   const HomePreviewScreen({
     super.key,
-    required this.custNumber,
-    required this.accessToken,
-    required this.custGroupId,
   });
   @override
   _HomePreviewScreenState createState() => _HomePreviewScreenState();
 }
 
 class _HomePreviewScreenState extends State<HomePreviewScreen> {
-  DetailProfileData? profile;
-  bool isLoadingProfile = true;
-  ExistsPackage? existsPackage;
-  bool isLoadingPackage = true;
 
-  late String currentCustNumber;
-  late String currentCustGroupId;
+
 
   @override
   void initState() {
     super.initState();
-    _loadCurrentCust();
-  }
-  Future<void> _loadCurrentCust() async {
-    String? savedCustNumber = await SecureStorage.getCustNumber();
-    String? savedCustGroupId = await SecureStorage.getCustGroupId();
-
-    setState(() {
-      currentCustNumber = savedCustNumber ?? widget.custNumber;
-      currentCustGroupId = savedCustGroupId ?? widget.custGroupId;
-    });
-
-    _loadProfile();
-    _loadExistingPackage();
   }
 
-  Future<void> _loadProfile() async {
-    setState(() => isLoadingProfile = true);
-    final api = ApiService();
-    final result = await api.getProfile(
-      currentCustNumber,
-      widget.accessToken,
-      context,
-    );
-
-    if (result != null && result.success == 1 && result.data != null) {
-      setState(() {
-        profile = result.data!;
-        isLoadingProfile = false;
-      });
-    } else {
-      setState(() => isLoadingProfile = false);
-      print("Gagal memuat profil");
-    }
-  }
-
-  Future<void> _loadExistingPackage() async {
-    setState(() => isLoadingPackage = true);
-    final api = ApiService();
-    final result = await api.getExistingPackage(
-      currentCustGroupId,
-      currentCustNumber,
-      widget.accessToken,
-    );
-
-    setState(() {
-      existsPackage = result;
-      isLoadingPackage = false;
-    });
-  }
-
-  Future<void> _openAddCustList() async {
-    final result = await Navigator.push<Map<String, String>>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddCustlistScreen(
-          custNumber: currentCustNumber,
-          accessToken: widget.accessToken,
-          custGroupId: currentCustGroupId,
-        ),
-      ),
-    );
-
-    if (result != null) {
-      final newCustNumber = result['custNumber'];
-      final newCustGroupId = result['custGroupId'];
-
-      if (newCustNumber != null && newCustGroupId != null) {
-        await SecureStorage.saveCustNumber(newCustNumber);
-        await SecureStorage.saveCustGroupId(newCustGroupId);
-
-        setState(() {
-          currentCustNumber = newCustNumber;
-          currentCustGroupId = newCustGroupId;
-          isLoadingProfile = true;
-          isLoadingPackage = true;
-        });
-
-        await _loadProfile();
-        await _loadExistingPackage();
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,10 +62,7 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MainProfileScreen(
-                                  accessToken: widget.accessToken,
-                                  custNumber: currentCustNumber,
-                                  custGroupId: currentCustGroupId,
+                                builder: (context) => WelcomeScreen(
                                 ),
                               ),
                             );
@@ -186,7 +81,6 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                               ),
                               const SizedBox(width: 12),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "Anda Belum Login",
@@ -196,7 +90,6 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
                                 ],
                               ),
                               const Spacer(),
@@ -204,7 +97,7 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                                    MaterialPageRoute(builder: (context) => const WelcomeScreen()),
                                   );
                                 },
                                 icon: SvgPicture.asset(
@@ -226,7 +119,11 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: _openAddCustList,
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => WelcomeScreen()));
+                            },
                             splashColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             hoverColor: Colors.transparent,
@@ -262,75 +159,114 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                           ),
                         ),
 
-                        // Info Tagihan Card
+                        // Guest Access Card
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white.withValues(alpha: 0.20),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                isLoadingProfile ? "..." : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
-                                style: GoogleFonts.inter(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+
+                              // === MYLM LOGO (SAFE SIZE) ===
+                              SizedBox(
+                                height: 40, // aman, tidak bikin card turun
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Image.asset("assets/images/mylm_logo.png"),
                                 ),
                               ),
-                              const SizedBox(height: 4),
+
+                              SizedBox(height: 12),
+
                               Text(
-                                isLoadingProfile ? "..." : shortText(profile?.custAddress, limit: 36),
+                                "Akses Layanan MyLifemedia",
                                 style: GoogleFonts.inter(
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w700,
                                   color: Colors.white,
-                                  fontSize: 13.sp,
                                 ),
                               ),
-                              const Divider(color: Colors.white54, height: 20),
+
+                              SizedBox(height: 6),
+
+                              Text(
+                                "Masukkan ID Pelanggan untuk mulai menggunakan layanan MyLifemedia. "
+                                    "Jika Anda belum memiliki ID, silakan daftar layanan terlebih dahulu.",
+                                style: GoogleFonts.inter(
+                                  fontSize: 14.sp,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+
+                              SizedBox(height: 14),
+
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Layanan Internet",
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white70,
-                                            fontSize: 12.sp,
-                                          )),
-                                      Text(
-                                          isLoadingPackage ? "..." : (existsPackage?.spCode ?? "-"),
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                          )),
-                                    ],
+                                  // Tombol Masuk
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (_) => WelcomeScreen()),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: darkorange,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                      child: Text(
+                                        "Masuk",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text("Total Tagihan",
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white70,
-                                            fontSize: 12.sp,
-                                          )),
-                                      Text(
-                                          isLoadingPackage
-                                              ? "..."
-                                              : formatRupiah(existsPackage?.spReguler ?? 0),
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                          )),
-                                    ],
+
+                                  SizedBox(width: 12),
+
+                                  // Tombol Daftar Layanan
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (_) => DaftarLayananScreen()),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                      child: Text(
+                                        "Daftar Layanan",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.sp,
+                                          color: darkorange,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -356,42 +292,17 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
+                          _buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => TambahLayananScreen(
-                                custNumber: currentCustNumber,
-                                accessToken: widget.accessToken,
-                                custGroupId: currentCustGroupId,
+                              MaterialPageRoute(builder: (context) => WelcomeScreen(
                               )),
                             );
                           }),
-                          buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
-                            if (isLoadingPackage || existsPackage == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    "Sedang memuat paket aktif...",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                  margin: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  backgroundColor: Colors.black,
-                                  duration: const Duration(seconds: 3),
-                                ),
-                              );
-                              return;
-                            }
+                          _buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => UbahLayananScreen(
-                                custNumber: currentCustNumber,
-                                accessToken: widget.accessToken,
-                                custGroupId: currentCustGroupId,
-                                currentPackage: existsPackage,
+                              MaterialPageRoute(builder: (context) => WelcomeScreen(
                               )),
                             );
                           }),
@@ -399,9 +310,8 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                               onTap: () {
                                 Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => BayarTagihanScreen(
-                                      accessToken: widget.accessToken,
-                                      custNumber: currentCustNumber,)));
+                                    MaterialPageRoute(builder: (context) => WelcomeScreen(
+                                    )));
                               }),
                         ],
                       ),
@@ -507,4 +417,41 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
       ),
     );
   }
+}
+
+Widget _buildFeature(BuildContext context, String svgPath, String title,
+    {VoidCallback? onTap}) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(12),
+    onTap: onTap,
+    child: Column(
+      children: [
+        ShaderMask(
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [darkorange, orange],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ).createShader(bounds),
+          child: SvgPicture.asset(
+            svgPath,
+            width: 45.w,
+            height: 45.h,
+            colorFilter: const ColorFilter.mode(
+              Colors.white,
+              BlendMode.srcIn,
+          ),
+          )
+        ),
+        const SizedBox(height: 6),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    ),
+  );
 }
