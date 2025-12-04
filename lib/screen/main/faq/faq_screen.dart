@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/support/faq_response.dart';
-import 'package:mylm/screen/faq/detailfaq_screen.dart';
+import 'package:mylm/screen/main/faq/detailfaq_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
 class FaqScreen extends StatelessWidget {

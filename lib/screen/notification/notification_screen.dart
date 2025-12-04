@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/notification/notification_response.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
-import 'package:mylm/screen/message/notification_status_screen.dart';
+import 'package:mylm/screen/notification/notification_status_screen.dart';
 import 'package:mylm/base/date_formatter.dart';
 
 class NotificationScreen extends StatefulWidget {

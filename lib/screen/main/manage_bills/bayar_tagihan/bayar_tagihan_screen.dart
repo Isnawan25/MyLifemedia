@@ -8,7 +8,7 @@ import 'package:mylm/data/network/api_service.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/date_formatter.dart';
-import 'package:mylm/screen/fitur_layanan/bayar_tagihan/detail_tagihan_screen.dart';
+import 'package:mylm/screen/main/manage_bills/bayar_tagihan/detail_tagihan_screen.dart';
 
 class BayarTagihanScreen extends StatelessWidget {
   final String custNumber;

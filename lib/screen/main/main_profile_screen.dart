@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mylm/base/widgets/bottom_nav.dart';
-import 'package:mylm/screen/faq/faq_screen.dart';
-import 'package:mylm/screen/helpdesk/helpdesk_screen.dart';
-import 'package:mylm/screen/home/home_screen.dart';
-import 'package:mylm/screen/riwayat_tagihan/riwayat_tagihan_screen.dart';
-import 'package:mylm/screen/user_profile/profile_screen.dart';
+import 'package:mylm/screen/main/faq/faq_screen.dart';
+import 'package:mylm/screen/main/helpdesk/helpdesk_screen.dart';
+import 'package:mylm/screen/main/home/home_screen.dart';
+import 'package:mylm/screen/main/manage_bills/riwayat_tagihan/riwayat_tagihan_screen.dart';
+import 'package:mylm/screen/main/user_profile/profile_screen.dart';
 
 class MainProfileScreen extends StatefulWidget {
   final String custNumber;
