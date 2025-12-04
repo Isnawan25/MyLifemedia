@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
+import 'package:mylm/screen/guest/main_preview_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:mylm/screen/welcome_screen.dart';
 import 'package:flutter/services.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -57,8 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Kalau token tidak ada → ke WelcomeScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-      );
+        MaterialPageRoute(builder: (_) => const MainPreviewScreen()));
     }
   }
 

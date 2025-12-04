@@ -35,7 +35,6 @@ class _RiwayatTagihanScreenState extends State<RiwayatTagihanScreen> {
     super.initState();
     _billFuture = ApiService().getBillList(
       custNumber: widget.custNumber,
-      custGroupId: widget.custGroupId,
       accessToken: widget.accessToken,
     );
   }

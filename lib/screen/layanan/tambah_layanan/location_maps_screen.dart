@@ -85,8 +85,8 @@ class _LocationMapsScreenState extends State<LocationMapsScreen> {
                 userLocationMarker: UserLocationMaker(
                   personMarker: MarkerIcon(
                     iconWidget: Container(
-                      width: 60,
-                      height: 60,
+                      width: 60.w,
+                      height: 60.h,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
 
@@ -96,22 +96,22 @@ class _LocationMapsScreenState extends State<LocationMapsScreen> {
                         alignment: Alignment.center,
                         children: [
                           Container(
-                            width: 50,
-                            height: 50,
+                            width: 50.w,
+                            height: 50.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: darkorange.withOpacity(0.25),
+                              color: darkorange.withValues(alpha: 0.25),
                             ),
                           ),
                           Container(
-                            width: 20,
-                            height: 20,
+                            width: 20.w,
+                            height: 20.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: darkorange,
                               border: Border.all(
                                 color: Colors.white,
-                                width: 3,
+                                width: 3.w,
                               ),
                             ),
                           ),
@@ -164,7 +164,7 @@ class _LocationMapsScreenState extends State<LocationMapsScreen> {
                   style: GoogleFonts.inter(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(

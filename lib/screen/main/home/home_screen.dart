@@ -16,7 +16,6 @@ import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_loading.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:mylm/base/widgets/icons_colors.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 
@@ -371,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
+                          _buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => TambahLayananScreen(
@@ -381,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                             );
                           }),
-                          buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
+                          _buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
                             if (isLoadingPackage || existsPackage == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -410,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                             );
                           }),
-                          buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan",
+                          _buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan",
                               onTap: () {
                             Navigator.push(
                                 context,
@@ -522,4 +521,41 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+Widget _buildFeature(BuildContext context, String svgPath, String title,
+    {VoidCallback? onTap}) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(12),
+    onTap: onTap,
+    child: Column(
+      children: [
+        ShaderMask(
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [darkorange, orange],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ).createShader(bounds),
+          child: SvgPicture.asset(
+            svgPath,
+            width: 45.w,
+            height: 45.h,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              )
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    ),
+  );
 }

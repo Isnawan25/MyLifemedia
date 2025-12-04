@@ -399,11 +399,10 @@ class ApiService {
   // BILL LIST
   Future<BillListResponse> getBillList({
     required String custNumber,
-    required String custGroupId,
     required String accessToken,
   })
   async {
-    final url = Uri.parse('$baseUrl/bill-list?cust_number=$custNumber&group_id=$custGroupId');
+    final url = Uri.parse('$baseUrl/bill-list?cust_number=$custNumber');
 
     final response = await http.get(
       url,

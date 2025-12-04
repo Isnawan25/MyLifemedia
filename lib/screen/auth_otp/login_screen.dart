@@ -7,7 +7,7 @@ import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/auth_otp/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/auth_&_otp/login_response.dart';
-import 'package:mylm/screen/welcome_screen.dart';
+import 'package:mylm/screen/guest/welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final CustomerData? customerData;

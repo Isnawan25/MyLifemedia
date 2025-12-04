@@ -79,9 +79,9 @@ class HelpdeskScreen extends StatelessWidget {
           "Butuh bantuan lebih lanjut?\nTim kami siap membantu Anda",
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.black54,
           ),
         ),
 

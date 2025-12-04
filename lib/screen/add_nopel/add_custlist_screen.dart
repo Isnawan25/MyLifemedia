@@ -9,7 +9,7 @@ import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 
 class AddCustlistScreen extends StatefulWidget {
-  String custNumber;
+  final String custNumber;
   final String accessToken;
   final String custGroupId;
 
