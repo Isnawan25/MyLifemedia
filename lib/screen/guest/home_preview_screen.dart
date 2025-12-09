@@ -56,9 +56,11 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
                         // Profil
                         GestureDetector(
                           onTap: () {
+                            Feedback.forTap(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(

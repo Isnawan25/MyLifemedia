@@ -139,6 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Center(
               child: GestureDetector(
                 onTap: () async {
+                  Feedback.forTap(context);
                   final confirmLogout = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(

@@ -43,7 +43,7 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
       groupId: widget.custGroupId,
     );
 
-    if (resp != null && resp.data != null) {
+    if (resp != null && resp.data !="") {
       setState(() {
         customerList = resp.data.map((e) => e.nopel).toList();
         isLoading = false;

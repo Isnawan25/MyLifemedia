@@ -12,17 +12,11 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Container(
         height: double.infinity,
         width: double.infinity,
 
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [darkorange, orange],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
 
         child: SafeArea(
           child: Column(
@@ -38,7 +32,7 @@ class WelcomeScreen extends StatelessWidget {
                   icon: SvgPicture.asset(
                     "assets/svgs/arrow_back.svg",
                     colorFilter: const ColorFilter.mode(
-                      Colors.white,
+                      Colors.black,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -63,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: blacklm,
                   ),
                 ),
               ),
@@ -76,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14.sp,
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: blacklm.withValues(alpha: 0.9),
                   ),
                 ),
               ),

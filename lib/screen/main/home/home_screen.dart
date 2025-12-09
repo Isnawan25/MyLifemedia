@@ -160,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Profil
                         GestureDetector(
                           onTap: () {
+                            Feedback.forTap(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
