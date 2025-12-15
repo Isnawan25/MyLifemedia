@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/currency_formatter.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/main/manage_bills/riwayat_tagihan/detail_tagihan_screen.dart';

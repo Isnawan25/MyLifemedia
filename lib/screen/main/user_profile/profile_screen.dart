@@ -10,6 +10,8 @@ import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/user_preferences.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   final String custNumber;
@@ -88,176 +90,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-        child: Column(
+        child: isLoadingProfile
+            ? _buildProfileSkeleton()
+            : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ID Pelanggan
             _buildInfoField(
               label: "ID Pelanggan",
-              value: isLoadingProfile ? "..."
-                  : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
+              value: profile?.custNumber ?? "-",
               showEditButton: false,
             ),
             SizedBox(height: 12.h),
 
-            // Nama Lengkap
             _buildInfoField(
               label: "Nama Lengkap",
-              value: shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 30),
+              value: shortText(profile?.custName ?? "-", limit: 30),
               showEditButton: false,
             ),
             SizedBox(height: 12.h),
 
             _buildInfoField(
               label: "Alamat",
-              value: isLoadingProfile
-                  ? "..." : shortText(profile?.custAddress, limit: 36),
+              value: shortText(profile?.custAddress ?? "-", limit: 36),
               showEditButton: false,
             ),
-
             SizedBox(height: 12.h),
 
-            // No. Handphone
             _buildInfoField(
               label: "No. Handphone",
-              value: profile?.custPhone ?? "No. Handphone Tidak Tersedia",
+              value: profile?.custPhone ?? "-",
               showEditButton: false,
             ),
-
             SizedBox(height: 12.h),
 
-            // Email
             _buildInfoField(
               label: "Email",
-              value: profile?.custEmail ?? "Email Tidak Tersedia",
+              value: profile?.custEmail ?? "-",
               showEditButton: false,
             ),
 
             const Spacer(),
-
-            // Exit
-            Center(
-              child: GestureDetector(
-                onTap: () async {
-                  Feedback.forTap(context);
-                  final confirmLogout = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      title: Text(
-                        "Keluar Aplikasi",
-                        style: GoogleFonts.inter(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      content: Text(
-                        "Apakah Anda yakin ingin keluar dari akun ini?",
-                        style: GoogleFonts.inter(
-                          fontSize: 14.sp,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      actionsAlignment: MainAxisAlignment.end,
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: Text(
-                            "Batal",
-                            style: GoogleFonts.inter(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [(darkorange), (orange)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            ),
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(
-                              "Keluar",
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        )
-
-                      ],
-                    ),
-                  );
-
-                  if (confirmLogout == true) {
-                    try {
-                      // Hapus semua data user yang tersimpan
-                      await SecureStorage.clear();
-                      await UserPreferences.clear();
-
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            (route) => false,
-                      );
-                    } catch (e) {
-                      debugPrint("Logout error: $e");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Gagal logout, coba lagi.")),
-                      );
-                    }
-                  }
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ShaderMask(
-                      shaderCallback: (Rect bounds) {
-                        return const LinearGradient(
-                          colors: [darkorange, orange],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.srcIn,
-                      child: SvgPicture.asset(
-                        "assets/svgs/icons_exit.svg",
-                        width: 28.w,
-                        height: 28.h,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      "Keluar",
-                      style: GoogleFonts.inter(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
+            const LogoutButton(),
             SizedBox(height: 20.h),
           ],
         ),
@@ -339,3 +212,150 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+class LogoutButton extends StatelessWidget {
+  const LogoutButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () async {
+          Feedback.forTap(context);
+
+          final confirmLogout = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              title: Text(
+                "Keluar Aplikasi",
+                style: GoogleFonts.inter(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              content: Text(
+                "Apakah Anda yakin ingin keluar dari akun ini?",
+                style: GoogleFonts.inter(
+                  fontSize: 14.sp,
+                  color: Colors.black54,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(
+                    "Batal",
+                    style: GoogleFonts.inter(color: Colors.grey[700]),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [darkorange, orange],
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(
+                        "Keluar",
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        )
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmLogout == true) {
+            try {
+              await SecureStorage.clear();
+              await UserPreferences.clear();
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (_) => false,
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Gagal logout, coba lagi")),
+              );
+            }
+          }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [darkorange, orange],
+              ).createShader(bounds),
+              blendMode: BlendMode.srcIn,
+              child: SvgPicture.asset(
+                "assets/svgs/icons_exit.svg",
+                width: 28.w,
+                height: 28.h,
+              ),
+            ),
+            SizedBox(width: 6.w),
+            Text(
+              "Keluar",
+              style: GoogleFonts.inter(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+Widget _buildProfileSkeleton() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: List.generate(5, (index) {
+      return Padding(
+        padding: EdgeInsets.only(bottom: 12.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // label skeleton
+            SkeletonLoading(
+              width: 120.w,
+              height: 12.h,
+              radius: 4,
+            ),
+            SizedBox(height: 6.h),
+
+            // value field skeleton
+            SkeletonLoading(
+              width: double.infinity,
+              height: 44.h,
+              radius: 8,
+            ),
+          ],
+        ),
+      );
+    }),
+  );
+}
+

@@ -7,6 +7,7 @@ import 'package:mylm/data/models/notification/notification_response.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/notification/notification_status_screen.dart';
 import 'package:mylm/base/date_formatter.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -128,19 +129,75 @@ class _NotificationScreenState extends State<NotificationScreen> {
         centerTitle: true,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+        itemCount: 2, // jumlah dummy skeleton
+        separatorBuilder: (_, __) => SizedBox(height: 12.h),
+        itemBuilder: (_, __) {
+          return Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // dot bulat kiri
+                SkeletonLoading(
+                  width: 10.w,
+                  height: 10.w,
+                ),
+                SizedBox(width: 12.w),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SkeletonLoading(
+                        width: double.infinity,
+                        height: 14.h,
+                      ),
+                      SizedBox(height: 8.h),
+                      SkeletonLoading(
+                        width: 180.w,
+                        height: 12.h,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(width: 8.w),
+
+                // waktu kanan
+                SkeletonLoading(
+                  width: 40.w,
+                  height: 12.h,
+                ),
+              ],
+            ),
+          );
+        },
+      )
           : isError
           ? Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text("Tidak ada Notifikasi"),
-            const SizedBox(height: 8)
+            const SizedBox(height: 8),
           ],
         ),
       )
           : ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
         itemCount: notifications.length,
         separatorBuilder: (context, index) =>
             Divider(height: 1.h, color: Colors.grey[300]),

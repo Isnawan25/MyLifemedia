@@ -7,7 +7,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/layanan/tambah_layanan/tambah_layanan2_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
 class TambahLayananScreen extends StatefulWidget {
   final String custNumber;

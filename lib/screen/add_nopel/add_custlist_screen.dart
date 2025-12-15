@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/screen/add_nopel/addcust_bottomsheet.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';

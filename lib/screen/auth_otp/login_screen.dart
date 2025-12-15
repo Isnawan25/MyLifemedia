@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/base/popup/toast.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/auth_otp/verify_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
@@ -176,13 +177,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   }
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          "Login gagal: ${result?.message ?? 'Server error'}"),
-                    ),
-                  );
-                }
+                    showCustomErrorToast(
+                      context,
+                      result?.message ?? 'Login gagal, periksa kembali ID pelanggan',
+                    );
+                  }
+
               }
                   : null, // nonaktif jika tidak valid
               child: Center(

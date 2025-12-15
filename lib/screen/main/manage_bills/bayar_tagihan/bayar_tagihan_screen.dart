@@ -9,6 +9,7 @@ import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/date_formatter.dart';
 import 'package:mylm/screen/main/manage_bills/bayar_tagihan/detail_tagihan_screen.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
 class BayarTagihanScreen extends StatelessWidget {
   final String custNumber;
@@ -56,8 +57,12 @@ class BayarTagihanScreen extends StatelessWidget {
         ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: _buildBillSkeleton(),
+            );
           }
+
 
           if (snapshot.hasError) {
             return const Center(child: Text("Gagal memuat data"));
@@ -268,3 +273,68 @@ class BayarTagihanScreen extends StatelessWidget {
     }
   }
 }
+
+Widget _buildBillSkeleton() {
+  return Column(
+    children: [
+      SizedBox(height: 20.h),
+      Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // SP CODE + STATUS
+            Row(
+              children: [
+                SkeletonLoading(width: 100.w, height: 20.h),
+                const Spacer(),
+                SkeletonLoading(width: 90.w, height: 24.h, radius: 8),
+              ],
+            ),
+
+            SizedBox(height: 12.h),
+
+            // TOTAL TAGIHAN
+            SkeletonLoading(width: 160.w, height: 24.h),
+
+            SizedBox(height: 10.h),
+
+            // TANGGAL JATUH TEMPO
+            SkeletonLoading(width: 200.w, height: 16.h),
+
+            SizedBox(height: 20.h),
+
+            // BUTTON BAYAR
+            Center(
+              child: SkeletonLoading(
+                width: 300.w,
+                height: 48.h,
+                radius: 20,
+              ),
+            ),
+
+            SizedBox(height: 16.h),
+
+            // NO TAGIHAN
+            Center(
+              child: SkeletonLoading(width: 180.w, height: 14.h),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+

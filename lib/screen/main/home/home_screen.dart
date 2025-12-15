@@ -13,7 +13,7 @@ import 'package:mylm/screen/main/main_profile_screen.dart';
 import 'package:mylm/screen/notification/notification_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
@@ -42,6 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoadingProfile = true;
   ExistsPackage? existsPackage;
   bool isLoadingPackage = true;
+  bool hasUnreadNotification = false;
+  bool isCheckingNotification = true;
+
 
   late String currentCustNumber;
   late String currentCustGroupId;
@@ -50,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadCurrentCust();
+    checkUnreadNotification();
   }
   Future<void> _loadCurrentCust() async {
     String? savedCustNumber = await SecureStorage.getCustNumber();
@@ -132,6 +136,37 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> checkUnreadNotification() async {
+    try {
+      final token = await SecureStorage.getAccessToken();
+      final cust = await SecureStorage.getCustNumber();
+
+      if (token == null || cust == null) return;
+
+      final result = await ApiService().getNotifications(
+        accessToken: token,
+        custNumber: cust,
+      );
+
+      final hasUnread = result.any(
+            (n) => n.notificationStatus.toLowerCase() == 'not_read',
+      );
+
+      if (mounted) {
+        setState(() {
+          hasUnreadNotification = hasUnread;
+          isCheckingNotification = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("checkUnreadNotification error: $e");
+      if (mounted) {
+        setState(() => isCheckingNotification = false);
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,7 +210,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const CircleAvatar(
+                              isLoadingProfile
+                                  ? skeletonCircle(size: 56)
+                                  : const CircleAvatar(
                                 radius: 28,
                                 backgroundColor: Colors.white,
                                 child: Icon(
@@ -188,7 +225,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  isLoadingProfile
+                                      ? skeletonText( width: 160, height: 18)
+                                      : Text(
                                     shortText(profile?.custName ?? "Nama Tidak Tersedia", limit: 25),
                                     style: GoogleFonts.inter(
                                       fontSize: 18.sp,
@@ -197,7 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Container(
+                                  isLoadingProfile
+                                      ? skeletonText(width: 60, height: 12, radius: 10)
+                                      : Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                     decoration: BoxDecoration(
                                       color: darkorange,
@@ -215,23 +256,51 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                               const Spacer(),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
+                              isLoadingProfile || isCheckingNotification
+                                  ? skeletonIcon(size: 28)
+                                  : IconButton(
+                                onPressed: () async {
+                                  await Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                                    MaterialPageRoute(
+                                      builder: (context) => const NotificationScreen(),
+                                    ),
                                   );
+
+                                  // refresh badge
+                                  checkUnreadNotification();
                                 },
-                                icon: SvgPicture.asset(
-                                  "assets/svgs/icons_notification.svg",
-                                  width: 28.w,
-                                  height: 28.h,
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.white,
-                                    BlendMode.srcIn,
-                                  ),
+                                icon: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    SvgPicture.asset(
+                                      "assets/svgs/icons_notification.svg",
+                                      width: 32.w,
+                                      height: 32.h,
+                                      colorFilter: const ColorFilter.mode(
+                                        Colors.white,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+
+                                    // dot
+                                    if (hasUnreadNotification)
+                                      Positioned(
+                                        right: -1,
+                                        top: -1,
+                                        child: Container(
+                                          width: 9.w,
+                                          height: 9.w,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
+
                             ],
                           ),
                         ),
@@ -285,11 +354,50 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Column(
+                          child: isLoadingProfile || isLoadingPackage
+                              ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ID Pelanggan
+                              skeletonText(width: 140),
+                              const SizedBox(height: 6),
+
+                              // Alamat
+                              skeletonText(width: 220, height: 13),
+
+                              const Divider(color: Colors.white54, height: 20),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Layanan
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      skeletonText(width: 90, height: 12),
+                                      const SizedBox(height: 6),
+                                      skeletonText(width: 120),
+                                    ],
+                                  ),
+
+                                  // Total Tagihan
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      skeletonText(width: 80, height: 12),
+                                      const SizedBox(height: 6),
+                                      skeletonText(width: 100),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                              : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isLoadingProfile ? "..." : profile?.custNumber ?? "ID Pelanggan tidak tersedia",
+                                profile?.custNumber ?? "-",
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -297,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isLoadingProfile ? "..." : shortText(profile?.custAddress, limit: 36),
+                                shortText(profile?.custAddress, limit: 36),
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontSize: 13.sp,
@@ -310,42 +418,46 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("Layanan Internet",
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white70,
-                                            fontSize: 12.sp,
-                                          )),
                                       Text(
-                                          isLoadingPackage ? "..." : (existsPackage?.spCode ?? "-"),
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                          )),
+                                        "Layanan Internet",
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white70,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        existsPackage?.spCode ?? "-",
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text("Total Tagihan",
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white70,
-                                            fontSize: 12.sp,
-                                          )),
                                       Text(
-                                          isLoadingPackage
-                                              ? "..."
-                                              : formatRupiah(existsPackage?.spReguler ?? 0),
-                                          style: GoogleFonts.inter(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                          )),
+                                        "Total Tagihan",
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white70,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        formatRupiah(existsPackage?.spReguler ?? 0),
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -371,7 +483,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
+                          isLoadingProfile
+                              ? Column(
+                            children: [
+                              skeletonIcon(size: 32),
+                              const SizedBox(height: 8),
+                              skeletonText(width: 70, height: 12),
+                            ],
+                          )
+                              : _buildFeature(context, "assets/svgs/icons_cart.svg", "Tambah Layanan", onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => TambahLayananScreen(
@@ -381,7 +501,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                             );
                           }),
-                          _buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
+                          isLoadingProfile
+                              ? Column(
+                            children: [
+                              skeletonIcon(size: 32),
+                              const SizedBox(height: 8),
+                              skeletonText(width: 70, height: 12),
+                            ],
+                          )
+                              : _buildFeature(context, "assets/svgs/icons_repost.svg", "Ubah Layanan", onTap: () {
                             if (isLoadingPackage || existsPackage == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -410,7 +538,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               )),
                             );
                           }),
-                          _buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan",
+                          isLoadingProfile
+                              ? Column(
+                            children: [
+                              skeletonIcon(size: 32),
+                              const SizedBox(height: 8),
+                              skeletonText(width: 70, height: 12),
+                            ],
+                          )
+                              : _buildFeature(context, "assets/svgs/icons_invoice.svg", "Bayar Tagihan",
                               onTap: () {
                             Navigator.push(
                                 context,
@@ -522,6 +658,41 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+
+// SKELETON HELPERS
+  Widget skeletonText({
+    double width = double.infinity,
+    double height = 14,
+    double radius = 6,
+  }) {
+    return SkeletonLoading(
+      width: width,
+      height: height,
+      radius: radius,
+    );
+  }
+
+  Widget skeletonCircle({
+    double size = 40,
+  }) {
+    return SkeletonLoading(
+      width: size,
+      height: size,
+      radius: size / 2,
+    );
+  }
+
+  Widget skeletonIcon({
+    double size = 32,
+  }) {
+    return SkeletonLoading(
+      width: size,
+      height: size,
+      radius: 8,
+    );
+  }
+
 }
 
 Widget _buildFeature(BuildContext context, String svgPath, String title,

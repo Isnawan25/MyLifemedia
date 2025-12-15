@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/support/faq_response.dart';
 import 'package:mylm/screen/main/faq/detailfaq_screen.dart';

@@ -277,6 +277,13 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: Colors.black,
+                              duration: const Duration(seconds: 3),
                               content: Text(
                                 " ${_alamatController.text.isNotEmpty ? _alamatController.text : 'Alamat tidak lengkap'}",
                               ),

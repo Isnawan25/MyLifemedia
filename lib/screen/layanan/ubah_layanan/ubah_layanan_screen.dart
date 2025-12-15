@@ -7,7 +7,7 @@ import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/screen/layanan/ubah_layanan/ubah_layanan2_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/base/currency_formatter.dart';
 
 class UbahLayananScreen extends StatefulWidget {

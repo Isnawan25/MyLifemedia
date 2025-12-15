@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/base/popup/toast.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/auth_otp/verify_screen.dart';
@@ -97,11 +98,7 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                     // login new id
                     final loginRes = await api.login(custNumber);
                     if (loginRes == null || loginRes.data == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("ID Pelanggan tidak ditemukan."),
-                        ),
-                      );
+                      showCustomErrorToast(context, "ID Pelanggan Tidak ditemukan");
                       return;
                     }
 

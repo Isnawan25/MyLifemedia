@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/base/popup/toast.dart';
 import 'package:mylm/screen/add_nopel/success_bottomsheet.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
@@ -100,9 +101,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
     // otp gagal
     if (response == null || response.data?.statusOTP.toLowerCase() != "verified") {
       debugPrint("OTP verification FAILED");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Kode OTP salah")),
-      );
+      showCustomErrorToast(context, "Kode OTP kamu salah");
       return;
     }
 

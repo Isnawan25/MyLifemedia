@@ -249,32 +249,46 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
             const SizedBox(height: 12),
 
             // Checkbox
-            Row(
-              children: [
-                Checkbox(
-                  value: isChecked,
-                  activeColor: orange,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque, // area klik full
+              onTap: () {
+                setState(() {
+                  isChecked = !isChecked;
+                });
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Checkbox(
+                    value: isChecked,
+                    activeColor: orange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        isChecked = value ?? false;
+                      });
+                    },
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      isChecked = value!;
-                    });
-                  },
-                ),
-                Expanded(
-                  child: Text(
-                    "Saya telah membaca dan menyetujui syarat & ketentuan yang berlaku",
-                    style: GoogleFonts.inter(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        "Saya telah membaca dan menyetujui syarat & ketentuan yang berlaku",
+                        style: GoogleFonts.inter(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+
+
 
             const SizedBox(height: 16),
 
@@ -393,6 +407,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text(
             "Apakah kamu yakin?",

@@ -112,32 +112,6 @@ class NotificationStatusScreen extends StatelessWidget {
                     padding: EdgeInsets.only(top: 16.h),
                     child: Text("Ref: ${notification.notificationPINumber}", style: GoogleFonts.inter(fontSize: 12.sp, color: Colors.grey[700])),
                   ),
-
-                if (notification.notificationType.toLowerCase() == 'payment')
-                  Padding(
-                    padding: EdgeInsets.only(top: 24.h),
-                    child: SizedBox(
-                      width: 200.w,
-                      height: 40.h,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // untuk ke detail tagihan
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
-                          backgroundColor: null,
-                          padding: EdgeInsets.zero,
-                        ),
-                        child: Ink(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(colors: [darkorange, orange]),
-                            borderRadius: BorderRadius.all(Radius.circular(30)),
-                          ),
-                          child: Center(child: Text("Detail Tagihan", style: GoogleFonts.inter(color: Colors.white))),
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),

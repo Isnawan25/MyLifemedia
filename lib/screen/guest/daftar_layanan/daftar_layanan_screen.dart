@@ -7,7 +7,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/screen/guest/daftar_layanan/daftar_layanan2_screen.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
 class DaftarLayananScreen extends StatefulWidget {
 

@@ -5,7 +5,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
-import 'package:mylm/base/widgets/skeleton_loading.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/screen/guest/daftar_layanan/daftar_layanan_screen.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mylm/screen/guest/welcome_screen.dart';
@@ -104,8 +104,8 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                                 },
                                 icon: SvgPicture.asset(
                                   "assets/svgs/icons_notification.svg",
-                                  width: 28.w,
-                                  height: 28.h,
+                                  width: 32.w,
+                                  height: 32.h,
                                   colorFilter: const ColorFilter.mode(
                                     Colors.white,
                                     BlendMode.srcIn,
