@@ -18,7 +18,7 @@ import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
-
+import 'package:mylm/data/network/check_internet_connection.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -45,17 +45,38 @@ class _HomeScreenState extends State<HomeScreen> {
   bool hasUnreadNotification = false;
   bool isCheckingNotification = true;
 
-
   late String currentCustNumber;
   late String currentCustGroupId;
+
+  late Future<List<Promotion>> _promotionFuture;
 
   @override
   void initState() {
     super.initState();
     _loadCurrentCust();
+    _promotionFuture = ApiService().getPromotions();
     checkUnreadNotification();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkInternetConnection(
+        context,
+        onConnected: _reloadAllData,
+      );
+    });
   }
+
+  Future<void> _reloadAllData() async {
+    await _loadCurrentCust();
+    await checkUnreadNotification();
+
+    setState(() {
+      _promotionFuture = ApiService().getPromotions();
+    });
+  }
+
+
   Future<void> _loadCurrentCust() async {
+    final hasInternet = await checkInternetConnection(context);
+    if (!hasInternet) return;
     String? savedCustNumber = await SecureStorage.getCustNumber();
     String? savedCustGroupId = await SecureStorage.getCustGroupId();
 
@@ -69,6 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadProfile() async {
+    final hasInternet = await checkInternetConnection(context);
+    if (!hasInternet) return;
+
     setState(() => isLoadingProfile = true);
     final api = ApiService();
     final result = await api.getProfile(
@@ -89,6 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadExistingPackage() async {
+    final hasInternet = await checkInternetConnection(context);
+    if (!hasInternet) return;
     setState(() => isLoadingPackage = true);
     final api = ApiService();
     final result = await api.getExistingPackage(
@@ -104,6 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openAddCustList() async {
+    final hasInternet = await checkInternetConnection(context);
+    if (!hasInternet) return;
     final result = await Navigator.push<Map<String, String>>(
       context,
       MaterialPageRoute(
@@ -137,6 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> checkUnreadNotification() async {
+    final hasInternet = await checkInternetConnection(context);
+    if (!hasInternet) return;
     try {
       final token = await SecureStorage.getAccessToken();
       final cust = await SecureStorage.getCustNumber();
@@ -581,7 +611,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
 
               FutureBuilder<List<Promotion>>(
-                future: ApiService().getPromotions(),
+                future: _promotionFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Padding(

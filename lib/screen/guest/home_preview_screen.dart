@@ -7,9 +7,8 @@ import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/screen/guest/daftar_layanan/daftar_layanan_screen.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:mylm/screen/guest/welcome_screen.dart';
-
+import 'package:mylm/data/network/check_internet_connection.dart';
 
 
 class HomePreviewScreen extends StatefulWidget {
@@ -23,12 +22,30 @@ class HomePreviewScreen extends StatefulWidget {
 
 class _HomePreviewScreenState extends State<HomePreviewScreen> {
 
+  late Future<List<Promotion>> _promotionsFuture;
 
 
   @override
   void initState() {
     super.initState();
+
+    _promotionsFuture = ApiService().getPromotions();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkInternetConnection(
+        context,
+        onConnected: _reloadHomeData,
+      );
+    });
   }
+
+  void _reloadHomeData() {
+    setState(() {
+      _promotionsFuture = ApiService().getPromotions();
+    });
+  }
+
+
 
 
   @override
@@ -342,7 +359,7 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
               const SizedBox(height: 12),
 
               FutureBuilder<List<Promotion>>(
-                future: ApiService().getPromotions(),
+                future: _promotionsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Padding(
@@ -352,66 +369,38 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
                   } else if (snapshot.hasError) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text("Gagal memuat promosi: ${snapshot.error}"),
+                      child: Text("Gagal memuat promosi"),
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24),
                       child: Text("Belum ada penawaran."),
                     );
-                  } else {
-                    final promotions = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        children: promotions.map((promo) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                height: 280.h,
-                                width: double.infinity,
-                                color: Colors.grey.shade200,
-                                child: Image.network(
-                                  promo.photo,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: 280.h,
-                                  loadingBuilder: (context, child, progress) {
-                                    if (progress == null) return child;
-                                    return Shimmer.fromColors(
-                                      baseColor: Colors.grey.shade300,
-                                      highlightColor: Colors.grey.shade100,
-                                      child: Container(
-                                        height: 280.h,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade300,
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) => Container(
-                                    height: 280.h,
-                                    color: Colors.grey.shade300,
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.broken_image,
-                                      size: 40,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    );
                   }
+
+                  final promotions = snapshot.data!;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: promotions.map((promo) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              promo.photo,
+                              height: 280.h,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
                 },
               ),
+
               const SizedBox(height: 20),
             ],
           ),
