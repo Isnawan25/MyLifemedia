@@ -11,6 +11,7 @@ class RegisterCustomerRequest {
   final double custLat;
   final double custLong;
   final String packageId;
+  final String accManager;
 
   RegisterCustomerRequest({
     required this.custName,
@@ -25,6 +26,7 @@ class RegisterCustomerRequest {
     required this.custLat,
     required this.custLong,
     required this.packageId,
+    required this.accManager
   });
 
   Map<String, dynamic> toJson() => {
@@ -40,5 +42,6 @@ class RegisterCustomerRequest {
     "custLat": custLat,
     "custLong": custLong,
     "packageId": packageId,
+    "accManager": accManager
   };
 }

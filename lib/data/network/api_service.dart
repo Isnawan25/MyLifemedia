@@ -24,11 +24,11 @@ import 'package:mylm/data/models/bill/bill_last_response.dart';
 import 'package:mylm/data/models/bill/url_bill_response.dart';
 import 'package:mylm/data/models/bill/detail_bill_response.dart';
 
-
 enum OtpMode {
   login,
   addCustomer,
 }
+
 class ApiService {
   static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
 
@@ -540,7 +540,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return true; // sukses
+      return true;
     } else {
       return false;
     }

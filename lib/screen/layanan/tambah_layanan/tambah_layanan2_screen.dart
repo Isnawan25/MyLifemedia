@@ -48,6 +48,8 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
   final _provinsiController = TextEditingController();
   final _latController = TextEditingController();
   final _longController = TextEditingController();
+  final _accManagerController =  TextEditingController();
+
 
   bool _isFilled = false;
   Uint8List? _mapPreview;
@@ -64,6 +66,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
     _kecamatanController.addListener(_checkFormFilled);
     _kotaController.addListener(_checkFormFilled);
     _provinsiController.addListener(_checkFormFilled);
+    _accManagerController.addListener(_checkFormFilled);
     _loadTerms();
   }
 
@@ -77,7 +80,8 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
           _kelurahanController.text.isNotEmpty &&
           _kecamatanController.text.isNotEmpty &&
           _kotaController.text.isNotEmpty &&
-          _provinsiController.text.isNotEmpty;
+          _provinsiController.text.isNotEmpty &&
+          _accManagerController.text.isNotEmpty;
     });
   }
 
@@ -94,6 +98,8 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
     _provinsiController.dispose();
     _latController.dispose();
     _longController.dispose();
+    _accManagerController.dispose();
+
 
     super.dispose();
   }
@@ -348,6 +354,8 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
               _buildLabeledTextField("Kecamatan", _kecamatanController),
               _buildLabeledTextField("Kabupaten/Kota", _kotaController),
               _buildLabeledTextField("Provinsi", _provinsiController),
+              _buildLabeledTextField("Account Manager (Sales)", _accManagerController),
+
 
               SizedBox(height: 24.h),
 
@@ -377,6 +385,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
                             custLat: double.parse(_latController.text.isEmpty ? '0' : _latController.text),
                             custLong: double.parse(_longController.text.isEmpty ? '0' : _longController.text),
                             packageId: widget.packageId,
+                            accManager: _accManagerController.text,
                           );
 
                           // Log isi data yang akan dikirim
