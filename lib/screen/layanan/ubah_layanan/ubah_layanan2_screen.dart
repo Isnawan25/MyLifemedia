@@ -51,6 +51,16 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   String? custVillage;
   String? custAddress;
 
+  final TextEditingController accManagerController = TextEditingController();
+  String? accManager;
+
+  @override
+  void dispose() {
+    accManagerController.dispose();
+    super.dispose();
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -95,6 +105,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
@@ -178,6 +189,48 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
             ),
 
             const SizedBox(height: 24),
+
+            Text(
+              "Account Manager (Opsional)",
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            TextField(
+              controller: accManagerController,
+              textInputAction: TextInputAction.done,
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                color: Colors.black,
+              ),
+              decoration: InputDecoration(
+                hintText: "Masukkan Account Manager (Opsional)",
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 13.sp,
+                  color: Colors.grey.shade500,
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (value) {
+                accManager = value.trim().isEmpty ? null : value.trim();
+              },
+            ),
+
+            const SizedBox(height: 24),
+
 
             Text(
               "Syarat dan Ketentuan",
@@ -318,6 +371,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                         custAddress: custAddress ?? "",
                         custSpCodeIdExists: widget.currentPackage?.spCodeId ?? "",
                         custSpCodeIdNew: widget.newPackageId,
+                        accManager: accManager
                       );
 
                       print("=== RESPONSE RESULT ===");

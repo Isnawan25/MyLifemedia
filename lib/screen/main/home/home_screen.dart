@@ -45,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool hasUnreadNotification = false;
   bool isCheckingNotification = true;
 
-  late String currentCustNumber;
-  late String currentCustGroupId;
+  String? currentCustNumber;
+  String? currentCustGroupId;
 
   late Future<List<Promotion>> _promotionFuture;
 
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => isLoadingProfile = true);
     final api = ApiService();
     final result = await api.getProfile(
-      currentCustNumber,
+      currentCustNumber!,
       widget.accessToken,
       context,
     );
@@ -118,8 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => isLoadingPackage = true);
     final api = ApiService();
     final result = await api.getExistingPackage(
-      currentCustGroupId,
-      currentCustNumber,
+      currentCustGroupId!,
+      currentCustNumber!,
       widget.accessToken,
     );
 
@@ -136,9 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => AddCustlistScreen(
-          custNumber: currentCustNumber,
+          custNumber: currentCustNumber!,
           accessToken: widget.accessToken,
-          custGroupId: currentCustGroupId,
+          custGroupId: currentCustGroupId!,
         ),
       ),
     );
@@ -199,6 +199,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (currentCustNumber == null || currentCustGroupId == null) {
+      return const Scaffold(
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -231,8 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               MaterialPageRoute(
                                 builder: (context) => MainProfileScreen(
                                   accessToken: widget.accessToken,
-                                  custNumber: currentCustNumber,
-                                  custGroupId: currentCustGroupId,
+                                  custNumber: currentCustNumber!,
+                                  custGroupId: currentCustGroupId!,
                                 ),
                               ),
                             );
@@ -525,9 +530,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => TambahLayananScreen(
-                                custNumber: currentCustNumber,
+                                custNumber: currentCustNumber!,
                                 accessToken: widget.accessToken,
-                                custGroupId: currentCustGroupId,
+                                custGroupId: currentCustGroupId!,
                               )),
                             );
                           }),
@@ -561,9 +566,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => UbahLayananScreen(
-                                custNumber: currentCustNumber,
+                                custNumber: currentCustNumber!,
                                 accessToken: widget.accessToken,
-                                custGroupId: currentCustGroupId,
+                                custGroupId: currentCustGroupId!,
                                 currentPackage: existsPackage,
                               )),
                             );
@@ -582,7 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(builder: (context) => BayarTagihanScreen(
                                   accessToken: widget.accessToken,
-                                  custNumber: currentCustNumber,)));
+                                  custNumber: currentCustNumber!,)));
                           }),
                         ],
                       ),

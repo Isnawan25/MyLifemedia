@@ -11,7 +11,7 @@ class RegisterCustomerRequest {
   final double custLat;
   final double custLong;
   final String packageId;
-  final String accManager;
+  String? accManager;
 
   RegisterCustomerRequest({
     required this.custName,

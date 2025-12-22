@@ -73,8 +73,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
           _kelurahanController.text.isNotEmpty &&
           _kecamatanController.text.isNotEmpty &&
           _kotaController.text.isNotEmpty &&
-          _provinsiController.text.isNotEmpty &&
-          _accManagerController.text.isNotEmpty;
+          _provinsiController.text.isNotEmpty;
     });
   }
 
@@ -346,7 +345,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
               _buildLabeledTextField("Kecamatan", _kecamatanController),
               _buildLabeledTextField("Kabupaten/Kota", _kotaController),
               _buildLabeledTextField("Provinsi", _provinsiController),
-              _buildLabeledTextField("Account Manager (Sales)", _accManagerController),
+              _buildLabeledTextField("Account Manager", _accManagerController),
 
               SizedBox(height: 24.h),
 

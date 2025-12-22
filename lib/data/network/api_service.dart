@@ -285,6 +285,7 @@ class ApiService {
     required String custAddress,
     required String custSpCodeIdExists,
     required String custSpCodeIdNew,
+    String? accManager,
   }) async {
     final url = Uri.parse("$baseUrl/upgrade-package");
 
@@ -292,26 +293,33 @@ class ApiService {
     print("custNumber: $custNumber");
     print("custSpCodeIdExists: $custSpCodeIdExists");
     print("custSpCodeIdNew: $custSpCodeIdNew");
+    print("accManager: $accManager");
+
+    final Map<String, dynamic> body = {
+      "custNumber": custNumber,
+      "custName": custName,
+      "custPhone": custPhone,
+      "custEmail": custEmail,
+      "custProvince": custProvince,
+      "custDistrict": custDistrict,
+      "custSubDistrict": custSubDistrict,
+      "custVillage": custVillage,
+      "custAddress": custAddress,
+      "custSpCodeIdExists": custSpCodeIdExists,
+      "custSpCodeIdNew": custSpCodeIdNew,
+    };
+
+    if (accManager != null && accManager.isNotEmpty) {
+      body["accManager"] = accManager;
+    }
 
     final response = await http.post(
       url,
       headers: {
         "Authorization": "Bearer $accessToken",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: jsonEncode({
-        "custNumber": custNumber,
-        "custName": custName,
-        "custPhone": custPhone,
-        "custEmail": custEmail,
-        "custProvince": custProvince,
-        "custDistrict": custDistrict,
-        "custSubDistrict": custSubDistrict,
-        "custVillage": custVillage,
-        "custAddress": custAddress,
-        "custSpCodeIdExists": custSpCodeIdExists,
-        "custSpCodeIdNew": custSpCodeIdNew,
-      }),
+      body: jsonEncode(body),
     );
 
     print("=== UPGRADE PACKAGE RESPONSE ===");
@@ -319,13 +327,13 @@ class ApiService {
 
     final decoded = jsonDecode(response.body);
 
-    // Jika bukan 200, maka lempar error
-    if (response.statusCode != 200 && response.statusCode != 201) {
+    if (response.statusCode != 201) {
       throw Exception(decoded['message'] ?? "Upgrade package failed");
     }
 
     return UpgradePackageResponse.fromJson(decoded);
   }
+
 
 
   // REGISTER CUSTOMERS
@@ -337,7 +345,7 @@ class ApiService {
       body: jsonEncode(request.toJson()),
     );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 201) {
       final jsonResponse = jsonDecode(response.body);
 
       if (jsonResponse["success"] == 1) {
