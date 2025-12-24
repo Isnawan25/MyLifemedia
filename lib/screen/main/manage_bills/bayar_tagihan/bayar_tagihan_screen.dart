@@ -4,10 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/data/models/bill/bill_last_response.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/date_formatter.dart';
+import 'package:mylm/data/network/services/get/get_bill_last.dart';
+import 'package:mylm/data/network/services/get/get_url_bill.dart';
 import 'package:mylm/screen/main/manage_bills/bayar_tagihan/detail_tagihan_screen.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
@@ -51,7 +52,7 @@ class BayarTagihanScreen extends StatelessWidget {
       ),
 
       body: FutureBuilder<List<BillItem>>(
-        future: ApiService().getBillLast(
+        future: BillLastService().getBillLast(
           accessToken: accessToken,
           custNumber: custNumber,
         ),
@@ -83,23 +84,26 @@ class BayarTagihanScreen extends StatelessWidget {
 
   // EMPTY PAGE
   Widget _buildEmpty() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset(
-          "assets/images/no_empty_logo.png",
-          height: 200.h,
-        ),
-        Text(
-          "Belum ada Tagihan untuk saat ini",
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            "assets/images/no_empty_logo.png",
+            height: 200.h,
           ),
-        ),
-      ],
+          SizedBox(height: 16.h),
+          Text(
+            "Belum ada Tagihan untuk saat ini",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -251,7 +255,7 @@ class BayarTagihanScreen extends StatelessWidget {
   // PAYMENT URL
   void _getPaymentUrl(BuildContext context) async {
     try {
-      final urlResponse = await ApiService()
+      final urlResponse = await UrlBillService()
           .getUrlBill(accessToken: accessToken, custNumber: custNumber);
 
       _openCustomTab(urlResponse.url);

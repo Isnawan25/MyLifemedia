@@ -3,9 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/data/models/bill/detail_bill_response.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/base/date_formatter.dart';
 import 'package:mylm/base/currency_formatter.dart';
+import 'package:mylm/data/network/services/post/post_detail_bill.dart';
 
 class DetailTagihanScreen extends StatelessWidget {
   final String accessToken;
@@ -47,7 +47,7 @@ class DetailTagihanScreen extends StatelessWidget {
       ),
 
       body: FutureBuilder<DetailBillResponse>(
-        future: ApiService().getDetailBill(
+        future: DetailBillService().getDetailBill(
           accessToken: accessToken,
           piNumber: piNumber,
         ),

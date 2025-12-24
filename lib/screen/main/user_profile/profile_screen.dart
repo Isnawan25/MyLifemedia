@@ -4,10 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
-import 'package:mylm/screen/auth_otp/login_screen.dart';
+import 'package:mylm/data/network/services/get/get_profile.dart';
+import 'package:mylm/screen/auth/login_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/user_preferences.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadProfile() async {
     setState(() => isLoadingProfile = true);
 
-    final api = ApiService();
+    final api = ProfileService();
     final result = await api.getProfile(widget.custNumber, widget.accessToken, context);
 
     if (result != null && result.success == 1 && result.data != null) {

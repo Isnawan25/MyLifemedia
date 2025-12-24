@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/popup.dart';
-import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/network/services/get/get_term_conditions.dart';
+import 'package:mylm/data/network/services/post/post_register_customer.dart';
 import 'package:mylm/screen/guest/main_preview_screen.dart';
 import 'package:mylm/screen/layanan/tambah_layanan/location_maps_screen.dart';
 import 'package:mylm/data/models/customer/register_cust/register_customer_request.dart';
@@ -96,7 +97,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
   }
 
   Future<void> _loadTerms() async {
-    final apiService = ApiService();
+    final apiService = TermConditionsService();
     final result = await apiService.getTermConditions();
     if (mounted) {
       setState(() {
@@ -383,7 +384,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                           print(request.toJson());
 
                           print("Mengirim Req ke server...");
-                          final response = await ApiService().registerCustomer(request);
+                          final response = await RegisterCustomerService().registerCustomer(request);
 
                           print("Response diterima dari server:");
                           print("Status: ${response.success}");

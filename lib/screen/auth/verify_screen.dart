@@ -5,9 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/toast.dart';
+import 'package:mylm/data/network/services/post/post_added_nopel.dart';
+import 'package:mylm/data/network/services/post/post_auth_otp.dart';
 import 'package:mylm/screen/add_nopel/success_bottomsheet.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 
 class VerifyScreen extends StatefulWidget {
@@ -90,7 +91,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
     String otp = _controllers.map((c) => c.text).join();
     debugPrint("OTP Input: $otp");
 
-    final api = ApiService();
+    final api = AuthOtpService();
     final response = await api.verifyOtp(
       custNumber: widget.custNumber,
       otp: otp,
@@ -135,6 +136,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
       debugPrint("Processing ADD CUSTOMER MODE...");
       debugPrint("Calling addNopel API...");
 
+      final api = AddedNopelService();
       final addResp = await api.addNopel(
         custNumber: widget.mainCustNumber,    // ID utama
         newCustNumber: widget.custNumber,     // ID baru
@@ -309,7 +311,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
               onTap: _canResend
                   ? () async {
                 _startTimer();
-                await ApiService().resendOtp(
+                await AuthOtpService().resendOtp(
                   custNumber: widget.custNumber,
                   accessToken: widget.accessToken,
                   mode: widget.mode,

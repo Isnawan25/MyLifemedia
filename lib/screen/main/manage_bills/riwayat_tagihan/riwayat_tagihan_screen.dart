@@ -6,9 +6,9 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
+import 'package:mylm/data/network/services/get/get_bill_list.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/main/manage_bills/riwayat_tagihan/detail_tagihan_screen.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/base/date_formatter.dart';
 
 class RiwayatTagihanScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _RiwayatTagihanScreenState extends State<RiwayatTagihanScreen> {
   @override
   void initState() {
     super.initState();
-    _billFuture = ApiService().getBillList(
+    _billFuture = BillListService().getBillList(
       custNumber: widget.custNumber,
       accessToken: widget.accessToken,
     );

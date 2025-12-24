@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
+import 'package:mylm/data/network/services/get/get_cust_list.dart';
+import 'package:mylm/data/network/services/post/post_auth_otp.dart';
 import 'package:mylm/screen/add_nopel/addcust_bottomsheet.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 
 class AddCustlistScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
   Future<void> fetchCustomerList() async {
     setState(() => isLoading = true);
 
-    final resp = await ApiService().getCustomerList(
+    final resp = await CustListService().getCustomerList(
       accessToken: widget.accessToken,
       groupId: widget.custGroupId,
     );
@@ -57,7 +58,7 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
   Future<void> performSilentLogin(String newCustNumber) async {
     setState(() => isSilentLogin = true);
 
-    final resp = await ApiService().login(newCustNumber);
+    final resp = await AuthOtpService().login(newCustNumber);
 
     if (resp != null && resp.success && resp.data != null) {
       final d = resp.data!;

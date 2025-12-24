@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/notification/notification_response.dart';
+import 'package:mylm/data/network/services/get/get_notifications.dart';
+import 'package:mylm/data/network/services/post/post_read_notifications.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/notification/notification_status_screen.dart';
 import 'package:mylm/base/date_formatter.dart';
@@ -17,7 +18,8 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  final ApiService apiService = ApiService();
+  final NotificationsService notificationsService = NotificationsService();
+  final ReadNotificationsService readNotificationsService = ReadNotificationsService();
 
   List<NotificationItem> notifications = [];
   bool isLoading = true;
@@ -61,7 +63,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     });
 
     try {
-      final result = await apiService.getNotifications(
+      final result = await notificationsService.getNotifications(
         accessToken: accessToken,
         custNumber: custNumber,
       );
@@ -90,7 +92,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> _markAsRead(int notificationId) async {
     try {
-      final ok = await apiService.readNotification(
+      final ok = await readNotificationsService.readNotification(
         accessToken: accessToken,
         notificationId: notificationId,
       );

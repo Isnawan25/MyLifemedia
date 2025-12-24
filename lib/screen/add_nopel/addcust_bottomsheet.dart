@@ -3,9 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/toast.dart';
-import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/network/services/post/post_auth_otp.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
-import 'package:mylm/screen/auth_otp/verify_screen.dart';
+import 'package:mylm/screen/auth/verify_screen.dart';
 
 Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
   final TextEditingController _idController = TextEditingController();
@@ -88,7 +88,7 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                   onTap: isValid
                       ? () async {
                     final custNumber = _idController.text.trim();
-                    final api = ApiService();
+                    final api = AuthOtpService();
 
                     final mainGroupId =
                         await SecureStorage.getCustGroupId() ?? "";

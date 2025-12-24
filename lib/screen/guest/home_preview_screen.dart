@@ -3,9 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
+import 'package:mylm/data/network/services/get/get_promotions.dart';
 import 'package:mylm/screen/guest/daftar_layanan/daftar_layanan_screen.dart';
 import 'package:mylm/screen/guest/welcome_screen.dart';
 import 'package:mylm/data/network/check_internet_connection.dart';
@@ -29,7 +29,7 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
   void initState() {
     super.initState();
 
-    _promotionsFuture = ApiService().getPromotions();
+    _promotionsFuture = PromotionService().getPromotions();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkInternetConnection(
@@ -41,7 +41,7 @@ class _HomePreviewScreenState extends State<HomePreviewScreen> {
 
   void _reloadHomeData() {
     setState(() {
-      _promotionsFuture = ApiService().getPromotions();
+      _promotionsFuture = PromotionService().getPromotions();
     });
   }
 

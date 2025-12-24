@@ -6,8 +6,10 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/popup.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
-import 'package:mylm/data/network/api_service.dart';
+import 'package:mylm/data/models/product/upgrade_package_request.dart';
 import 'package:mylm/data/models/support/term_conditions_response.dart';
+import 'package:mylm/data/network/services/get/get_term_conditions.dart';
+import 'package:mylm/data/network/services/post/post_upgrade_packages.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
@@ -91,7 +93,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   }
 
   Future<void> _loadTerms() async {
-    final apiService = ApiService();
+    final apiService = TermConditionsService();
     final result = await apiService.getTermConditions();
     if (mounted) {
       setState(() {
@@ -356,9 +358,9 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                     bool? confirm = await _showConfirmationDialog(context);
 
                     if (confirm == true) {
-                      final api = ApiService();
+                      final api = UpgradePackageService();
 
-                      final result = await api.upgradePackage(
+                      final request = UpgradePackageRequest(
                         accessToken: widget.accessToken,
                         custNumber: widget.custNumber,
                         custName: custName ?? "",
@@ -372,6 +374,11 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                         custSpCodeIdExists: widget.currentPackage?.spCodeId ?? "",
                         custSpCodeIdNew: widget.newPackageId,
                         accManager: accManager
+                      );
+
+                      final result = await api.upgradePackage(
+                        accessToken: widget.accessToken,
+                        request: request,
                       );
 
                       print("=== RESPONSE RESULT ===");

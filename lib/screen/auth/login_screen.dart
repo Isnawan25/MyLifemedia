@@ -4,10 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/toast.dart';
+import 'package:mylm/data/network/services/post/post_auth_otp.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
-import 'package:mylm/screen/auth_otp/verify_screen.dart';
-import 'package:mylm/data/network/api_service.dart';
-import 'package:mylm/data/models/auth_&_otp/login_response.dart';
+import 'package:mylm/screen/auth/verify_screen.dart';
+import 'package:mylm/data/models/auth/login_response.dart';
 import 'package:mylm/screen/guest/welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
             GestureDetector(
               onTap: isValid
                   ? () async {
-                final api = ApiService();
+                final api = AuthOtpService();
                 final custNumber = _idController.text.trim();
 
                 // Login

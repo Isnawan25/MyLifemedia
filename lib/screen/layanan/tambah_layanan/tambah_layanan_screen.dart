@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/data/network/services/get/get_packages.dart';
 import 'package:mylm/screen/layanan/tambah_layanan/tambah_layanan2_screen.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/packages_response.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
@@ -38,7 +38,7 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
   }
 
   Future<void> _fetchPackages() async {
-    final api = ApiService();
+    final api = PackagesService();
     final response = await api.getPackages();
 
     if (response != null && response.success == 1) {

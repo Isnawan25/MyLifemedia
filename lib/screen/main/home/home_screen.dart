@@ -5,13 +5,16 @@ import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
+import 'package:mylm/data/network/services/get/get_exists_package.dart';
+import 'package:mylm/data/network/services/get/get_notifications.dart';
+import 'package:mylm/data/network/services/get/get_profile.dart';
+import 'package:mylm/data/network/services/get/get_promotions.dart';
 import 'package:mylm/screen/add_nopel/add_custlist_screen.dart';
 import 'package:mylm/screen/main/manage_bills/bayar_tagihan/bayar_tagihan_screen.dart';
 import 'package:mylm/screen/layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/layanan/ubah_layanan/ubah_layanan_screen.dart';
 import 'package:mylm/screen/main/main_profile_screen.dart';
 import 'package:mylm/screen/notification/notification_screen.dart';
-import 'package:mylm/data/network/api_service.dart';
 import 'package:mylm/data/models/product/promotion_response.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/models/user_profile/detail_profile_response.dart';
@@ -54,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadCurrentCust();
-    _promotionFuture = ApiService().getPromotions();
+    _promotionFuture = PromotionService().getPromotions();
     checkUnreadNotification();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkInternetConnection(
@@ -69,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await checkUnreadNotification();
 
     setState(() {
-      _promotionFuture = ApiService().getPromotions();
+      _promotionFuture = PromotionService().getPromotions();
     });
   }
 
@@ -89,12 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadExistingPackage();
   }
 
+  // LOAD PROFILE
   Future<void> _loadProfile() async {
     final hasInternet = await checkInternetConnection(context);
     if (!hasInternet) return;
 
     setState(() => isLoadingProfile = true);
-    final api = ApiService();
+    final api = ProfileService();
     final result = await api.getProfile(
       currentCustNumber!,
       widget.accessToken,
@@ -112,11 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  //LOAD EXIST PACKAGE
   Future<void> _loadExistingPackage() async {
     final hasInternet = await checkInternetConnection(context);
     if (!hasInternet) return;
     setState(() => isLoadingPackage = true);
-    final api = ApiService();
+    final api = ExistsPackageService();
     final result = await api.getExistingPackage(
       currentCustGroupId!,
       currentCustNumber!,
@@ -129,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  //OPEN ADD CUSTLIST
   Future<void> _openAddCustList() async {
     final hasInternet = await checkInternetConnection(context);
     if (!hasInternet) return;
@@ -164,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // CHECK PESAN YANG BELUM DIBACA
   Future<void> checkUnreadNotification() async {
     final hasInternet = await checkInternetConnection(context);
     if (!hasInternet) return;
@@ -173,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (token == null || cust == null) return;
 
-      final result = await ApiService().getNotifications(
+      final result = await NotificationsService().getNotifications(
         accessToken: token,
         custNumber: cust,
       );
