@@ -495,7 +495,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
 
-                      // ⬇️ INI YANG TADI KURANG
                       child: BlocBuilder<ProfileCubit, ProfileState>(
                         builder: (context, profileState) {
                           final loadingProfile = profileState is ProfileLoading;
