@@ -16,6 +16,7 @@ class NotificationStatusScreen extends StatelessWidget {
     this.onMarkAsRead,
   });
 
+  // memilih icon berdasarkan tipe atau judul
   IconData _selectIcon(String typeOrTitle) {
     final lower = typeOrTitle.toLowerCase();
     if (lower.contains("payment") || lower.contains("pembayaran") || lower == 'payment') {

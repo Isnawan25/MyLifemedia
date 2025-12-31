@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mylm/screen/main/main_screen.dart';
+import 'package:mylm/screen/guest/main_preview_screen.dart';
 
-void showSuccessDialog(
-    BuildContext context, {
-      required String custNumber,
-      required String accessToken,
-      required String custGroupId,
-    }) {
+
+void showSuccessDialogGuest(
+    BuildContext context,) {
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -47,10 +44,7 @@ void showSuccessDialog(
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MainScreen(
-                      custNumber: custNumber,
-                      accessToken: accessToken,
-                      custGroupId: custGroupId,
+                    builder: (context) => MainPreviewScreen(
                     ),
                   ),
                 );
@@ -66,41 +60,6 @@ void showSuccessDialog(
             ),
           ],
         ),
-      );
-    },
-  );
-}
-
-//Pop-up Konfirmasi
-Future<bool?> showConfirmationDialog(BuildContext context) {
-  return showDialog<bool>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          "Apakah kamu yakin data yang dimasukkan sudah benar?",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16),
-        ),
-        actionsAlignment: MainAxisAlignment.spaceEvenly,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              "TIDAK",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              "YA",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ],
       );
     },
   );

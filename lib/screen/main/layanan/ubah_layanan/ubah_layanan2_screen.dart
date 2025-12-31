@@ -3,16 +3,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
-import 'package:mylm/base/popup/popup.dart';
+import 'package:mylm/base/popup/showSuccessDialogLoggedin.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
 import 'package:mylm/data/models/product/exists_package_response.dart';
 import 'package:mylm/data/models/product/upgrade_package_request.dart';
-import 'package:mylm/data/models/support/term_conditions_response.dart';
-import 'package:mylm/data/network/services/get/get_term_conditions.dart';
 import 'package:mylm/data/network/services/post/post_upgrade_packages.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mylm/data/cubit/term_conditions/term_conditions_state.dart';
+
 
 
 class UbahLayanan2Screen extends StatefulWidget {
@@ -40,8 +41,6 @@ class UbahLayanan2Screen extends StatefulWidget {
 
 class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   bool isChecked = false;
-  TermConditionsData? termData;
-  bool isLoading = true;
 
   // DATA PROFIL (diambil dari SecureStorage)
   String? custName;
@@ -66,7 +65,6 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
   @override
   void initState() {
     super.initState();
-    _loadTerms();
     _loadCustomerData();
   }
 
@@ -92,21 +90,13 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
     print("custAddress: $custAddress");
   }
 
-  Future<void> _loadTerms() async {
-    final apiService = TermConditionsService();
-    final result = await apiService.getTermConditions();
-    if (mounted) {
-      setState(() {
-        termData = result?.data;
-        isLoading = false;
-      });
-    }
-  }
 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocProvider(
+      create: (_) => TermConditionsCubit()..loadTerms(),
+      child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -244,62 +234,52 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
             const SizedBox(height: 8),
 
             Expanded(
-              child: isLoading
-                  ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              )
-                  : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: termData == null
-                    ? Text(
-                  "Gagal memuat Syarat & Ketentuan.",
-                  style: GoogleFonts.inter(fontSize: 13.sp),
-                )
-                : Html(
-                  data: termData!.termconditions,
-                  style: {
-                    "body": Style(
-                      margin: Margins.zero,
-                      padding: HtmlPaddings.zero,
-                      fontSize: FontSize(13.sp),
-                      color: Colors.black87,
-                      fontFamily: GoogleFonts.inter().fontFamily,
-                      lineHeight: LineHeight.number(1.5),
-                      textAlign: TextAlign.justify,
-                    ),
-                    "ul": Style(
-                      margin: Margins.zero,
-                      padding: HtmlPaddings.only(left: 0),
-                    ),
-                    "li": Style(
-                      margin: Margins.only(bottom: 6),
-                      padding: HtmlPaddings.only(left: 10),
-                      lineHeight: LineHeight.number(1.5),
-                    ),
-                    "a": Style(
-                      color: darkorange,
-                      textDecoration: TextDecoration.underline,
-                    ),
-                  },
-                  onLinkTap: (url, attributes, element) async {
-                    if (url == null) return;
-                    final Uri uri = Uri.parse(url);
-                    if (!await launchUrl(
-                      uri,
-                      mode: LaunchMode.externalApplication,
-                    )) {
-                      // fallback ke browser default
-                      if (!await launchUrl(
-                        uri,
-                        mode: LaunchMode.platformDefault,
-                      )) {
-                        debugPrint("Tidak dapat membuka URL: $url");
-                      }
-                    }
-                  },
-                )
+              child: BlocBuilder<TermConditionsCubit, TermConditionsState>(
+                builder: (context, state) {
+                  if (state is TermConditionsLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                    );
+                  }
+
+                  if (state is TermConditionsError) {
+                    return Center(
+                      child: Text(
+                        state.message,
+                        style: GoogleFonts.inter(fontSize: 13.sp),
+                      ),
+                    );
+                  }
+
+                  if (state is TermConditionsLoaded) {
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Html(
+                        data: state.data.termconditions,
+                        style: {
+                          "body": Style(
+                            margin: Margins.zero,
+                            padding: HtmlPaddings.zero,
+                            fontSize: FontSize(13.sp),
+                            color: Colors.black87,
+                            fontFamily: GoogleFonts.inter().fontFamily,
+                            lineHeight: LineHeight.number(1.5),
+                            textAlign: TextAlign.justify,
+                          ),
+                          "a": Style(
+                            color: darkorange,
+                            textDecoration: TextDecoration.underline,
+                          ),
+                        },
+                      ),
+                    );
+                  }
+
+                  return const SizedBox();
+                },
               ),
             ),
+
 
             const SizedBox(height: 12),
 
@@ -355,7 +335,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
               child: ElevatedButton(
                   onPressed: isChecked
                       ? () async {
-                    bool? confirm = await _showConfirmationDialog(context);
+                    bool? confirm = await showConfirmationDialog(context);
 
                     if (confirm == true) {
                       final api = UpgradePackageService();
@@ -385,7 +365,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
                       print(result.toJson());
 
                       if (result.success == 1) {
-                        showSuccessDialog(
+                        showSuccessDialogLoggedIn(
                           context,
                           custNumber: widget.custNumber,
                           accessToken: widget.accessToken,
@@ -438,6 +418,7 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -460,40 +441,6 @@ class _UbahLayanan2ScreenState extends State<UbahLayanan2Screen> {
           ),
         ),
       ],
-    );
-  }
-  //Pop-up Konfirmasi
-  Future<bool?> _showConfirmationDialog(BuildContext context) {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text(
-            "Apakah kamu yakin?",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text(
-                "TIDAK",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                "YA",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/network/services/get/get_cust_list.dart';
 import 'package:mylm/data/network/services/post/post_auth_otp.dart';
-import 'package:mylm/screen/add_nopel/addcust_bottomsheet.dart';
+import 'package:mylm/screen/main/add_nopel/addcust_bottomsheet.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 
 class AddCustlistScreen extends StatefulWidget {
@@ -36,6 +36,7 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
     fetchCustomerList();
   }
 
+  // List Customer
   Future<void> fetchCustomerList() async {
     setState(() => isLoading = true);
 

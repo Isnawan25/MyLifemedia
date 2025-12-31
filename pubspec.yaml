@@ -44,7 +44,9 @@ dependencies:
   screenshot: ^3.0.0                      # ambil gambar maps
   flutter_html: ^3.0.0                    # menampilkan html
   url_launcher: ^6.3.2                    # launcher URL
-  flutter_custom_tabs: ^2.4.1            # custom tabs
+  flutter_custom_tabs: ^2.4.1             # custom tabs
+  flutter_bloc: ^9.1.1                    # state cubit
+  equatable: ^2.0.7                       # # untuk menentukan apakah dua objek atau instance sama
 
 
 dev_dependencies:

@@ -358,4 +358,3 @@ Widget _buildProfileSkeleton() {
     }),
   );
 }
-

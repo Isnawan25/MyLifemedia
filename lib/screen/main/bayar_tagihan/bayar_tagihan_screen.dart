@@ -9,7 +9,7 @@ import 'package:mylm/base/currency_formatter.dart';
 import 'package:mylm/base/date_formatter.dart';
 import 'package:mylm/data/network/services/get/get_bill_last.dart';
 import 'package:mylm/data/network/services/get/get_url_bill.dart';
-import 'package:mylm/screen/main/manage_bills/bayar_tagihan/detail_tagihan_screen.dart';
+import 'package:mylm/screen/main/bayar_tagihan/detail_tagihan_screen.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 
 class BayarTagihanScreen extends StatelessWidget {

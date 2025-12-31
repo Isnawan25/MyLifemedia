@@ -3,20 +3,22 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
-import 'package:mylm/base/popup/popup.dart';
-import 'package:mylm/data/network/services/get/get_term_conditions.dart';
-import 'package:mylm/data/network/services/post/post_register_customer.dart';
-import 'package:mylm/screen/guest/main_preview_screen.dart';
-import 'package:mylm/screen/layanan/tambah_layanan/location_maps_screen.dart';
+import 'package:mylm/base/popup/showSuccessDialogLoggedin.dart';
+import 'package:mylm/base/popup/showSuccessDialogGuest.dart';
+import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
+import 'package:mylm/data/cubit/term_conditions/term_conditions_state.dart';
+import 'package:mylm/screen/main/layanan/tambah_layanan/location_maps_screen.dart';
 import 'package:mylm/data/models/customer/register_cust/register_customer_request.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:mylm/data/network/geocoding_service.dart';
 import 'dart:typed_data';
-import 'package:mylm/data/models/support/term_conditions_response.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mylm/data/cubit/register_cust/form_register_cubit.dart';
+import 'package:mylm/data/cubit/register_cust/form_register_state.dart';
 
 class DaftarLayanan2Screen extends StatefulWidget {
   final String packageId;
+
   const DaftarLayanan2Screen({
     super.key,
     required this.packageId,
@@ -28,8 +30,7 @@ class DaftarLayanan2Screen extends StatefulWidget {
 
 class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
   final _formKey = GlobalKey<FormState>();
-  bool isLoading = true;
-  TermConditionsData? termData;
+
 
   // Controller untuk setiap field
   final _namaController = TextEditingController();
@@ -61,7 +62,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
     _kotaController.addListener(_checkFormFilled);
     _provinsiController.addListener(_checkFormFilled);
     _accManagerController.addListener(_checkFormFilled);
-    _loadTerms();
+    context.read<TermConditionsCubit>().loadTerms();
   }
 
   void _checkFormFilled() {
@@ -96,20 +97,22 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
     super.dispose();
   }
 
-  Future<void> _loadTerms() async {
-    final apiService = TermConditionsService();
-    final result = await apiService.getTermConditions();
-    if (mounted) {
-      setState(() {
-        termData = result?.data;
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<FormRegisterCubit, FormRegisterState>(
+      listener: (context, state) {
+        if (state is FormRegisterSubmitSuccess) {
+          showSuccessDialogGuest(context);
+        }
+
+        if (state is FormRegisterError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+    child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
@@ -153,27 +156,40 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
               ),
               SizedBox(height: 8.h),
 
-              isLoading
-                  ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              )
-                  : Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: termData == null
-                    ? Text(
-                  "Gagal memuat Syarat & Ketentuan.",
-                  style: GoogleFonts.inter(fontSize: 13.sp),
-                )
-                    : Text(
-                  termData!.termconditions,
-                  textAlign: TextAlign.justify,
-                  style: GoogleFonts.inter(
-                    fontSize: 12.sp,
-                    height: 1.5,
-                    color: Colors.black54,
-                  ),
-                ),
+              BlocBuilder<TermConditionsCubit, TermConditionsState>(
+                builder: (context, state) {
+                  if (state is TermConditionsLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8)
+                    );
+                  }
+
+                  if (state is TermConditionsLoaded) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        state.data.termconditions,
+                        textAlign: TextAlign.justify,
+                        style: GoogleFonts.inter(
+                          fontSize: 12.sp,
+                          height: 1.5,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (state is TermConditionsError) {
+                    return Text(
+                      state.message,
+                      style: GoogleFonts.inter(fontSize: 13.sp),
+                    );
+                  }
+
+                  return const SizedBox();
+                },
               ),
+
 
               SizedBox(height: 16.h),
 
@@ -359,10 +375,10 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                   child: ElevatedButton(
                     onPressed: _isFilled
                         ? () async {
-                      bool? confirm = await showConfirmationDialog(context);
+                      final confirm = await showConfirmationDialog(context);
+                      if (confirm != true) return;
 
-                      if (confirm == true) {
-                        try {
+                      //kirim data ke API
                           final request = RegisterCustomerRequest(
                             custName: _namaController.text,
                             custPhone: _hpController.text,
@@ -383,31 +399,8 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                           print("Kirim Data:");
                           print(request.toJson());
 
-                          print("Mengirim Req ke server...");
-                          final response = await RegisterCustomerService().registerCustomer(request);
-
-                          print("Response diterima dari server:");
-                          print("Status: ${response.success}");
-                          print("Pesan: ${response.message}");
-
-                          if (response.success == 1) {
-                            print("Data berhasil dikirim dan diterima server!");
-                            _showSuccessDialog(context,
-                              );
-                          } else {
-                            print("Server menolak data: ${response.message}");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Gagal: ${response.message}")),
-                            );
+                          context.read<FormRegisterCubit>().register(request);
                           }
-                        } catch (e) {
-                          print("Terjadi error saat mengirim data: $e");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Error: $e")),
-                          );
-                        }
-                      }
-                    }
                         : null,
                     style: ButtonStyle(
                       shape: WidgetStateProperty.all(
@@ -452,6 +445,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
           ),
         ),
       ),
+    )
     );
   }
 
@@ -498,65 +492,4 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
       ),
     );
   }
-}
-void _showSuccessDialog(
-    BuildContext context,) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              "assets/images/success.gif",
-              height: 120.h,
-              width: 120.w,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              "Data kamu sudah terkirim!",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "Tim kami akan segera menghubungi kamu,\nuntuk proses lebih lanjut.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black54, fontSize: 12),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context); // Tutup dialog
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MainPreviewScreen(
-                    ),
-                  ),
-                );
-              },
-              child: const Text(
-                "Kembali ke Beranda",
-                style: TextStyle(
-                  color: Colors.pink,
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
 }

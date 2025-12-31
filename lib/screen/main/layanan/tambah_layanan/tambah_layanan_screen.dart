@@ -1,50 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/paketItem.dart';
 import 'package:mylm/data/cubit/register_cust/form_register_cubit.dart';
+import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
+import 'package:mylm/screen/main/layanan/tambah_layanan/tambah_layanan2_screen.dart';
+import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/data/cubit/register_cust/packages_register_cubit.dart';
 import 'package:mylm/data/cubit/register_cust/packages_register_state.dart';
-import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
-import 'package:mylm/screen/guest/daftar_layanan/daftar_layanan2_screen.dart';
-import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
+
+class TambahLayananScreen extends StatefulWidget {
+  final String custNumber;
+  final String accessToken;
+  final String custGroupId;
 
 
-class DaftarLayananScreen extends StatelessWidget {
-  const DaftarLayananScreen({super.key});
+  const TambahLayananScreen({
+    super.key,
+    required this.custNumber,
+    required this.accessToken,
+    required this.custGroupId,
+  });
+
+  @override
+  State<TambahLayananScreen> createState() => _TambahLayananScreenState();
+}
+class _TambahLayananScreenState extends State<TambahLayananScreen> {
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PackagesCubit()..fetchPackages(),
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            icon: SvgPicture.asset(
-              "assets/svgs/arrow_back.svg",
-              colorFilter: const ColorFilter.mode(
-                Colors.black,
-                BlendMode.srcIn,
-              ),
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            "Daftar Layanan",
-            style: GoogleFonts.inter(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-          ),
-          centerTitle: true,
-        ),
+      appBar: AppBar(
+        elevation: 0,
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            "assets/svgs/arrow_back.svg",
+            colorFilter: const ColorFilter.mode(
+              Colors.black,
+              BlendMode.srcIn,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "Tambah Layanan",
+          style: GoogleFonts.inter(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.white,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: BlocBuilder<PackagesCubit, PackagesState>(
@@ -113,7 +129,10 @@ class DaftarLayananScreen extends StatelessWidget {
                                       create: (_) => TermConditionsCubit()..loadTerms(),
                                     ),
                                   ],
-                                  child: DaftarLayanan2Screen(
+                                  child: TambahLayanan2Screen(
+                                    custNumber: widget.custNumber,
+                                    accessToken: widget.accessToken,
+                                    custGroupId: widget.custGroupId,
                                     packageId: state.selectedPackageId!,
                                   ),
                                 ),
@@ -167,7 +186,7 @@ class DaftarLayananScreen extends StatelessWidget {
             },
           ),
         ),
-      ),
+    ),
     );
   }
 }

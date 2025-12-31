@@ -8,7 +8,7 @@ import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/models/bill/bill_list_response.dart';
 import 'package:mylm/data/network/services/get/get_bill_list.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:mylm/screen/main/manage_bills/riwayat_tagihan/detail_tagihan_screen.dart';
+import 'package:mylm/screen/main/riwayat_tagihan/detail_tagihan_screen.dart';
 import 'package:mylm/base/date_formatter.dart';
 
 class RiwayatTagihanScreen extends StatefulWidget {
