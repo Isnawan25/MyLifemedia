@@ -14,6 +14,8 @@ import 'package:mylm/screen/main/helpdesk/helpdesk_screen.dart';
 import 'package:mylm/screen/main/home/home_screen.dart';
 import 'package:mylm/screen/main/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/main/user_profile/profile_screen.dart';
+import 'package:mylm/data/cubit/current_cust_loaded/current_cust_state.dart';
+
 
 class MainScreen extends StatefulWidget {
   final String custNumber;
@@ -32,38 +34,49 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // default home
+  int _currentIndex = 2;
+
+  late String _custNumber;
+  late String _custGroupId;
+
   late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
 
+    _custNumber = widget.custNumber;
+    _custGroupId = widget.custGroupId;
+
+    _buildScreens();
+  }
+
+  void _buildScreens() {
     _screens = [
       ProfileScreen(
-        custNumber: widget.custNumber,
+        custNumber: _custNumber,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,
+        custGroupId: _custGroupId,
       ),
       RiwayatTagihanScreen(
-        custNumber: widget.custNumber,
+        custNumber: _custNumber,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,
+        custGroupId: _custGroupId,
       ),
       HomeScreen(
-        custNumber: widget.custNumber,
+        custNumber: _custNumber,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,
+        custGroupId: _custGroupId,
       ),
       FaqScreen(
-        custNumber: widget.custNumber,
+        custNumber: _custNumber,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,
+        custGroupId: _custGroupId,
       ),
       HelpdeskScreen(
-        custNumber: widget.custNumber,
+        custNumber: _custNumber,
         accessToken: widget.accessToken,
-        custGroupId: widget.custGroupId,
+        custGroupId: _custGroupId,
       ),
     ];
   }
@@ -77,36 +90,48 @@ class _MainScreenState extends State<MainScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => CurrentCustCubit(),
+          create: (_) => CurrentCustCubit()
+            ..load(
+              defaultCustNumber: _custNumber,
+              defaultCustGroupId: _custGroupId,
+            ),
         ),
-
         BlocProvider(
           create: (_) => ProfileCubit(ProfileService()),
         ),
-
         BlocProvider(
           create: (_) => ExistsPackageCubit(ExistsPackageService()),
         ),
-
         BlocProvider(
           create: (_) => NotificationReadCubit(),
         ),
-
         BlocProvider(
           create: (_) => PromotionsCubit(PromotionService())
             ..fetchPromotions(),
         ),
       ],
-      child: Scaffold(
-        body: _screens[_currentIndex],
-        bottomNavigationBar: BottomNav(
-          currentIndex: _currentIndex,
-          onTap: _onTap,
+      child: BlocListener<CurrentCustCubit, CurrentCustState>(
+        listener: (context, state) {
+          if (state is CurrentCustLoaded) {
+            // 🔥 INI INTINYA
+            setState(() {
+              _custNumber = state.custNumber;
+              _custGroupId = state.custGroupId;
+              _buildScreens(); // rebuild SEMUA tab
+            });
+          }
+        },
+        child: Scaffold(
+          body: _screens[_currentIndex],
+          bottomNavigationBar: BottomNav(
+            currentIndex: _currentIndex,
+            onTap: _onTap,
+          ),
         ),
       ),
     );
   }
-
 }
+
 
 
