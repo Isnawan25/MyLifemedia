@@ -113,7 +113,7 @@ class _MainScreenState extends State<MainScreen> {
       child: BlocListener<CurrentCustCubit, CurrentCustState>(
         listener: (context, state) {
           if (state is CurrentCustLoaded) {
-            // 🔥 INI INTINYA
+
             setState(() {
               _custNumber = state.custNumber;
               _custGroupId = state.custGroupId;

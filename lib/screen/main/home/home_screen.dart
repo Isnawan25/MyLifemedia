@@ -160,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Avatar
                               BlocBuilder<ProfileCubit, ProfileState>(
                                 builder: (context, state) {
                                   if (state is ProfileLoading) {
@@ -167,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   }
 
                                   if (state is ProfileLoaded) {
-
                                     return const CircleAvatar(
                                       radius: 28,
                                       backgroundColor: Colors.white,
@@ -180,72 +180,78 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
 
                               const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  BlocBuilder<ProfileCubit, ProfileState>(
-                                    builder: (context, state) {
-                                      if (state is ProfileLoaded) {
-                                        return Text(
-                                          shortText(state.profile.custName, limit: 25),
-                                          style: GoogleFonts.inter(
-                                            fontSize: 18.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                      }
 
-                                      return skeletonText(width: 160, height: 18);
-                                    },
-                                  ),
-
-                                  const SizedBox(height: 4),
-                                  BlocBuilder<ProfileCubit, ProfileState>(
-                                    builder: (context, state) {
-
-                                      if (state is ProfileLoading) {
-                                        return skeletonText(width: 60, height: 12, radius: 10);
-                                      }
-
-                                      if (state is ProfileLoaded) {
-                                        return Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: darkorange,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            widget.accessToken.isNotEmpty ? "Aktif" : "Nonaktif",
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    BlocBuilder<ProfileCubit, ProfileState>(
+                                      builder: (context, state) {
+                                        if (state is ProfileLoaded) {
+                                          return Text(
+                                            state.profile.custName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.inter(
+                                              fontSize: 18.sp,
+                                              fontWeight: FontWeight.w600,
                                               color: Colors.white,
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w500,
                                             ),
-                                          ),
-                                        );
-                                      }
+                                          );
+                                        }
 
-                                      // error/idle
-                                      return const SizedBox.shrink();
-                                    },
-                                  ),
+                                        return skeletonText(width: 160, height: 18);
+                                      },
+                                    ),
 
-                                ],
+                                    const SizedBox(height: 4),
+
+                                    BlocBuilder<ProfileCubit, ProfileState>(
+                                      builder: (context, state) {
+                                        if (state is ProfileLoading) {
+                                          return skeletonText(width: 60, height: 12, radius: 10);
+                                        }
+
+                                        if (state is ProfileLoaded) {
+                                          return Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: darkorange,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              widget.accessToken.isNotEmpty ? "Aktif" : "Nonaktif",
+                                              style: GoogleFonts.inter(
+                                                color: Colors.white,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        return const SizedBox.shrink();
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const Spacer(),
+
                               BlocBuilder<NotificationReadCubit, NotificationReadState>(
                                 builder: (context, state) {
-                                  final hasUnread = state is NotificationReadLoaded && state.hasUnread;
+                                  final hasUnread =
+                                      state is NotificationReadLoaded && state.hasUnread;
+
                                   return IconButton(
                                     onPressed: () async {
-                                      await Navigator.push(context,
+                                      await Navigator.push(
+                                        context,
                                         MaterialPageRoute(
                                           builder: (_) => const NotificationScreen(),
                                         ),
                                       );
                                       context.read<NotificationReadCubit>().check();
-                                      },
+                                    },
                                     icon: Stack(
                                       clipBehavior: Clip.none,
                                       children: [
@@ -274,11 +280,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   );
-                                  },
-                              )
-
+                                },
+                              ),
                             ],
-                          ),
+                          )
                         ),
                         const SizedBox(height: 12),
 
