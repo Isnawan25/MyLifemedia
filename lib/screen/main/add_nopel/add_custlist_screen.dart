@@ -36,7 +36,6 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
     fetchCustomerList();
   }
 
-  // List Customer
   Future<void> fetchCustomerList() async {
     setState(() => isLoading = true);
 

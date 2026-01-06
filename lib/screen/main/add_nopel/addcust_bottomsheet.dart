@@ -6,6 +6,8 @@ import 'package:mylm/base/popup/toast.dart';
 import 'package:mylm/data/network/services/post/post_auth_otp.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/auth/verify_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mylm/data/cubit/verify/verify_cubit.dart';
 
 Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
   final TextEditingController _idController = TextEditingController();
@@ -144,20 +146,24 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                       'accessToken': token,
                     });
 
-                    // next to verify screen
+                    // next to verify screen// APAKAH DISINI PERMASALAHAN NYA?
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => VerifyScreen(
-                          mainCustNumber: mainCustomerNumber,
-                          custNumber: data.custNumber,
-                          newCustNumber: data.custNumber,
-                          accessToken: token,
-                          custGroupId: mainGroupId,
-                          mode: OtpMode.addCustomer,
+                        builder: (_) => BlocProvider(
+                          create: (_) => VerifyCubit(),
+                          child: VerifyScreen(
+                            mainCustNumber: mainCustomerNumber,
+                            custNumber: data.custNumber,
+                            newCustNumber: data.custNumber,
+                            accessToken: token,
+                            custGroupId: mainGroupId,
+                            mode: OtpMode.addCustomer,
+                          ),
                         ),
                       ),
                     );
+
                   }
                       : null,
                   child: Container(
