@@ -171,7 +171,7 @@ class NotificationScreen extends StatelessWidget {
   Widget _skeletonList() {
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-      itemCount: 2,
+      itemCount: 12,
       separatorBuilder: (_, __) => SizedBox(height: 12.h),
       itemBuilder: (_, __) {
         return Container(

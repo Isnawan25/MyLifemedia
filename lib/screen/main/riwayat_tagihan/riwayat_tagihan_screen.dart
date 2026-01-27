@@ -78,7 +78,7 @@ class _RiwayatTagihanScreenState extends State<RiwayatTagihanScreen> {
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return ListView.separated(
-              itemCount: 3, // jumlah dummy skeleton
+              itemCount: 12, // jumlah dummy skeleton
               separatorBuilder: (_, __) => SizedBox(height: 12.h),
               itemBuilder: (_, __) {
                 return Container(

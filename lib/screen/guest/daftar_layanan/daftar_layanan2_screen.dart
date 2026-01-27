@@ -11,10 +11,10 @@ import 'package:mylm/screen/main/layanan/tambah_layanan/location_maps_screen.dar
 import 'package:mylm/data/models/customer/register_cust/register_customer_request.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:mylm/data/network/geocoding_service.dart';
-import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/data/cubit/register_cust/form_register_cubit.dart';
 import 'package:mylm/data/cubit/register_cust/form_register_state.dart';
+import 'package:flutter/services.dart';
 
 class DaftarLayanan2Screen extends StatefulWidget {
   final String packageId;
@@ -31,6 +31,10 @@ class DaftarLayanan2Screen extends StatefulWidget {
 class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
   final _formKey = GlobalKey<FormState>();
 
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return emailRegex.hasMatch(email);
+  }
 
   // Controller untuk setiap field
   final _namaController = TextEditingController();
@@ -375,6 +379,8 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                   child: ElevatedButton(
                     onPressed: _isFilled
                         ? () async {
+                      if (!_formKey.currentState!.validate()) return;
+
                       final confirm = await showConfirmationDialog(context);
                       if (confirm != true) return;
 
@@ -450,7 +456,11 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
   }
 
   Widget _buildLabeledTextField(String label, TextEditingController controller) {
-    final bool isEmailOrPhone = label.toLowerCase().contains('email') || label.toLowerCase().contains('handphone');
+    final isEmail = label.toLowerCase().contains('email');
+    final isPhone = label.toLowerCase().contains('handphone');
+    final isAccountManager =
+    label.toLowerCase().contains('account manager');
+
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: Column(
@@ -465,13 +475,52 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
             ),
           ),
           SizedBox(height: 6.h),
+
           TextFormField(
             controller: controller,
-            textCapitalization:
-            isEmailOrPhone ? TextCapitalization.none : TextCapitalization.words,
-            keyboardType: isEmailOrPhone && label.toLowerCase().contains('email')
+
+            // Keyboard
+            keyboardType: isEmail
                 ? TextInputType.emailAddress
+                : isPhone
+                ? TextInputType.phone
                 : TextInputType.text,
+
+            // Hanya angka untuk HP
+            inputFormatters: isPhone
+                ? [FilteringTextInputFormatter.digitsOnly]
+                : null,
+
+            textCapitalization:
+            isEmail || isPhone
+                ? TextCapitalization.none
+                : TextCapitalization.words,
+
+            // Validation
+            validator: (value) {
+              final text = value?.trim() ?? "";
+
+              // WAJIB diisi (kecuali Account Manager)
+              if (!isAccountManager && text.isEmpty) {
+                return "$label wajib diisi";
+              }
+
+              // boleh null
+              if (isAccountManager && text.isEmpty) {
+                return null;
+              }
+
+              if (isEmail && !isValidEmail(text)) {
+                return "Format email tidak valid (contoh: nama@email.com)";
+              }
+
+              if (isPhone && text.length < 10) {
+                return "No. Handphone minimal 10 digit";
+              }
+
+              return null;
+            },
+
             decoration: InputDecoration(
               hintText: "Masukkan $label",
               hintStyle: GoogleFonts.inter(
@@ -492,4 +541,6 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
       ),
     );
   }
+
+
 }

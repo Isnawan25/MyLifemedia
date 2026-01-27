@@ -74,6 +74,7 @@ class DetailFaqScreen extends StatelessWidget {
               padding: EdgeInsets.all(16.w),
               child: Text(
                 faq.descFaq,
+                textAlign: TextAlign.justify,
                 style: GoogleFonts.inter(
                   fontSize: 14.sp,
                   height: 1.4,

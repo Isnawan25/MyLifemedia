@@ -8,7 +8,7 @@ import 'package:mylm/data/network/services/get/get_faq.dart';
 import 'package:mylm/screen/main/faq/detailfaq_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
 
-class FaqScreen extends StatelessWidget {
+class FaqScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final String custGroupId;
@@ -19,6 +19,32 @@ class FaqScreen extends StatelessWidget {
     required this.accessToken,
     required this.custGroupId,
   });
+
+  @override
+  State<FaqScreen> createState() => _FaqScreenState();
+}
+
+class _FaqScreenState extends State<FaqScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Faq> allFaqs = [];
+  List<Faq> filteredFaqs = [];
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      filteredFaqs = allFaqs.where((faq) {
+        return faq.titleFaq
+            .toLowerCase()
+            .contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +65,9 @@ class FaqScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => MainScreen(
-                custNumber: custNumber,
-                accessToken: accessToken,
-                custGroupId: custGroupId,
+                custNumber: widget.custNumber,
+                accessToken: widget.accessToken,
+                custGroupId: widget.custGroupId,
               ),
             ),
           ),
@@ -61,6 +87,7 @@ class FaqScreen extends StatelessWidget {
         padding: EdgeInsets.all(24.w),
         child: Column(
           children: [
+            // SEARCH
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey[100],
@@ -68,6 +95,8 @@ class FaqScreen extends StatelessWidget {
                 border: Border.all(color: Colors.grey[300]!),
               ),
               child: TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
                 decoration: InputDecoration(
                   hintText: "Cari Bantuan",
                   hintStyle: GoogleFonts.inter(
@@ -86,50 +115,41 @@ class FaqScreen extends StatelessWidget {
 
             SizedBox(height: 16.h),
 
+            // LIST FAQ
             Expanded(
               child: FutureBuilder<List<Faq>>(
-                future: FaqService().getFaqs(accessToken),
+                future: FaqService().getFaqs(widget.accessToken),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return ListView.separated(
-                      itemCount: 3, // jumlah dummy skeleton
+                      itemCount: 10,
                       separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                      itemBuilder: (_, __) {
-                        return Container(
-                          padding: EdgeInsets.all(16.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: SkeletonLoading(width: double.infinity, height: 20.h),
-                        );
-                      },
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        "Gagal memuat FAQ",
-                        style: GoogleFonts.inter(fontSize: 14.sp),
-                      ),
-                    );
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "Tidak ada FAQ tersedia",
-                        style: GoogleFonts.inter(fontSize: 14.sp),
+                      itemBuilder: (_, __) => SkeletonLoading(
+                        width: double.infinity,
+                        height: 50.h,
                       ),
                     );
                   }
 
-                  final faqs = snapshot.data!;
+                  if (snapshot.hasError) {
+                    return const Center(child: Text("Gagal memuat FAQ"));
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("FAQ tidak tersedia"));
+                  }
+
+                  if (allFaqs.isEmpty) {
+                    allFaqs = snapshot.data!;
+                    filteredFaqs = allFaqs;
+                  }
 
                   return ListView.separated(
-                    itemCount: faqs.length,
+                    itemCount: filteredFaqs.length,
                     separatorBuilder: (_, __) => SizedBox(height: 12.h),
                     itemBuilder: (context, index) {
-                      final item = faqs[index];
+                      final item = filteredFaqs[index];
+
                       return Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -143,31 +163,24 @@ class FaqScreen extends StatelessWidget {
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 10.h,
-                          ),
                           title: Text(
                             item.titleFaq,
                             style: GoogleFonts.inter(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black,
                             ),
                           ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 18,
-                            color: Colors.black54,
-                          ),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailFaqScreen(faq: item,
-                                  custNumber: custNumber,
-                                  accessToken: accessToken,
-                                  custGroupId: custGroupId,),
+                                builder: (_) => DetailFaqScreen(
+                                  faq: item,
+                                  custNumber: widget.custNumber,
+                                  accessToken: widget.accessToken,
+                                  custGroupId: widget.custGroupId,
+                                ),
                               ),
                             );
                           },

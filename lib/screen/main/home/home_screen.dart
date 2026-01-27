@@ -25,6 +25,9 @@ import 'package:mylm/data/cubit/profile/profile_cubit.dart';
 import 'package:mylm/data/cubit/profile/profile_state.dart';
 import 'package:mylm/data/cubit/exists_package/exists_package_cubit.dart';
 import 'package:mylm/data/cubit/exists_package/exists_package_state.dart';
+import 'package:mylm/data/cubit/customer_status/customer_status_cubit.dart';
+import 'package:mylm/data/cubit/customer_status/customer_status_state.dart';
+
 
 
 class HomeScreen extends StatefulWidget {
@@ -60,6 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     context.read<NotificationReadCubit>().check();
     context.read<PromotionsCubit>().fetchPromotions();
+    context.read<CustomerStatusCubit>().fetchStatus(widget.custNumber);
+
   }
 
 
@@ -108,6 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
               custNumber: state.custNumber,
               accessToken: widget.accessToken,
             );
+            context.read<CustomerStatusCubit>()
+                .fetchStatus(state.custNumber);
           }
         },
         child: Scaffold(
@@ -206,21 +213,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                     const SizedBox(height: 4),
 
-                                    BlocBuilder<ProfileCubit, ProfileState>(
+                                    BlocBuilder<CustomerStatusCubit, CustomerStatusState>(
                                       builder: (context, state) {
-                                        if (state is ProfileLoading) {
-                                          return skeletonText(width: 60, height: 12, radius: 10);
+                                        if (state is CustomerStatusLoading) {
+                                          return skeletonText(
+                                            width: 60,
+                                            height: 12,
+                                            radius: 10,
+                                          );
                                         }
 
-                                        if (state is ProfileLoaded) {
+                                        if (state is CustomerStatusLoaded) {
+                                          final status = state.status.custStatus.toLowerCase();
+                                          final isActive = status.contains("aktif") &&
+                                              !status.contains("tidak");
+
                                           return Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 4,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: darkorange,
+                                              color: isActive ? Colors.green : darkorange,
                                               borderRadius: BorderRadius.circular(12),
                                             ),
                                             child: Text(
-                                              widget.accessToken.isNotEmpty ? "Aktif" : "Nonaktif",
+                                              isActive ? "Aktif" : "Tidak Aktif",
                                               style: GoogleFonts.inter(
                                                 color: Colors.white,
                                                 fontSize: 12.sp,
@@ -230,12 +248,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                           );
                                         }
 
+                                        if (state is CustomerStatusError) {
+                                          return Text(
+                                            "Status tidak tersedia",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12.sp,
+                                              color: Colors.white70,
+                                            ),
+                                          );
+                                        }
+
                                         return const SizedBox.shrink();
                                       },
                                     ),
+
                                   ],
+                                )
                                 ),
-                              ),
 
                               BlocBuilder<NotificationReadCubit, NotificationReadState>(
                                 builder: (context, state) {

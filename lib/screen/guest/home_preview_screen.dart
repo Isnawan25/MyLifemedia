@@ -74,7 +74,7 @@ class _HomePreviewView extends StatelessWidget {
                             );
                           },
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const CircleAvatar(
                                 radius: 28,
@@ -87,6 +87,8 @@ class _HomePreviewView extends StatelessWidget {
                               ),
                               const SizedBox(width: 12),
                               Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "Anda Belum Login",

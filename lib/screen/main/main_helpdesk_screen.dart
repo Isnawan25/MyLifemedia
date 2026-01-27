@@ -15,6 +15,8 @@ import 'package:mylm/screen/main/home/home_screen.dart';
 import 'package:mylm/screen/main/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/main/user_profile/profile_screen.dart';
 import 'package:mylm/data/cubit/current_cust_loaded/current_cust_state.dart';
+import 'package:mylm/data/cubit/customer_status/customer_status_cubit.dart';
+import 'package:mylm/data/network/services/get/get_user_status.dart';
 
 
 class MainHelpdeskScreen extends StatefulWidget {
@@ -109,6 +111,10 @@ class _MainHelpdeskScreenState extends State<MainHelpdeskScreen> {
           create: (_) => PromotionsCubit(PromotionService())
             ..fetchPromotions(),
         ),
+        BlocProvider(
+          create: (_) => CustomerStatusCubit(CustomerStatusService())
+            ..fetchStatus(_custNumber),
+        ),
       ],
       child: BlocListener<CurrentCustCubit, CurrentCustState>(
         listener: (context, state) {
@@ -119,6 +125,9 @@ class _MainHelpdeskScreenState extends State<MainHelpdeskScreen> {
               _custGroupId = state.custGroupId;
               _buildScreens(); // rebuild SEMUA tab
             });
+            context
+                .read<CustomerStatusCubit>()
+                .fetchStatus(state.custNumber);
           }
         },
         child: Scaffold(
