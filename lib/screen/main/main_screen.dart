@@ -2,34 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/base/widgets/bottom_nav.dart';
 import 'package:mylm/data/cubit/current_cust_loaded/current_cust_cubit.dart';
+import 'package:mylm/data/cubit/current_cust_loaded/current_cust_state.dart';
+import 'package:mylm/data/cubit/profile/profile_cubit.dart';
 import 'package:mylm/data/cubit/exists_package/exists_package_cubit.dart';
 import 'package:mylm/data/cubit/notification/notification_read_cubit.dart';
-import 'package:mylm/data/cubit/profile/profile_cubit.dart';
 import 'package:mylm/data/cubit/promotions/promotions_cubit.dart';
-import 'package:mylm/data/network/services/get/get_exists_package.dart';
+import 'package:mylm/data/cubit/customer_status/customer_status_cubit.dart';
 import 'package:mylm/data/network/services/get/get_profile.dart';
+import 'package:mylm/data/network/services/get/get_exists_package.dart';
 import 'package:mylm/data/network/services/get/get_promotions.dart';
+import 'package:mylm/data/network/services/get/get_user_status.dart';
+import 'package:mylm/screen/main/home/home_screen.dart';
+import 'package:mylm/screen/main/user_profile/profile_screen.dart';
+import 'package:mylm/screen/main/riwayat_tagihan/riwayat_tagihan_screen.dart';
 import 'package:mylm/screen/main/faq/faq_screen.dart';
 import 'package:mylm/screen/main/helpdesk/helpdesk_screen.dart';
-import 'package:mylm/screen/main/home/home_screen.dart';
-import 'package:mylm/screen/main/riwayat_tagihan/riwayat_tagihan_screen.dart';
-import 'package:mylm/screen/main/user_profile/profile_screen.dart';
-import 'package:mylm/data/cubit/current_cust_loaded/current_cust_state.dart';
-import 'package:mylm/data/cubit/customer_status/customer_status_cubit.dart';
-import 'package:mylm/data/network/services/get/get_user_status.dart';
-
-
 
 class MainScreen extends StatefulWidget {
   final String custNumber;
   final String accessToken;
   final String custGroupId;
+  final int initialIndex;
 
   const MainScreen({
     super.key,
     required this.custNumber,
     required this.accessToken,
     required this.custGroupId,
+    this.initialIndex = 2, // default ke Home
   });
 
   @override
@@ -37,8 +37,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2;
-
+  late int _currentIndex;
   late String _custNumber;
   late String _custGroupId;
 
@@ -48,6 +47,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
+    _currentIndex = widget.initialIndex;
     _custNumber = widget.custNumber;
     _custGroupId = widget.custGroupId;
 
@@ -120,12 +120,12 @@ class _MainScreenState extends State<MainScreen> {
       child: BlocListener<CurrentCustCubit, CurrentCustState>(
         listener: (context, state) {
           if (state is CurrentCustLoaded) {
-
             setState(() {
               _custNumber = state.custNumber;
               _custGroupId = state.custGroupId;
-              _buildScreens(); // rebuild SEMUA tab
+              _buildScreens();
             });
+
             context
                 .read<CustomerStatusCubit>()
                 .fetchStatus(state.custNumber);
@@ -142,6 +142,3 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-
-
-

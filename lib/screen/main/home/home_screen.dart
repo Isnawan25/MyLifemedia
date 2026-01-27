@@ -11,7 +11,7 @@ import 'package:mylm/screen/main/add_nopel/add_custlist_screen.dart';
 import 'package:mylm/screen/main/bayar_tagihan/bayar_tagihan_screen.dart';
 import 'package:mylm/screen/main/layanan/tambah_layanan/tambah_layanan_screen.dart';
 import 'package:mylm/screen/main/layanan/ubah_layanan/ubah_layanan_screen.dart';
-import 'package:mylm/screen/main/main_profile_screen.dart';
+import 'package:mylm/screen/main/main_screen.dart';
 import 'package:mylm/screen/main/notification/notification_screen.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/data/cubit/notification/notification_read_cubit.dart';
@@ -154,10 +154,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       accessToken: widget.accessToken,
                                       context: context,
                                     ),
-                                  child: MainProfileScreen(
+                                  child: MainScreen(
                                     custNumber: currentCustNumber??"",
                                     accessToken: widget.accessToken,
                                     custGroupId: currentCustGroupId??"",
+                                    initialIndex: 0,
                                   ),
                                 ),
                               ),

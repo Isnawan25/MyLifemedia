@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/data/models/support/faq_response.dart';
-import 'package:mylm/screen/main/main_helpdesk_screen.dart';
+import 'package:mylm/screen/main/main_screen.dart';
 
 
 
@@ -99,10 +99,11 @@ class DetailFaqScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => MainHelpdeskScreen(
+                      MaterialPageRoute(builder: (context) => MainScreen(
                         custNumber: custNumber,
                         accessToken: accessToken,
                         custGroupId: custGroupId,
+                        initialIndex: 4,
                       ))
                   );
                 },
