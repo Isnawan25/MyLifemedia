@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mylm/data/models/product/exists_package_response.dart';
 
 class ExistsPackageService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
   //EXISTS PACKAGES
   Future<ExistsPackage?> getExistingPackage(String groupId, String custNumber,

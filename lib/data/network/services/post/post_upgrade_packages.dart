@@ -4,7 +4,7 @@ import 'package:mylm/data/models/product/upgrade_package_response.dart';
 import 'package:mylm/data/models/product/upgrade_package_request.dart';
 
 class UpgradePackageService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
   // UPGRADE PACKAGES
   Future<UpgradePackageResponse> upgradePackage({

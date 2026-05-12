@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mylm/data/models/customer/customer_status_response.dart';
 
 class CustomerStatusService {
-  static const String baseUrl =
-      "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
   Future<CustomerStatusResponse?> getCustomerStatus({
     required String custNumber,

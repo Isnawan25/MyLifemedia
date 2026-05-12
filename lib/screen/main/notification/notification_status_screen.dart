@@ -44,21 +44,21 @@ class NotificationStatusScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        leading: InkWell(
-          onTap: () async {
-            if (onMarkAsRead != null) await onMarkAsRead!();
-            Navigator.pop(context);
-          },
-          child: Padding(
-            padding: EdgeInsets.all(12.w),
-           child: IconButton(
-              icon: SvgPicture.asset(
-                "assets/svgs/arrow_back.svg",
-                colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-              ),
-              onPressed: () => Navigator.pop(context),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            "assets/svgs/arrow_back.svg",
+            colorFilter: const ColorFilter.mode(
+              Colors.black,
+              BlendMode.srcIn,
             ),
           ),
+          onPressed: () async {
+            if (onMarkAsRead != null) {
+              await onMarkAsRead!();
+            }
+
+            Navigator.pop(context, true);
+          },
         ),
         title: Text('Pesan', style: GoogleFonts.inter(fontSize: 16.sp, fontWeight: FontWeight.w600, color: Colors.black87)),
       ),

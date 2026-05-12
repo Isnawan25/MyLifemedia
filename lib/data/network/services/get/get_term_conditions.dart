@@ -4,7 +4,7 @@ import 'package:mylm/data/models/support/term_conditions_response.dart';
 import 'package:flutter/material.dart';
 
 class TermConditionsService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
 
   // TERM CONDITIONS

@@ -4,6 +4,7 @@ import 'package:mylm/data/models/auth/login_response.dart';
 import 'package:mylm/data/models/auth/otp_request_response.dart';
 import 'package:mylm/data/models/auth/verify_otp_response.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 enum OtpMode {
   login,
@@ -11,23 +12,43 @@ enum OtpMode {
 }
 
 class AuthOtpService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
-  // AUTH/LOGIN
-  Future<LoginResponse?> login(String custNumber) async {
+// AUTH/LOGIN
+  Future<LoginResponse?> login({
+    required String custNumber,
+    required String password,
+  }) async {
     final url = Uri.parse("$baseUrl/login");
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"cust_number": custNumber}),
-    );
 
-    print(" LOGIN Response: ${response.body}");
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "cust_number": custNumber,
+          "password": password,
+        }),
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return LoginResponse.fromJson(jsonDecode(response.body));
-    } else {
-      print(" Login failed: ${response.statusCode} - ${response.body}");
+      debugPrint("LOGIN Response: ${response.statusCode}");
+      debugPrint("LOGIN Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+
+        final decoded = jsonDecode(response.body);
+
+        return LoginResponse.fromJson(decoded);
+      } else {
+        debugPrint(
+          "Login gagal: ${response.statusCode} - ${response.body}",
+        );
+        return null;
+      }
+    } catch (e) {
+      debugPrint("Error login: $e");
       return null;
     }
   }

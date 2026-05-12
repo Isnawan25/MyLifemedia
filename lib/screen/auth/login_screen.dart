@@ -51,11 +51,20 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class _LoginView extends StatelessWidget {
+class _LoginView extends StatefulWidget {
   const _LoginView();
 
   @override
+  State<_LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<_LoginView> {
+
+  bool _obscurePassword = true;
+
+  @override
   Widget build(BuildContext context) {
+
     final cubit = context.read<LoginCubit>();
 
     return Scaffold(
@@ -65,90 +74,200 @@ class _LoginView extends StatelessWidget {
         leading: IconButton(
           icon: SvgPicture.asset(
             "assets/svgs/arrow_back.svg",
-            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(
+              Colors.black,
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () => Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => WelcomeScreen()),
+            MaterialPageRoute(
+              builder: (_) => WelcomeScreen(),
+            ),
           ),
         ),
         title: Text(
           "Masuk",
-          style: GoogleFonts.inter(fontSize: 18.sp, fontWeight: FontWeight.w600),
+          style: GoogleFonts.inter(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         centerTitle: true,
       ),
+
       backgroundColor: Colors.white,
+
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 30,
+        ),
+
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+
           children: [
-            Text("Selamat Datang",
-                style: GoogleFonts.inter(
-                    fontSize: 24.sp, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+
             Text(
-              "Silahkan masukan ID pelanggan Anda yang sudah didaftarkan di Life Media",
-              style: GoogleFonts.inter(fontSize: 14.sp, color: Colors.grey),
+              "Selamat Datang",
+              style: GoogleFonts.inter(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              "Silahkan masukan ID pelanggan dan password akun Life Media Anda",
+              style: GoogleFonts.inter(
+                fontSize: 14.sp,
+                color: Colors.grey,
+              ),
+            ),
+
             const SizedBox(height: 30),
 
+            // ================= ID PELANGGAN =================
+
             TextField(
-              textCapitalization: TextCapitalization.characters,
+              textCapitalization:
+              TextCapitalization.characters,
+
               onChanged: cubit.onIdChanged,
+
               decoration: InputDecoration(
                 labelText: "ID Pelanggan",
-                labelStyle: GoogleFonts.inter(color: Colors.grey[600]),
+
+                labelStyle: GoogleFonts.inter(
+                  color: Colors.grey[600],
+                ),
+
                 filled: true,
                 fillColor: Colors.grey[100],
+
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius:
+                  BorderRadius.circular(12),
+
                   borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ================= PASSWORD =================
+
+            TextField(
+              obscureText: _obscurePassword,
+
+              onChanged: cubit.onPasswordChanged,
+
+              decoration: InputDecoration(
+                labelText: "Password",
+
+                labelStyle: GoogleFonts.inter(
+                  color: Colors.grey[600],
+                ),
+
+                filled: true,
+                fillColor: Colors.grey[100],
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(12),
+
+                  borderSide: BorderSide.none,
+                ),
+
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword =
+                      !_obscurePassword;
+                    });
+                  },
+
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 30),
 
+            // ================= BUTTON LOGIN =================
+
             BlocBuilder<LoginCubit, LoginState>(
               builder: (context, state) {
-                final isLoading = state.status == LoginStatus.loading;
+
+                final isLoading =
+                    state.status ==
+                        LoginStatus.loading;
 
                 return Center(
                   child: GestureDetector(
-                    onTap: state.isValid && !isLoading
+
+                    onTap: state.isValid &&
+                        !isLoading
                         ? () => cubit.login()
                         : null,
+
                     child: Container(
                       width: 250.w,
                       height: 50.h,
+
                       alignment: Alignment.center,
+
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius:
+                        BorderRadius.circular(30),
+
                         gradient: state.isValid
                             ? const LinearGradient(
-                          colors: [darkorange, orange],
+                          colors: [
+                            darkorange,
+                            orange,
+                          ],
                         )
                             : null,
-                        color: state.isValid ? null : Colors.grey[300],
+
+                        color: state.isValid
+                            ? null
+                            : Colors.grey[300],
                       ),
+
                       child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+
                           : Text(
                         "Masuk",
+
                         style: GoogleFonts.inter(
                           fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                          color:
-                          state.isValid ? Colors.white : Colors.black,
+                          fontWeight:
+                          FontWeight.w600,
+
+                          color: state.isValid
+                              ? Colors.white
+                              : Colors.black,
                         ),
                       ),
                     ),
                   ),
                 );
               },
-            )
+            ),
           ],
         ),
       ),

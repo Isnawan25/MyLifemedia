@@ -7,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mylm/data/network/check_server_status.dart';
 
 class ProfileService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
 // PROFILE
   Future<DetailProfileResponse?> getProfile(String custNumber,

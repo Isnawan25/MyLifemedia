@@ -7,6 +7,7 @@ class NotificationItem {
   final String notificationUpdateAt;
   final String notificationPINumber;
   final String notificationCustNumber;
+  final String? notificationImageUrl;
 
   NotificationItem({
     required this.notificationId,
@@ -17,18 +18,20 @@ class NotificationItem {
     required this.notificationUpdateAt,
     required this.notificationPINumber,
     required this.notificationCustNumber,
+    this.notificationImageUrl,
   });
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
     return NotificationItem(
-      notificationId: json['notificationId'],
-      notificationTitle: json['notificationTitle'],
-      notificationDesc: json['notificationDesc'],
-      notificationType: json['notificationType'],
-      notificationStatus: json['notificationStatus'],
-      notificationUpdateAt: json['notificationUpdateAt'],
-      notificationPINumber: json['notificationPINumber'],
-      notificationCustNumber: json['notificationCustNumber'],
+      notificationId: json['notificationId'] ?? 0,
+      notificationTitle: json['notificationTitle'] ?? '',
+      notificationDesc: json['notificationDesc'] ?? '',
+      notificationType: json['notificationType'] ?? '',
+      notificationStatus: json['notificationStatus'] ?? '',
+      notificationUpdateAt: json['notificationUpdateAt'] ?? '',
+      notificationPINumber: json['notificationPINumber'] ?? '',
+      notificationCustNumber: json['notificationCustNumber'] ?? '',
+      notificationImageUrl: json['notificationImageUrl'],
     );
   }
 }

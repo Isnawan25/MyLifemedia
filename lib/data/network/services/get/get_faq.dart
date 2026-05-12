@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mylm/data/models/support/faq_response.dart';
 
 class FaqService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
   // FAQS
   Future<List<Faq>> getFaqs(String accessToken) async {

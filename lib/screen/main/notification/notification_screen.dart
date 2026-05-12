@@ -80,24 +80,23 @@ class NotificationScreen extends StatelessWidget {
 
                   return InkWell(
                     onTap: () async {
-                      context
-                          .read<NotificationsCubit>()
-                          .markAsRead(notif.notificationId);
-
-                      await Navigator.push(
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => NotificationStatusScreen(
                             notification: notif,
                             onMarkAsRead: () async {
-                              context
+                              await context
                                   .read<NotificationsCubit>()
-                                  .markAsRead(
-                                  notif.notificationId,);
+                                  .markAsRead(notif.notificationId);
                             },
                           ),
                         ),
                       );
+
+                      if (result == true) {
+                        context.read<NotificationsCubit>().load();
+                      }
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.h),

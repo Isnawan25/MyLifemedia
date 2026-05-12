@@ -4,7 +4,7 @@ import 'package:mylm/data/models/customer/register_cust/register_customer_reques
 import 'package:mylm/data/models/customer/register_cust/register_customer_response.dart';
 
 class RegisterCustomerService {
-  static const String baseUrl = "http://202.169.224.27:3004/api/v1/apps";
+  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
 
 
   // REGISTER CUSTOMERS
