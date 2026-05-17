@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/showSuccessDialogLoggedin.dart';
 import 'package:mylm/base/widgets/labeltextfield.dart';
-import 'package:mylm/base/widgets/showregionbottomsheet.dart';
+import 'package:mylm/base/widgets/builddropdownfield.dart';
 import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
 import 'package:mylm/data/cubit/term_conditions/term_conditions_state.dart';
 import 'package:mylm/screen/main/layanan/tambah_layanan/location_maps_screen.dart';
@@ -347,7 +347,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
 
                           // PROVINCE
                           buildDropdownField(
-                            title: "Pilih Provinsi",
+                            title: "Provinsi",
 
                             value:
                             regionState.selectedProvince,
@@ -383,7 +383,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
 
                           // REGENCY
                           buildDropdownField(
-                            title: "Pilih Kabupaten/Kota",
+                            title: "Kabupaten/Kota",
 
                             value:
                             regionState.selectedRegency,
@@ -425,7 +425,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
 
                           // DISTRICT
                           buildDropdownField(
-                            title: "Pilih Kecamatan",
+                            title: "Kecamatan",
 
                             value:
                             regionState.selectedDistrict,
@@ -467,7 +467,7 @@ class _TambahLayanan2ScreenState extends State<TambahLayanan2Screen> {
 
                           // VILLAGE
                           buildDropdownField(
-                            title: "Pilih Kelurahan",
+                            title: "Kelurahan",
 
                             value:
                             regionState.selectedVillage,

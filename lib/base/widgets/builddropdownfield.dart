@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/data/models/customer/register_cust/region_response.dart';
 
-
 Widget buildDropdownField({
   required String title,
   required RegionModel? value,
@@ -12,64 +11,88 @@ Widget buildDropdownField({
   required VoidCallback? onTap,
 }) {
 
-  return InkWell(
-    borderRadius: BorderRadius.circular(16),
+  return Padding(
+    padding: EdgeInsets.only(bottom: 16.h),
 
-    onTap: onTap,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
 
-    child: Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 18.w,
-        vertical: 18.h,
-      ),
+      children: [
 
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-
-        borderRadius:
-        BorderRadius.circular(16),
-
-        border: Border.all(
-          color: Colors.grey.shade300,
+        // LABEL
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.black54,
+          ),
         ),
-      ),
 
-      child: Row(
-        children: [
+        SizedBox(height: 6.h),
 
-          Expanded(
-            child: Text(
+        // DROPDOWN
+        InkWell(
+          borderRadius: BorderRadius.circular(16),
 
-              value?.name ?? title,
+          onTap: onTap,
 
-              style: GoogleFonts.inter(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 18.w,
+              vertical: 18.h,
+            ),
 
-                color: value == null
-                    ? Colors.grey
-                    : Colors.black87,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+
+              borderRadius:
+              BorderRadius.circular(16),
+
+              border: Border.all(
+                color: Colors.grey.shade300,
               ),
             ),
-          ),
 
-          RotatedBox(
-            quarterTurns: 2,
+            child: Row(
+              children: [
 
-            child: SvgPicture.asset(
-              "assets/svgs/arrow_back.svg",
+                Expanded(
+                  child: Text(
 
-              width: 18.w,
+                    value?.name ?? "Pilih $title",
 
-              colorFilter:
-              const ColorFilter.mode(
-                Colors.black54,
-                BlendMode.srcIn,
-              ),
+                    style: GoogleFonts.inter(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+
+                      color: value == null
+                          ? Colors.grey
+                          : Colors.black87,
+                    ),
+                  ),
+                ),
+
+                RotatedBox(
+                  quarterTurns: 2,
+
+                  child: SvgPicture.asset(
+                    "assets/svgs/arrow_back.svg",
+
+                    width: 18.w,
+
+                    colorFilter:
+                    const ColorFilter.mode(
+                      Colors.black54,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }
