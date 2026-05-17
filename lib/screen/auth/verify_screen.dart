@@ -79,10 +79,16 @@ class _VerifyScreenState extends State<VerifyScreen> {
   }
 
   void _onOtpChanged(String value, int index) {
+
     if (value.isNotEmpty && index < 3) {
       _focusNodes[index + 1].requestFocus();
     }
 
+    if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
+    }
+
+    // auto verify
     if (_controllers.every((c) => c.text.isNotEmpty)) {
       _verifyOtp();
     }
@@ -236,36 +242,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
 
             SizedBox(height: 25.h),
 
-            // Tombol Verifikasi
-            GestureDetector(
-              onTap: isValid ? _verifyOtp : null,
-              child: Center(
-                child: Container(
-                  width: 250.w,
-                  height: 50.h,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30.r),
-                    gradient: isValid
-                        ? const LinearGradient(
-                      colors: [darkorange, orange],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    )
-                        : null,
-                    color: isValid ? null : Colors.grey[300],
-                  ),
-                  child: Text(
-                    "Verifikasi",
-                    style: GoogleFonts.inter(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: isValid ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
 
             const SizedBox(height: 16),
 

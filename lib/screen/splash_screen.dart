@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/guest/main_preview_screen.dart';
 import 'package:mylm/screen/main/main_screen.dart';
-import 'package:flutter/services.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,14 +17,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.white,
-        systemNavigationBarIconBrightness: Brightness.dark,
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ));
-    });
   }
 
 
@@ -42,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
         && token.isNotEmpty
         && custNumber != null
         && custNumber.isNotEmpty) {
-      // Kalau token ada → langsung ke MainScreen
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -54,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     } else {
-      // Kalau token tidak ada → ke WelcomeScreen
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainPreviewScreen()));

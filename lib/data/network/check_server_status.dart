@@ -8,7 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 
 Future<bool> checkServerStatus(BuildContext context) async {
-  const baseUrl = "http://202.169.224.27:3004";
+  const baseUrl = "http://103.157.26.55:3004";
 
   try {
     final response = await http.get(

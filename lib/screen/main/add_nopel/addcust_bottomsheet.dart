@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/toast.dart';
+import 'package:mylm/data/network/services/post/post_added_nopel.dart';
 import 'package:mylm/data/network/services/post/post_auth_otp.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/screen/auth/verify_screen.dart';
@@ -11,7 +12,10 @@ import 'package:mylm/data/cubit/verify/verify_cubit.dart';
 
 Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
   final TextEditingController _idController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   bool isValid = false;
+  bool obscurePassword = true;
 
   return showModalBottomSheet<Map<String, String>>(
     context: context,
@@ -23,13 +27,17 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
-          void _validateInput(String text) {
-            bool hasLetter = text.contains(RegExp(r'[A-Za-z]'));
-            bool hasNumber = text.contains(RegExp(r'[0-9]'));
-            bool minLength = text.length >= 6;
+          void _validateInput() {
+            final id = _idController.text.trim();
+            final password = _passwordController.text.trim();
+
+            bool hasLetter = id.contains(RegExp(r'[A-Za-z]'));
+            bool hasNumber = id.contains(RegExp(r'[0-9]'));
+            bool minLength = id.length >= 6;
 
             setState(() {
-              isValid = hasLetter && hasNumber && minLength;
+              isValid =
+                  hasLetter && hasNumber && minLength && password.isNotEmpty;
             });
           }
 
@@ -67,7 +75,7 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                   controller: _idController,
                   textCapitalization: TextCapitalization.characters,
                   cursorColor: Colors.grey[600],
-                  onChanged: _validateInput,
+                  onChanged: (_) => _validateInput(),
                   decoration: InputDecoration(
                     labelText: "ID Pelanggan",
                     labelStyle: GoogleFonts.inter(color: Colors.grey[600]),
@@ -83,50 +91,94 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 16),
+
+                TextField(
+                  controller: _passwordController,
+                  obscureText: obscurePassword,
+                  cursorColor: Colors.grey[600],
+                  onChanged: (_) => _validateInput(),
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    labelStyle: GoogleFonts.inter(
+                      color: Colors.grey[600],
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          obscurePassword = !obscurePassword;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 25),
 
                 // submit
                 GestureDetector(
                   onTap: isValid
                       ? () async {
+
                     final custNumber = _idController.text.trim();
-                    final api = AuthOtpService();
+                    final password = _passwordController.text.trim();
 
                     final mainGroupId =
                         await SecureStorage.getCustGroupId() ?? "";
+
                     final mainCustomerNumber =
                         await SecureStorage.getCustNumber() ?? "";
 
-                    // login new id
-                    final loginRes = await api.login(custNumber);
-                    if (loginRes == null || loginRes.data == null) {
-                      showCustomErrorToast(context, "ID Pelanggan Tidak ditemukan");
+                    final accessToken =
+                        await SecureStorage.getAccessToken() ?? "";
+
+                    final addNopelService = AddedNopelService();
+                    final api = AuthOtpService();
+
+                    // HIT API ADDED NOPEL
+                    final addRes = await addNopelService.addNopel(
+                      custNumber: mainCustomerNumber,
+                      custGroupId: mainGroupId,
+                      newCustNumber: custNumber,
+                      newCustPassword: password,
+                      accessToken: accessToken,
+                    );
+
+                    if (addRes == null || addRes.success != 1) {
+                      showCustomErrorToast(
+                        context,
+                        "Gagal menambahkan ID pelanggan",
+                      );
                       return;
                     }
 
-                    final data = loginRes.data!;
+                    // simpan password untuk silent login
+                    await SecureStorage.saveCustPassword(
+                      custNumber,
+                      password,
+                    );
 
-                    // save data ke secure storage
-                    await SecureStorage.saveAccessToken(data.accessToken);
-                    await SecureStorage.saveCustNumber(data.custNumber);
-                    await SecureStorage.saveCustGroupId(data.custGroupId);
-
-                    await SecureStorage.saveCustName(data.custName);
-                    await SecureStorage.saveCustPhone(data.custPhone);
-                    await SecureStorage.saveCustEmail(data.custEmail);
-                    await SecureStorage.saveCustAddress(data.custAddress);
-
-                    await SecureStorage.saveCustProvince(data.custProvince ?? "");
-                    await SecureStorage.saveCustDistrict(data.custDistrict ?? "");
-                    await SecureStorage.saveCustSubDistrict(data.custSubDistrict ?? "");
-                    await SecureStorage.saveCustVillage(data.custVillage ?? "");
-
-                    final token = data.accessToken;
-
-                    // req otp
+                    // REQUEST OTP
                     final otpRes = await api.requestOtp(
-                      custNumber: data.custNumber,
-                      accessToken: token,
+                      custNumber: custNumber,
+                      accessToken: accessToken,
                       mode: OtpMode.addCustomer,
                     );
 
@@ -139,14 +191,12 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                       return;
                     }
 
-                    // tutup bottomsheet dengan data
+                    // tutup bottomsheet
                     Navigator.pop(context, {
-                      'custNumber': data.custNumber,
-                      'custGroupId': mainGroupId,
-                      'accessToken': token,
+                      'nopel': custNumber,
                     });
 
-                    // next to verify screen// APAKAH DISINI PERMASALAHAN NYA?
+                    // next verify screen
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -154,9 +204,9 @@ Future<Map<String, String>?> showAddCustomerBottomSheet(BuildContext context) {
                           create: (_) => VerifyCubit(),
                           child: VerifyScreen(
                             mainCustNumber: mainCustomerNumber,
-                            custNumber: data.custNumber,
-                            newCustNumber: data.custNumber,
-                            accessToken: token,
+                            custNumber: custNumber,
+                            newCustNumber: custNumber,
+                            accessToken: accessToken,
                             custGroupId: mainGroupId,
                             mode: OtpMode.addCustomer,
                           ),

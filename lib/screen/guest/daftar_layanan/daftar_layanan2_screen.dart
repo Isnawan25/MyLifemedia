@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/popup/showSuccessDialogLoggedin.dart';
 import 'package:mylm/base/popup/showSuccessDialogGuest.dart';
+import 'package:mylm/base/widgets/labeltextfield.dart';
+import 'package:mylm/base/widgets/showregionbottomsheet.dart';
 import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
 import 'package:mylm/data/cubit/term_conditions/term_conditions_state.dart';
 import 'package:mylm/screen/main/layanan/tambah_layanan/location_maps_screen.dart';
@@ -15,13 +17,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/data/cubit/register_cust/form_register_cubit.dart';
 import 'package:mylm/data/cubit/register_cust/form_register_state.dart';
 import 'package:flutter/services.dart';
+import 'package:mylm/data/cubit/register_cust/region_cubit.dart';
+import 'package:mylm/data/cubit/register_cust/region_state.dart';
 
 class DaftarLayanan2Screen extends StatefulWidget {
-  final String packageId;
+  final int productId;
 
   const DaftarLayanan2Screen({
     super.key,
-    required this.packageId,
+    required this.productId,
+
   });
 
   @override
@@ -41,14 +46,8 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
   final _hpController = TextEditingController();
   final _emailController = TextEditingController();
   final _alamatController = TextEditingController();
-  final _kodeposController = TextEditingController();
-  final _kelurahanController = TextEditingController();
-  final _kecamatanController = TextEditingController();
-  final _kotaController = TextEditingController();
-  final _provinsiController = TextEditingController();
   final _latController = TextEditingController();
   final _longController = TextEditingController();
-  final _accManagerController =  TextEditingController();
 
   bool _isFilled = false;
   Uint8List? _mapPreview;
@@ -56,30 +55,32 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
   @override
   void initState() {
     super.initState();
+
     _namaController.addListener(_checkFormFilled);
     _hpController.addListener(_checkFormFilled);
     _emailController.addListener(_checkFormFilled);
-    _kodeposController.addListener(_checkFormFilled);
     _alamatController.addListener(_checkFormFilled);
-    _kelurahanController.addListener(_checkFormFilled);
-    _kecamatanController.addListener(_checkFormFilled);
-    _kotaController.addListener(_checkFormFilled);
-    _provinsiController.addListener(_checkFormFilled);
-    _accManagerController.addListener(_checkFormFilled);
+
     context.read<TermConditionsCubit>().loadTerms();
   }
 
   void _checkFormFilled() {
+
+    final regionState =
+        context.read<RegionCubit>().state;
+
     setState(() {
-      _isFilled = _namaController.text.isNotEmpty &&
-          _hpController.text.isNotEmpty &&
-          _emailController.text.isNotEmpty &&
-          _kodeposController.text.isNotEmpty &&
-          _alamatController.text.isNotEmpty &&
-          _kelurahanController.text.isNotEmpty &&
-          _kecamatanController.text.isNotEmpty &&
-          _kotaController.text.isNotEmpty &&
-          _provinsiController.text.isNotEmpty;
+
+      _isFilled =
+          _namaController.text.isNotEmpty &&
+              _hpController.text.isNotEmpty &&
+              _emailController.text.isNotEmpty &&
+              _alamatController.text.isNotEmpty &&
+
+              regionState.selectedProvince != null &&
+              regionState.selectedRegency != null &&
+              regionState.selectedDistrict != null &&
+              regionState.selectedVillage != null;
     });
   }
 
@@ -88,15 +89,9 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
     _namaController.dispose();
     _hpController.dispose();
     _emailController.dispose();
-    _kodeposController.dispose();
     _alamatController.dispose();
-    _kelurahanController.dispose();
-    _kecamatanController.dispose();
-    _kotaController.dispose();
-    _provinsiController.dispose();
     _latController.dispose();
     _longController.dispose();
-    _accManagerController.dispose();
 
     super.dispose();
   }
@@ -267,31 +262,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                               address['hamlet'],
                             ].where((e) => e != null && e.toString().isNotEmpty).join(', ');
 
-                            // Kelurahan
-                            _kelurahanController.text = address['village'] ??
-                                address['suburb'] ??
-                                address['neighbourhood'] ??
-                                '';
 
-                            // Kecamatan
-                            _kecamatanController.text = address['city_district'] ??
-                                address['district'] ??
-                                address['suburb'] ??
-                                '';
-
-                            // Kota
-                            _kotaController.text = address['city'] ??
-                                address['town'] ??
-                                address['municipality'] ??
-                                address['county'] ??
-                                '';
-
-                            // Provinsi
-                            _provinsiController.text = address['state'] ?? '';
-
-                            // Kode pos
-                            _kodeposController.text = address['postcode'] ?? '';
-                          });
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -307,9 +278,7 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                               ),
                             ),
                           );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Gagal membaca alamat lokasi")),
+                        },
                           );
                         }
                       }
@@ -348,8 +317,8 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                 visible: false, // Invisible UI
                 child: Column(
                   children: [
-                    _buildLabeledTextField("Latitude", _latController),
-                    _buildLabeledTextField("Longitude", _longController),
+                    buildLabeledTextField("Latitude", _latController),
+                    buildLabeledTextField("Longitude", _longController),
                   ],
                 ),
               ),
@@ -357,20 +326,186 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
               SizedBox(height: 24.h),
 
               // Label + TextField Inputs
-              _buildLabeledTextField("Nama Lengkap", _namaController),
-              _buildLabeledTextField("No. Handphone", _hpController),
-              _buildLabeledTextField("Email", _emailController),
-              _buildLabeledTextField("Kode Pos", _kodeposController),
-              _buildLabeledTextField("Alamat", _alamatController),
-              _buildLabeledTextField("Kelurahan", _kelurahanController),
-              _buildLabeledTextField("Kecamatan", _kecamatanController),
-              _buildLabeledTextField("Kabupaten/Kota", _kotaController),
-              _buildLabeledTextField("Provinsi", _provinsiController),
-              _buildLabeledTextField("Account Manager", _accManagerController),
+              buildLabeledTextField("Nama Lengkap", _namaController),
+              buildLabeledTextField("No. Handphone", _hpController),
+              buildLabeledTextField("Email", _emailController),
+              buildLabeledTextField("Alamat", _alamatController),
+
+              SizedBox(height: 8.h),
+
+              BlocBuilder<RegionCubit, RegionState>(
+                builder: (context, regionState) {
+
+                  return Column(
+                    children: [
+
+
+                      // PROVINCE
+                      buildDropdownField(
+                        title: "Pilih Provinsi",
+
+                        value:
+                        regionState.selectedProvince,
+
+                        items:
+                        regionState.provinces,
+
+                        onTap: () async {
+
+                          final selected =
+                          await showRegionBottomSheet(
+                            title: "Pilih Provinsi",
+                            context: context,
+                            items:
+                            regionState.provinces,
+                          );
+
+                          if (selected != null) {
+
+                            context
+                                .read<RegionCubit>()
+                                .selectProvince(
+                              selected,
+                            );
+
+                            _checkFormFilled();
+                          }
+                        },
+                      ),
+
+                      SizedBox(height: 14.h),
+
+
+                      // REGENCY
+                      buildDropdownField(
+                        title: "Pilih Kabupaten/Kota",
+
+                        value:
+                        regionState.selectedRegency,
+
+                        items:
+                        regionState.regencies,
+
+                        onTap: regionState
+                            .selectedProvince ==
+                            null
+                            ? null
+                            : () async {
+
+                          final selected =
+                          await showRegionBottomSheet(
+                            context: context,
+                            title:
+                            "Pilih Kabupaten/Kota",
+
+                            items:
+                            regionState.regencies,
+                          );
+
+                          if (selected != null) {
+
+                            context
+                                .read<RegionCubit>()
+                                .selectRegency(
+                              selected,
+                            );
+
+                            _checkFormFilled();
+                          }
+                        },
+                      ),
+
+                      SizedBox(height: 14.h),
+
+
+                      // DISTRICT
+                      buildDropdownField(
+                        title: "Pilih Kecamatan",
+
+                        value:
+                        regionState.selectedDistrict,
+
+                        items:
+                        regionState.districts,
+
+                        onTap: regionState
+                            .selectedRegency ==
+                            null
+                            ? null
+                            : () async {
+
+                          final selected =
+                          await showRegionBottomSheet(
+                            context: context,
+                            title:
+                            "Pilih Kecamatan",
+
+                            items:
+                            regionState.districts,
+                          );
+
+                          if (selected != null) {
+
+                            context
+                                .read<RegionCubit>()
+                                .selectDistrict(
+                              selected,
+                            );
+
+                            _checkFormFilled();
+                          }
+                        },
+                      ),
+
+                      SizedBox(height: 14.h),
+
+
+                      // VILLAGE
+                      buildDropdownField(
+                        title: "Pilih Kelurahan",
+
+                        value:
+                        regionState.selectedVillage,
+
+                        items:
+                        regionState.villages,
+
+                        onTap: regionState
+                            .selectedDistrict ==
+                            null
+                            ? null
+                            : () async {
+
+                          final selected =
+                          await showRegionBottomSheet(
+                            context: context,
+                            title:
+                            "Pilih Kelurahan",
+
+                            items:
+                            regionState.villages,
+                          );
+
+                          if (selected != null) {
+
+                            context
+                                .read<RegionCubit>()
+                                .selectVillage(
+                              selected,
+                            );
+
+                            _checkFormFilled();
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
 
               SizedBox(height: 24.h),
 
-              // Tombol Kirim
+              // Kirim
               Align(
                 alignment: Alignment.center,
                 child: SizedBox(
@@ -385,21 +520,51 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
                       if (confirm != true) return;
 
                       //kirim data ke API
-                          final request = RegisterCustomerRequest(
-                            custName: _namaController.text,
-                            custPhone: _hpController.text,
-                            custEmail: _emailController.text,
-                            custPostalCode: int.parse(_kodeposController.text),
-                            custProvince: _provinsiController.text,
-                            custDistrict: _kotaController.text,
-                            custSubDistrict: _kecamatanController.text,
-                            custVillage: _kelurahanController.text,
-                            custAddress: _alamatController.text,
-                            custLat: double.parse(_latController.text.isEmpty ? '0' : _latController.text),
-                            custLong: double.parse(_longController.text.isEmpty ? '0' : _longController.text),
-                            packageId: widget.packageId,
-                            accManager: _accManagerController.text,
-                          );
+                      final regionState =
+                          context.read<RegionCubit>().state;
+
+                      final request = RegisterCustomerRequest(
+
+                        customerName:
+                        _namaController.text,
+
+                        customerPhone:
+                        _hpController.text,
+
+                        email:
+                        _emailController.text,
+
+                        customerAddress:
+                        _alamatController.text,
+
+                        latitude:
+                        double.parse(
+                          _latController.text.isEmpty
+                              ? '0'
+                              : _latController.text,
+                        ),
+
+                        longitude:
+                        double.parse(
+                          _longController.text.isEmpty
+                              ? '0'
+                              : _longController.text,
+                        ),
+
+                        coverage: null,
+
+                        regionId:
+                        regionState.selectedVillage!.id,
+
+                        productId:
+                        widget.productId,
+
+                        productCategoryId: 6,
+
+                        divisionId: null,
+
+                        referralCode: null,
+                      );
 
                           // Log isi data yang akan dikirim
                           print("Kirim Data:");
@@ -454,93 +619,4 @@ class _DaftarLayanan2ScreenState extends State<DaftarLayanan2Screen> {
     )
     );
   }
-
-  Widget _buildLabeledTextField(String label, TextEditingController controller) {
-    final isEmail = label.toLowerCase().contains('email');
-    final isPhone = label.toLowerCase().contains('handphone');
-    final isAccountManager =
-    label.toLowerCase().contains('account manager');
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-              color: Colors.black54,
-            ),
-          ),
-          SizedBox(height: 6.h),
-
-          TextFormField(
-            controller: controller,
-
-            // Keyboard
-            keyboardType: isEmail
-                ? TextInputType.emailAddress
-                : isPhone
-                ? TextInputType.phone
-                : TextInputType.text,
-
-            // Hanya angka untuk HP
-            inputFormatters: isPhone
-                ? [FilteringTextInputFormatter.digitsOnly]
-                : null,
-
-            textCapitalization:
-            isEmail || isPhone
-                ? TextCapitalization.none
-                : TextCapitalization.words,
-
-            // Validation
-            validator: (value) {
-              final text = value?.trim() ?? "";
-
-              // WAJIB diisi (kecuali Account Manager)
-              if (!isAccountManager && text.isEmpty) {
-                return "$label wajib diisi";
-              }
-
-              // boleh null
-              if (isAccountManager && text.isEmpty) {
-                return null;
-              }
-
-              if (isEmail && !isValidEmail(text)) {
-                return "Format email tidak valid (contoh: nama@email.com)";
-              }
-
-              if (isPhone && text.length < 10) {
-                return "No. Handphone minimal 10 digit";
-              }
-
-              return null;
-            },
-
-            decoration: InputDecoration(
-              hintText: "Masukkan $label",
-              hintStyle: GoogleFonts.inter(
-                color: Colors.grey.shade400,
-                fontSize: 14.sp,
-              ),
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              contentPadding:
-              EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
-
-
-}

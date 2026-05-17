@@ -6,7 +6,10 @@ import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylm/base/widgets/buildFeature.dart';
 import 'package:mylm/base/widgets/text_utils.dart';
+import 'package:mylm/data/cubit/notification/notification_cubit.dart';
+import 'package:mylm/data/network/services/get/get_notifications.dart';
 import 'package:mylm/data/network/services/get/get_profile.dart';
+import 'package:mylm/data/network/services/post/post_read_notifications.dart';
 import 'package:mylm/screen/main/add_nopel/add_custlist_screen.dart';
 import 'package:mylm/screen/main/bayar_tagihan/bayar_tagihan_screen.dart';
 import 'package:mylm/screen/main/layanan/tambah_layanan/tambah_layanan_screen.dart';
@@ -277,9 +280,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => const NotificationScreen(),
+                                          builder: (context) => MultiBlocProvider(
+                                            providers: [
+                                              BlocProvider(
+                                                create: (_) => NotificationsCubit(
+                                                  notificationsService: NotificationsService(),
+                                                  readNotificationsService: ReadNotificationsService(),
+                                                )..load(),
+                                              ),
+                                              BlocProvider(
+                                                create: (_) => NotificationReadCubit()..check(),
+                                              ),
+                                            ],
+                                            child: const NotificationScreen(),
+                                          ),
                                         ),
                                       );
+
                                       context.read<NotificationReadCubit>().check();
                                     },
                                     icon: Stack(
@@ -678,8 +695,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 12),
 
-              //Tolong tambahkan fungsi cubit dari PromotionsCubit seperti HomePreviewScreen.dart yang saya kirim diatas kode HomeScreen ini,
-              // soalnya untuk fungsi ini belum aktif
               BlocBuilder<PromotionsCubit, PromotionsState>(
                 builder: (context, state) {
                   if (state is PromotionsLoading) {

@@ -5,12 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
 import 'package:mylm/base/widgets/paketItem.dart';
 import 'package:mylm/data/cubit/register_cust/form_register_cubit.dart';
+import 'package:mylm/data/cubit/register_cust/newpackages_cubit.dart';
 import 'package:mylm/data/cubit/term_conditions/term_conditions_cubit.dart';
-import 'package:mylm/screen/main/layanan/tambah_layanan/tambah_layanan2_screen.dart';
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mylm/data/cubit/register_cust/packages_register_cubit.dart';
-import 'package:mylm/data/cubit/register_cust/packages_register_state.dart';
+import 'package:mylm/data/cubit/register_cust/newpackages_state.dart';
+import 'package:mylm/data/cubit/register_cust/region_cubit.dart';
+import 'package:mylm/screen/main/layanan/tambah_layanan/tambah_layanan2_screen.dart';
 
 class TambahLayananScreen extends StatefulWidget {
   final String custNumber;
@@ -26,61 +27,86 @@ class TambahLayananScreen extends StatefulWidget {
   });
 
   @override
-  State<TambahLayananScreen> createState() => _TambahLayananScreenState();
+  State<TambahLayananScreen> createState() =>
+      _TambahLayananScreenState();
 }
-class _TambahLayananScreenState extends State<TambahLayananScreen> {
+
+class _TambahLayananScreenState
+    extends State<TambahLayananScreen> {
+
+  int? selectedProductId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PackagesCubit()..fetchPackages(),
+      create: (_) => NewPackagesCubit()..fetchPackages(),
+
       child: Scaffold(
-      appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            "assets/svgs/arrow_back.svg",
-            colorFilter: const ColorFilter.mode(
-              Colors.black,
-              BlendMode.srcIn,
+
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              "assets/svgs/arrow_back.svg",
+              colorFilter: const ColorFilter.mode(
+                Colors.black,
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+
+          title: Text(
+            "Tambah Layanan",
+            style: GoogleFonts.inter(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
             ),
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+
+          centerTitle: true,
         ),
-        title: Text(
-          "Tambah Layanan",
-          style: GoogleFonts.inter(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      backgroundColor: Colors.white,
+
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: BlocBuilder<PackagesCubit, PackagesState>(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 12,
+          ),
+
+          child: BlocBuilder<NewPackagesCubit, NewPackagesState>(
             builder: (context, state) {
-              if (state is PackagesLoading) {
+
+              // LOADING
+              if (state is NewPackagesLoading) {
                 return ListView.separated(
                   itemCount: 3,
-                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                  itemBuilder: (_, __) => SkeletonLoading(height: 60.h),
+                  separatorBuilder: (_, __) =>
+                      SizedBox(height: 12.h),
+
+                  itemBuilder: (_, __) =>
+                      SkeletonLoading(height: 60.h),
                 );
               }
 
-              if (state is PackagesError) {
-                return Center(child: Text(state.message));
+              // ERROR
+              if (state is NewPackagesError) {
+                return Center(
+                  child: Text(state.message),
+                );
               }
 
-              if (state is PackagesLoaded) {
+              // SUCCESS
+              if (state is NewPackagesLoaded) {
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
                   children: [
+
                     Text(
                       "Pilih Paket Layanan",
                       style: GoogleFonts.inter(
@@ -89,20 +115,38 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 16),
+
+                    SizedBox(height: 16.h),
 
                     Expanded(
                       child: ListView.separated(
                         itemCount: state.packages.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+
+                        separatorBuilder: (_, __) =>
+                        const SizedBox(height: 12),
+
                         itemBuilder: (context, index) {
-                          final pkg = state.packages[index];
-                          return PaketItem(
-                            data: pkg,
-                            selectedId: state.selectedPackageId,
-                            onTap: () => context
-                                .read<PackagesCubit>()
-                                .selectPackage(pkg.spCodeId),
+
+                          final pkg =
+                          state.packages[index];
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedProductId =
+                                    pkg.productId;
+                              });
+                            },
+
+                            child: PaketItem(
+                              data: pkg,
+                              selectedId: selectedProductId?.toString(),
+                              onTap: () {
+                                setState(() {
+                                  selectedProductId = pkg.productId;
+                                });
+                              },
+                            ),
                           );
                         },
                       ),
@@ -110,66 +154,117 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
 
                     Align(
                       alignment: Alignment.center,
+
                       child: SizedBox(
                         width: 300.w,
                         height: 48.h,
+
                         child: ElevatedButton(
-                          onPressed: state.selectedPackageId == null
+                          onPressed:
+                          selectedProductId == null
                               ? null
                               : () {
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => MultiBlocProvider(
                                   providers: [
+
                                     BlocProvider(
                                       create: (_) => FormRegisterCubit(),
                                     ),
+
                                     BlocProvider(
-                                      create: (_) => TermConditionsCubit()..loadTerms(),
+                                      create: (_) => TermConditionsCubit()
+                                        ..loadTerms(),
                                     ),
+
+                                    BlocProvider(
+                                      create: (_) => RegionCubit()
+                                        ..getProvinces(),
+                                    ),
+
                                   ],
+
                                   child: TambahLayanan2Screen(
-                                    custNumber: widget.custNumber,
-                                    accessToken: widget.accessToken,
-                                    custGroupId: widget.custGroupId,
-                                    packageId: state.selectedPackageId!,
+                                    productId: selectedProductId!,
+                                      custNumber: widget.custNumber,
+                                      accessToken: widget.accessToken,
+                                      custGroupId: widget.custGroupId
                                   ),
                                 ),
                               ),
                             );
                           },
+
                           style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
+                            shape:
+                            WidgetStateProperty.all(
                               RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius:
+                                BorderRadius.circular(
+                                    30),
                               ),
                             ),
-                            backgroundColor: state.selectedPackageId == null
-                                ? WidgetStateProperty.all(Colors.grey.shade300)
-                                : WidgetStateProperty.all(Colors.transparent),
-                            padding: WidgetStateProperty.all(EdgeInsets.zero),
-                            elevation: WidgetStateProperty.all(0),
+
+                            backgroundColor:
+                            selectedProductId == null
+                                ? WidgetStateProperty.all(
+                              Colors.grey.shade300,
+                            )
+                                : WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
+
+                            padding:
+                            WidgetStateProperty.all(
+                                EdgeInsets.zero),
+
+                            elevation:
+                            WidgetStateProperty.all(0),
                           ),
+
                           child: Ink(
-                            decoration: state.selectedPackageId == null
+                            decoration:
+                            selectedProductId == null
                                 ? null
                                 : BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [darkorange, orange],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                              gradient:
+                              const LinearGradient(
+                                colors: [
+                                  darkorange,
+                                  orange,
+                                ],
+
+                                begin:
+                                Alignment
+                                    .topLeft,
+
+                                end: Alignment
+                                    .bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(30),
+
+                              borderRadius:
+                              BorderRadius
+                                  .circular(
+                                  30),
                             ),
+
                             child: Container(
                               alignment: Alignment.center,
+
                               child: Text(
                                 "Selanjutnya",
+
                                 style: GoogleFonts.inter(
                                   fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: state.selectedPackageId == null
+                                  fontWeight:
+                                  FontWeight.w600,
+
+                                  color:
+                                  selectedProductId ==
+                                      null
                                       ? Colors.black45
                                       : Colors.white,
                                 ),
@@ -182,13 +277,12 @@ class _TambahLayananScreenState extends State<TambahLayananScreen> {
                   ],
                 );
               }
-              return const SizedBox(height: 20);
+
+              return const SizedBox();
             },
           ),
         ),
-    ),
+      ),
     );
   }
 }
-
-

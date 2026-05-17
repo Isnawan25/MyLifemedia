@@ -9,8 +9,8 @@ import 'package:mylm/screen/main/layanan/ubah_layanan/ubah_layanan2_screen.dart'
 import 'package:mylm/base/widgets/skeleton_shimmer/skeleton_loading.dart';
 import 'package:mylm/base/currency_formatter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mylm/data/cubit/register_cust/packages_register_cubit.dart';
-import 'package:mylm/data/cubit/register_cust/packages_register_state.dart';
+import 'package:mylm/data/cubit/register_cust/packages_cubit.dart';
+import 'package:mylm/data/cubit/register_cust/packages_state.dart';
 
 
 class UbahLayananScreen extends StatefulWidget {

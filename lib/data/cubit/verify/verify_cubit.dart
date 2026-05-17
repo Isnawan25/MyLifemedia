@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/data/network/services/post/post_auth_otp.dart';
-import 'package:mylm/data/network/services/post/post_added_nopel.dart';
 import 'package:mylm/data/preferences/secure_storage.dart';
 import 'verify_state.dart';
 
@@ -45,22 +44,10 @@ class VerifyCubit extends Cubit<VerifyState> {
 
     // ADD CUSTOMER MODE
     if (mode == OtpMode.addCustomer) {
-      final addResp = await AddedNopelService().addNopel(
-        custNumber: mainCustNumber,
-        newCustNumber: custNumber,
-        custGroupId: custGroupId,
-        accessToken: accessToken,
-      );
 
-      if (addResp == null || addResp.success != 1) {
-        emit(const VerifyError("Gagal menambahkan ID pelanggan"));
-        emit(VerifyInitial());
-        return;
-      }
+      await SecureStorage.saveCustGroupId(custGroupId);
 
-      await SecureStorage.saveCustGroupId(addResp.data!.groupId);
-
-      emit(VerifySuccessAddCustomer(addResp.data!.nopel));
+      emit(VerifySuccessAddCustomer(newCustNumber));
     }
   }
 

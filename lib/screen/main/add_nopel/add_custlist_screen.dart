@@ -58,28 +58,67 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
   Future<void> performSilentLogin(String newCustNumber) async {
     setState(() => isSilentLogin = true);
 
-    final resp = await AuthOtpService().login(newCustNumber);
+    // ambil password berdasarkan ID pelanggan
+    final password =
+    await SecureStorage.getCustPassword(newCustNumber);
+
+    if (password == null || password.isEmpty) {
+      setState(() => isSilentLogin = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.black,
+          duration: const Duration(seconds: 3),
+          content: Text(
+            " Silahkan Tambahkan Ulang ID Pelanggan ini",
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    final resp = await AuthOtpService().login(
+      custNumber: newCustNumber,
+      password: password,
+    );
 
     if (resp != null && resp.success && resp.data != null) {
       final d = resp.data!;
 
-      // Simpan Seluruh Data ke SecureStorage
+      // simpan data baru
       await SecureStorage.saveAccessToken(d.accessToken);
       await SecureStorage.saveCustNumber(d.custNumber);
       await SecureStorage.saveCustGroupId(d.custGroupId);
+
       await SecureStorage.saveCustName(d.custName);
       await SecureStorage.saveCustPhone(d.custPhone);
       await SecureStorage.saveCustEmail(d.custEmail);
       await SecureStorage.saveCustAddress(d.custAddress);
 
-      if (d.custProvince != null) await SecureStorage.saveCustProvince(d.custProvince!);
-      if (d.custDistrict != null) await SecureStorage.saveCustDistrict(d.custDistrict!);
-      if (d.custSubDistrict != null) await SecureStorage.saveCustSubDistrict(d.custSubDistrict!);
-      if (d.custVillage != null) await SecureStorage.saveCustVillage(d.custVillage!);
+      if (d.custProvince != null) {
+        await SecureStorage.saveCustProvince(d.custProvince!);
+      }
+
+      if (d.custDistrict != null) {
+        await SecureStorage.saveCustDistrict(d.custDistrict!);
+      }
+
+      if (d.custSubDistrict != null) {
+        await SecureStorage.saveCustSubDistrict(d.custSubDistrict!);
+      }
+
+      if (d.custVillage != null) {
+        await SecureStorage.saveCustVillage(d.custVillage!);
+      }
 
       setState(() => isSilentLogin = false);
 
-      // Kembalikan data ke page sebelumnya
       Navigator.pop(context, {
         'custNumber': d.custNumber,
         'custGroupId': d.custGroupId,
@@ -90,7 +129,9 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
       setState(() => isSilentLogin = false);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Gagal login. Coba lagi.")),
+        const SnackBar(
+          content: Text("Gagal login. Coba lagi."),
+        ),
       );
     }
   }
@@ -108,7 +149,6 @@ class _AddCustListScreenState extends State<AddCustlistScreen> {
 
     if (result != null && result['nopel'] != null) {
       await fetchCustomerList();
-      onSelectCustomer(result['nopel']??"");
     }
   }
 

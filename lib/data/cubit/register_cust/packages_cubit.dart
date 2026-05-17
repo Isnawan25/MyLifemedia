@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/data/network/services/get/get_packages.dart';
-import 'packages_register_state.dart';
+import 'packages_state.dart';
 
 class PackagesCubit extends Cubit<PackagesState> {
   PackagesCubit() : super(PackagesLoading());

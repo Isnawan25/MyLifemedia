@@ -3,13 +3,15 @@ import 'package:http/http.dart' as http;
 import 'package:mylm/data/models/customer/addnopel_response.dart';
 
 class AddedNopelService {
-  static const String baseUrl = "http://103.157.26.55:3004/api/v1/apps";
+  static const String baseUrl =
+      "http://103.157.26.55:3004/api/v1/apps";
 
   // ADD NEW ID CUSTOMER
   Future<AddNopelResponse?> addNopel({
     required String custNumber,
     required String custGroupId,
     required String newCustNumber,
+    required String newCustPassword,
     required String accessToken,
   }) async {
     final url = "$baseUrl/added-nopel";
@@ -17,8 +19,9 @@ class AddedNopelService {
     try {
       final body = {
         "cust_number": custNumber,
-        "group_id": custGroupId.isEmpty ? "" : custGroupId,
+        "group_id": custGroupId,
         "cust_number_new": newCustNumber,
+        "cust_password_new": newCustPassword,
       };
 
       print("=== SEND ADD NOPEL BODY ===");
@@ -33,10 +36,13 @@ class AddedNopelService {
         body: jsonEncode(body),
       );
 
-      print("ADD Nopel Response: ${res.statusCode} - ${res.body}");
+      print("ADD NOPEL RESPONSE:");
+      print(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        return AddNopelResponse.fromJson(jsonDecode(res.body));
+        return AddNopelResponse.fromJson(
+          jsonDecode(res.body),
+        );
       }
 
       return null;

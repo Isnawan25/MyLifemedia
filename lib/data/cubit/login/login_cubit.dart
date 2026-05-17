@@ -69,6 +69,11 @@ class LoginCubit extends Cubit<LoginState> {
           data?.custGroupId ?? '';
 
       // save storage
+      // simpan password
+      await SecureStorage.saveCustPassword(
+        custNumber,
+        password
+      );
       await SecureStorage.saveAccessToken(
           accessToken);
 
