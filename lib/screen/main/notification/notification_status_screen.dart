@@ -39,7 +39,20 @@ class NotificationStatusScreen extends StatelessWidget {
     final icon = _selectIcon(notification.notificationType);
     final waktuFormatted = formatTanggalWaktu(notification.notificationUpdateAt);
 
-    return Scaffold(
+    return PopScope(
+
+        canPop: true,
+
+      onPopInvokedWithResult: (didPop, result) async {
+
+        if (!didPop) return;
+
+        if (onMarkAsRead != null) {
+          await onMarkAsRead!();
+        }
+      },
+
+        child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
@@ -118,6 +131,7 @@ class NotificationStatusScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
