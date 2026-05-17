@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,33 +5,45 @@ import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
+import 'package:mylm/data/network/check_internet_connection.dart';
 
 Future<bool> checkServerStatus(BuildContext context) async {
+
   const baseUrl = "http://103.157.26.55:3004";
 
-  try {
-    final response = await http.get(
-      Uri.parse(baseUrl),
-    ).timeout(const Duration(seconds: 3));
+  // CEK INTERNET DULU
+  final hasInternet =
+  await checkInternetConnection(context);
 
-    if (response.statusCode == 404) {
-      // Server nyala (walaupun 404 tetap berarti hidup)
+  if (!hasInternet) {
+    return false;
+  }
+
+  try {
+
+    final response = await http
+        .get(Uri.parse(baseUrl))
+        .timeout(const Duration(seconds: 3));
+
+    // Server hidup
+    if (response.statusCode == 404 ||
+        response.statusCode == 200) {
+
       return true;
+
     } else {
-      // Status lain dianggap bermasalah
+
       showServerDownSheet(context);
       return false;
     }
-  } on SocketException catch (_) {
+
+  } on TimeoutException {
+
     showServerDownSheet(context);
     return false;
-  } on HttpException catch (_) {
-    showServerDownSheet(context);
-    return false;
-  } on TimeoutException catch (_) {
-    showServerDownSheet(context);
-    return false;
-  } catch (e) {
+
+  } catch (_) {
+
     showServerDownSheet(context);
     return false;
   }
