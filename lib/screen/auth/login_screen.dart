@@ -37,6 +37,16 @@ class LoginScreen extends StatelessWidget {
                     custGroupId: state.custGroupId,
                     mainCustNumber: "",
                     newCustNumber: "",
+                    password: state.password,
+
+                    custName: state.custName,
+                    custPhone: state.custPhone,
+                    custEmail: state.custEmail,
+                    custAddress: state.custAddress,
+                    custProvince: state.custProvince,
+                    custDistrict: state.custDistrict,
+                    custSubDistrict: state.custSubDistrict,
+                    custVillage: state.custVillage,
                     mode: OtpMode.login,
                   ),
                 ),
@@ -130,7 +140,7 @@ class _LoginViewState extends State<_LoginView> {
 
             const SizedBox(height: 30),
 
-            // ================= ID PELANGGAN =================
+            //ID PELANGGAN
 
             TextField(
               textCapitalization:
@@ -159,7 +169,7 @@ class _LoginViewState extends State<_LoginView> {
 
             const SizedBox(height: 20),
 
-            // ================= PASSWORD =================
+            // PASSWORD
 
             TextField(
               obscureText: _obscurePassword,
@@ -204,7 +214,7 @@ class _LoginViewState extends State<_LoginView> {
 
             const SizedBox(height: 30),
 
-            // ================= BUTTON LOGIN =================
+            //BUTTON LOGIN
 
             BlocBuilder<LoginCubit, LoginState>(
               builder: (context, state) {

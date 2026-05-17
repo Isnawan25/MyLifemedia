@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mylm/base/lifemedia_colors.dart';
@@ -18,6 +17,15 @@ class VerifyScreen extends StatefulWidget {
   final String accessToken;
   final String custGroupId;
   final String newCustNumber;
+  final String password;
+  final String custName;
+  final String custPhone;
+  final String custEmail;
+  final String custAddress;
+  final String custProvince;
+  final String custDistrict;
+  final String custSubDistrict;
+  final String custVillage;
   final OtpMode mode;
 
   const VerifyScreen({
@@ -27,6 +35,15 @@ class VerifyScreen extends StatefulWidget {
     required this.custNumber,
     required this.custGroupId,
     required this.newCustNumber,
+    required this.password,
+    required this.custName,
+    required this.custPhone,
+    required this.custEmail,
+    required this.custAddress,
+    required this.custProvince,
+    required this.custDistrict,
+    required this.custSubDistrict,
+    required this.custVillage,
     required this.mode,
   });
 
@@ -105,6 +122,16 @@ class _VerifyScreenState extends State<VerifyScreen> {
       mainCustNumber: widget.mainCustNumber,
       newCustNumber: widget.newCustNumber,
       mode: widget.mode,
+
+      password: widget.password,
+      custName: widget.custName,
+      custPhone: widget.custPhone,
+      custEmail: widget.custEmail,
+      custAddress: widget.custAddress,
+      custProvince: widget.custProvince,
+      custDistrict: widget.custDistrict,
+      custSubDistrict: widget.custSubDistrict,
+      custVillage: widget.custVillage,
     );
   }
 
@@ -154,13 +181,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
       appBar: AppBar(
         elevation: 0.w,
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            "assets/svgs/arrow_back.svg",
-            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
           "Masuk",
           style: GoogleFonts.inter(

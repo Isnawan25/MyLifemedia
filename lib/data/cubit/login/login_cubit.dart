@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mylm/data/network/services/post/post_auth_otp.dart';
-import 'package:mylm/data/preferences/secure_storage.dart';
 import 'package:mylm/data/cubit/login/login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -68,45 +67,6 @@ class LoginCubit extends Cubit<LoginState> {
       final custGroupId =
           data?.custGroupId ?? '';
 
-      // save storage
-      // simpan password
-      await SecureStorage.saveCustPassword(
-        custNumber,
-        password
-      );
-      await SecureStorage.saveAccessToken(
-          accessToken);
-
-      await SecureStorage.saveCustNumber(
-          custNumber);
-
-      await SecureStorage.saveCustGroupId(
-          custGroupId);
-
-      await SecureStorage.saveCustName(
-          data?.custName ?? '');
-
-      await SecureStorage.saveCustPhone(
-          data?.custPhone ?? '');
-
-      await SecureStorage.saveCustEmail(
-          data?.custEmail ?? '');
-
-      await SecureStorage.saveCustAddress(
-          data?.custAddress ?? '');
-
-      await SecureStorage.saveCustProvince(
-          data?.custProvince ?? '');
-
-      await SecureStorage.saveCustDistrict(
-          data?.custDistrict ?? '');
-
-      await SecureStorage.saveCustSubDistrict(
-          data?.custSubDistrict ?? '');
-
-      await SecureStorage.saveCustVillage(
-          data?.custVillage ?? '');
-
       // req otp
       final otp = await api.requestOtp(
         custNumber: custNumber,
@@ -126,6 +86,15 @@ class LoginCubit extends Cubit<LoginState> {
         status: LoginStatus.success,
         accessToken: accessToken,
         custGroupId: custGroupId,
+
+        custName: data?.custName ?? '',
+        custPhone: data?.custPhone ?? '',
+        custEmail: data?.custEmail ?? '',
+        custAddress: data?.custAddress ?? '',
+        custProvince: data?.custProvince ?? '',
+        custDistrict: data?.custDistrict ?? '',
+        custSubDistrict: data?.custSubDistrict ?? '',
+        custVillage: data?.custVillage ?? '',
       ));
     } catch (e) {
       emit(state.copyWith(

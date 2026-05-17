@@ -13,6 +13,15 @@ class VerifyCubit extends Cubit<VerifyState> {
     required String custGroupId,
     required String mainCustNumber,
     required String newCustNumber,
+    required String password,
+    required String custName,
+    required String custPhone,
+    required String custEmail,
+    required String custAddress,
+    required String custProvince,
+    required String custDistrict,
+    required String custSubDistrict,
+    required String custVillage,
     required OtpMode mode,
   }) async {
     emit(VerifyLoading());
@@ -34,11 +43,36 @@ class VerifyCubit extends Cubit<VerifyState> {
 
     // LOGIN MODE
     if (mode == OtpMode.login) {
+
+      await SecureStorage.saveCustPassword(
+        custNumber,
+        password,
+      );
+
       await SecureStorage.saveAccessToken(accessToken);
+
       await SecureStorage.saveCustNumber(custNumber);
+
       await SecureStorage.saveCustGroupId(custGroupId);
 
+      await SecureStorage.saveCustName(custName);
+
+      await SecureStorage.saveCustPhone(custPhone);
+
+      await SecureStorage.saveCustEmail(custEmail);
+
+      await SecureStorage.saveCustAddress(custAddress);
+
+      await SecureStorage.saveCustProvince(custProvince);
+
+      await SecureStorage.saveCustDistrict(custDistrict);
+
+      await SecureStorage.saveCustSubDistrict(custSubDistrict);
+
+      await SecureStorage.saveCustVillage(custVillage);
+
       emit(VerifySuccessLogin());
+
       return;
     }
 
