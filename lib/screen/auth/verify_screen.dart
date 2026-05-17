@@ -179,6 +179,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         },
         child: Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0.w,
         backgroundColor: Colors.white,
         title: Text(
